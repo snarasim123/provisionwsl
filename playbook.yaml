@@ -1,0 +1,16 @@
+- hosts: wsl
+  ### Go here to edit variables ###
+  vars_files:
+    - vars/language_versions.yml
+    - vars/prerequisite_packages.yml
+    - vars/tool_versions.yml
+    - vars/user_environment.yml
+  ### Comment out roles you don't need ###
+  roles:
+    - packages
+    - shell
+    # - workspace
+    # - ops
+    # - dev
+  ### Change to your user! ###
+  user: snarasim
