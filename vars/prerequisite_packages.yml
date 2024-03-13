@@ -1,8 +1,0 @@
----
-prerequisite_packages:
-  - vim
-  - git
-  - curl
-  - tmux
-  - unzip
-  - fzf

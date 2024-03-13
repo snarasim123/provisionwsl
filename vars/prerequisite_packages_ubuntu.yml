@@ -1,0 +1,19 @@
+---
+prerequisite_packages_ubuntu:
+  - vim
+  - nano
+  - git
+  - curl
+  - tmux
+  - unzip
+  - screen
+  - hostname
+  - wget
+  - util-linux
+  - passwd
+  - jq
+  - make
+  - mc
+  - dos2unix
+  - zip
+  - fzf

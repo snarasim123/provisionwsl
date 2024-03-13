@@ -1,8 +1,19 @@
 - hosts: wsl
   ### Go here to edit variables ###
+  gather_facts: true
+  # tasks:
+  # - name: Distribution
+  #   debug: msg="Distribution {{ ansible_distribution }}"
+  # - name: Distribution version
+  #   debug: msg="Distribution version {{ ansible_distribution_version}}"
+  #   when: ansible_facts['lsb']['release'] == "20.04"
+  # - name: Distribution version 2
+  #   debug: msg="Distribution version2 {{ ansible_facts['lsb']['release']}}"
+  # - name: Distribution major version
+  #   debug: msg="Distribution major version {{ ansible_distribution_major_version }}"
   vars_files:
     - vars/language_versions.yml
-    - vars/prerequisite_packages.yml
+    - vars/prerequisite_packages_ubuntu.yml
     - vars/tool_versions.yml
     - vars/user_environment.yml
   ### Comment out roles you don't need ###

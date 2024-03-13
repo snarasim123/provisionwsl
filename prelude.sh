@@ -2,6 +2,7 @@
 source ./variables.sh
 source ./secret.sh
 
+code_folder="~/code"
 upgrade() {
 sudo apt update -y
 sudo apt upgrade -y
@@ -78,9 +79,15 @@ setup-github () {
 clone-repo(){
 echo "#### clone repo."
 
-mkdir ~/code
-cd ~/code
-cp -r /mnt/d/code/setup ~/code
+mkdir "$HOME/code"  -p
+
+cd "$HOME/code"
+
+rm -rf ./*
+
+rm -rf ./.*
+
+cp -r /mnt/d/code/setup "$HOME/code"
 
 echo "#### Done Clone repo."
 }
@@ -89,8 +96,8 @@ setup_ansible(){
 echo "#### Ansible setup."
 
 sudo apt install ansible aptitude -y
-cd ~/code/setup
-ansible-playbook -K playbook.yaml
+cd "$HOME/code/setup/ansible"
+ansible-playbook -K ./playbook.yaml
 
 echo "#### Done Ansible setup."
 }

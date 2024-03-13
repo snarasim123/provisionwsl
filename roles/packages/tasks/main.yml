@@ -3,14 +3,17 @@
   become: true
   package:
     update_cache: yes
+  when: ansible_facts['lsb']['release'] == "20.04"  
 
 - name: upgrade all packages
   become: true
   package:
     name: "*"
     state: latest
+  when: ansible_facts['lsb']['release'] == "20.04"
 
 - name: Install packages
   become: true
+  when: ansible_facts['lsb']['release'] == "20.04"
   apt:
-    name: "{{ prerequisite_packages }}"
+    name: "{{ prerequisite_packages_ubuntu }}"
