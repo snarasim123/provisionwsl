@@ -1,8 +1,8 @@
 ---
 user: snarasim
-repo_directory: workspace
-repos:
-dotfiles_repo: snarasim/dotfiles
-dotfiles_branch: master
-dotfiles_command: bash install.sh
+repo_directory: code
+# repos:
+# dotfiles_repo: snarasim/dotfiles
+# dotfiles_branch: master
+# dotfiles_command: bash install.sh
 

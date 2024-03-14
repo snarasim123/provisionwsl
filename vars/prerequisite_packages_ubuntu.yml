@@ -16,4 +16,5 @@ prerequisite_packages_ubuntu:
   - mc
   - dos2unix
   - zip
+  - rxvt-unicode
   - fzf

@@ -1,0 +1,83 @@
+#!/bin/sh
+source ~/variables.sh
+
+if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+        current_env=Linux;
+elif [[ "$OSTYPE" == "darwin"* ]]; then
+        current_env=Mac;
+elif [[ "$OSTYPE" == "msys" ]]; then
+        current_env=CYGWIN;
+elif [[ "$OSTYPE" == "cygwin" ]]; then
+        current_env=CYGWIN;
+else
+        current_env="Unknown"
+fi
+
+
+if [ $current_env == 'Mac' ]  
+then
+    export LC_CTYPE=en_US.UTF-8
+    export TERM=screen-256color
+    export USER=$user_name
+    export LSCOLORS="exfxcxdxbxegedabagacad"
+    alias ls="ls -G"
+    alias ll='ls -Galrth'
+
+fi
+if [ $current_env == 'Linux' ]  
+then    
+    export LC_CTYPE=
+    export TERM=screen-256color
+    export USER=$user_name
+    export CODE_FOLDER=$code_folder
+    export DISPLAY="`grep nameserver /etc/resolv.conf | sed 's/nameserver //'`:0.0"
+#   #Wsl specific variable
+    export LIBGL_ALWAYS_INDIRECT=0
+    #export LS_COLORS="di=34;40:ln=35;40:so=32;40:pi=33;40:ex=31;40:bd=34;46:cd=34;43:su=0;41:sg=0;46:tw=0;42:ow=0;43:"
+    export HOST_IP="$(ip route |awk '/^default/{print $3}')"
+    export PULSE_SERVER="tcp:$HOST_IP"
+    export KUBECONFIG=${HOME}/.kube_aws/config
+    bind "set completion-ignore-case on"
+    # export DISPLAY="$HOST_IP:0.0"
+    alias ls="ls --color"
+    alias ll='ls -alrth --color'    
+fi
+
+if [ $current_env == 'Unknown' ]  
+then
+    echo  ***env cannot be identified, set as  ${current_env}***
+    export LC_CTYPE=
+    export TERM=xterm-256color
+    export USER=$user_name
+fi
+
+if [ $current_env == 'CYGWIN' ]  
+then
+    echo setting env for  ${current_env}
+    export LC_CTYPE=
+    export TERM=xterm-256color
+    export USER=$user_name
+fi
+
+cd ~
+
+#stty erase ^H
+stty erase '^?'
+export HISTSIZE=5000
+export HISTSIZE=10000
+export HISTFILESIZE=20000
+shopt -s histappend
+
+cd $STARTUP_FOLDER
+
+# :$HOME/.poetry/bin
+export PATH=.:$HOME:$HOME/bin:$HOME/.local/bin:/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin:/sbin:$PATH:
+
+
+
+
+export SCREENDIR=/home/snarasim/.screen
+export GOPATH=/home/snarasim/go
+export GOROOT=/usr/local/go
+export PATH=/home/snarasim/go/bin:/usr/local/go/bin:/usr/lib/jvm/java-11-openjdk-amd64/bin/:.:/home/snarasim:/home/snarasim/bin:/home/snarasim/.local/bin:/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin:/sbin:/home/snarasim/go/bin:/usr/local/go/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/usr/lib/wsl/lib:
+export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64/

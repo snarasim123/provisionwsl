@@ -1,0 +1,24 @@
+#!/bin/bash
+
+nxvt () {
+rxvt -bg white -fg black -sl 5000  -fn -adobe-courier-medium-r-normal-*-*-180-*-*-m-*-iso8859-1&
+#-b&h-lucida-medium-r-normal-*-*-180-*-*-p-*-iso8859-1 -adobe-courier-medium-r-normal-*-*-180-*-*-m-*-iso8859-1
+}
+
+
+find_file() {
+#find . -exec grep -i "$1" '{}' \; -print
+#egrep -H -B 2 -A 2
+find . -exec egrep  -H -B 2 -A 2 -i "$1" '{}' \; -print
+}
+
+
+find_file_name() {
+find . -exec grep -li "$1" '{}' \; -print
+}
+
+find_file_by_type() {
+find . -name "$1" -exec grep -i "$2" '{}' \; -print
+}
+
+

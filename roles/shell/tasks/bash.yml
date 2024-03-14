@@ -1,0 +1,56 @@
+---
+- name: remove files and directories
+  ansible.builtin.file:
+    state: "{{ item }}"
+    path: "{{ lookup('ansible.builtin.env', 'HOME') }}/bashfiles"
+    owner: "{{ user }}" # set your owner, group, and mode accordingly
+    group: "{{ user }}"
+    mode: '0777'
+  with_items:
+    - absent
+    - directory  
+    
+- name: Create a directory if it does not exist
+  ansible.builtin.file:
+    path: "{{ lookup('ansible.builtin.env', 'HOME') }}/bashfiles"
+    state: directory
+    mode: '0755'
+
+- name: Copy files
+  copy:
+    src: '{{item}}'
+    dest: "{{ lookup('ansible.builtin.env', 'HOME') }}/bashfiles"
+    owner: "{{ user }}"
+    group: "{{ user }}"
+    mode: 0644
+  loop:
+    - .alias
+    - .bash_funcs
+    - .bash_profile
+    - .bashrc
+    - .bashrc_custom
+    - prompt.sh
+    - variables.sh
+
+# - name: change user shell to zsh
+#   become: yes
+#   become_user: root
+#   command: chsh -s /bin/zsh {{ user }} 
+
+
+# - name: Check for dircolors
+#   stat: path=/$HOME/.dircolors
+#   register: dircolors
+
+# - name: Install dircolors
+#   command: curl https://raw.githubusercontent.com/seebi/dircolors-solarized/master/dircolors.ansi-dark --output /$HOME/.dircolors
+#   when: not dircolors.stat.exists
+
+# - name: Check for powerlevel10k
+#   stat: path=/$HOME/.oh-my-zsh/custom/themes/powerlevel10k
+#   register: powerlevel10k
+
+# - name: Clone powerlevel10k
+#   command: git clone --depth=1 https://github.com/romkatv/powerlevel10k.git {{ lookup("env", "HOME") }}/.oh-my-zsh/custom/themes/powerlevel10k
+#   when: not powerlevel10k.stat.exists
+

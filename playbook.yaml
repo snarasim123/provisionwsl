@@ -18,8 +18,9 @@
     - vars/user_environment.yml
   ### Comment out roles you don't need ###
   roles:
-    - packages
+    - userfacts
     - shell
+    - packages    
     # - workspace
     # - ops
     # - dev

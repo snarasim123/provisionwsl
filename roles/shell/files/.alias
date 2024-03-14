@@ -1,0 +1,92 @@
+
+#alias setprompt='set prompt="${PWD}% "'
+
+#cd aliases
+alias cdhome='cd ~'
+alias cd..='cd ..'
+alias ..='cd ..' 
+alias ...='cd ../../../' 
+alias ....='cd ../../../../' 
+alias .....='cd ../../../../' 
+alias .4='cd ../../../../' 
+alias .5='cd ../../../../..'
+alias cdback='cd -'
+alias cdc='cd /data/home/snarasimhan/code'
+
+# handy short cuts #
+alias h='history'
+alias j='jobs -l'
+alias path='echo -e ${PATH//:/\\n}'
+alias now='date +"%T"'
+alias nowdate='date +"%d-%m-%Y"'
+alias cls='clear'
+
+#vim 
+alias vi='vim' 
+alias svi='sudo vi' 
+alias vis='vim "+set si"' 
+
+# Stop after sending count ECHO_REQUEST packets #
+alias pings='ping -c 5'
+alias fastping='ping -c 100 -s.2'
+
+#Show open ports
+alias ports='netstat -tulanp'
+
+#ls aliases
+alias lsd='ls -al | grep -i ^d'
+
+#process aliases
+alias getzombie='ps -lA | grep Z'
+
+#grep aliases
+alias envg='env | grep -i'
+alias findg='find . -print | grep -i'
+alias psg='ps -efw | grep -i'
+alias llg='ll | grep -i'
+alias lsg='ls | grep -i'
+alias hg='history | grep -i'
+alias alg='alias | grep -i'
+
+#git aliases
+# TODO
+alias githome='cd $GITHOME'
+alias gitlog='git log -n 3'
+alias gitstatus='git status -s -b --show-stash'
+alias gitdiff='git difftool -y'
+alias gittag_2_branch='git branch -a --contains '
+alias gittags_in_branch='git tag --contains '
+
+#maven alias
+alias mvnclnpkg='mvn clean package -DskipTests'
+alias mvnrun='mvn spring-boot:run -e -X'
+
+#azure aliases
+# alias azdeploy='mvn azure-webapp:deploy'
+# alias azlogin='az login'
+# alias azshow='az account show'
+# alias azlist='az account list'
+
+#aws
+
+#k8s
+
+#vagrant aliases
+# alias vssh1='ssh vagrant@127.0.0.1 -p 2222 -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no'
+# alias vssh='ssh vagrant@127.0.0.1 -p 2222 -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no'
+
+#tmux aliases
+alias tmuxnew='tmux new -n -window'
+alias tmuxls='tmux ls'
+
+
+#install  colordiff package :)
+#alias diff='colordiff'
+#alias grep='grep --color=auto'
+#alias egrep='egrep --color=auto'
+#alias fgrep='fgrep --color=auto'
+#alias xt='xterm -j -rw -aw -sb -sl 1000 -geometry 93x31+100+350 -fa 'Monospace' -fs 14&'
+#alias python='/Library/Frameworks/Python.framework/Versions/3.4/python'
+
+
+
