@@ -32,11 +32,39 @@
     - prompt.sh
     - variables.sh
 
+- name: remove existing bash files from home
+  ansible.builtin.file:
+    state: absent
+    path: "{{ lookup('ansible.builtin.env', 'HOME') }}/{{ item }}"
+  with_items:
+    - .alias
+    - .bash_funcs
+    - .bash_profile
+    - .bashrc
+    - .bashrc_custom
+    - prompt.sh
+    - variables.sh
+
+- name: Create symbolic link 
+  file:
+   src: "{{ lookup('ansible.builtin.env', 'HOME') }}/bashfiles/{{ item }}"
+   dest: "{{ lookup('ansible.builtin.env', 'HOME') }}/{{ item }}"
+   state: link
+   owner: "{{ user }}" 
+   group: "{{ user }}"
+  with_items:
+    - .alias
+    - .bash_funcs
+    - .bash_profile
+    - .bashrc
+    - .bashrc_custom
+    - prompt.sh
+    - variables.sh
+
 # - name: change user shell to zsh
 #   become: yes
 #   become_user: root
 #   command: chsh -s /bin/zsh {{ user }} 
-
 
 # - name: Check for dircolors
 #   stat: path=/$HOME/.dircolors
