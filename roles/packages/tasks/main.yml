@@ -1,19 +1,45 @@
 ---
-- name: update package list
-  become: true
-  package:
+- name: Print if apt package manager is installed
+  ansible.builtin.debug:
+    msg: Apt installed as pkg manger
+  when: ansible_pkg_mgr == "apt"
+
+- name: Print if dnf package manager is installed
+  ansible.builtin.debug:
+    msg: dnf installed as pkg manger
+  when: ansible_pkg_mgr == "dnf"
+
+- name: Print if apk package manager is installed
+  ansible.builtin.debug:
+    msg: apk installed as pkg manger
+  when: ansible_pkg_mgr == "apk"
+
+- name: update apt cache
+  become: true  
+  apt:
     update_cache: yes
-  when: ansible_facts['lsb']['release'] == "20.04"  
+  when: ansible_pkg_mgr == "apt"
+
+- name: update dnf cache
+  become: true  
+  dnf:
+    update_cache: yes
+  when: ansible_pkg_mgr == "dnf"
+
+- name: update apk cache
+  become: true  
+  community.general.apk:
+    update_cache: yes
+  when: ansible_pkg_mgr == "apk"
 
 - name: upgrade all packages
   become: true
   package:
     name: "*"
     state: latest
-  when: ansible_facts['lsb']['release'] == "20.04"
 
 - name: Install packages
-  become: true
-  when: ansible_facts['lsb']['release'] == "20.04"
+  become: true  
   apt:
     name: "{{ prerequisite_packages_ubuntu }}"
+  
