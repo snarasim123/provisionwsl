@@ -1,8 +1,8 @@
 ---
 - name: Print user homedir
   ansible.builtin.debug:
-    msg: user_homedir {{ user_homedir }} for  {{ user }}
-    
+    msg: user homedir {{ user_home }} for  {{ user }}
+
 - name: remove files and directories
   ansible.builtin.file:
     state: "{{ item }}"
@@ -35,6 +35,8 @@
     - .bashrc_custom
     - prompt.sh
     - variables.sh
+    - dircolors256dark
+    - dircolorsansi-light
 
 - name: remove existing bash files from home
   ansible.builtin.file:
@@ -48,6 +50,7 @@
     - .bashrc_custom
     - prompt.sh
     - variables.sh
+    - .dircolors
 
 - name: Create symbolic link 
   file:
@@ -65,24 +68,17 @@
     - prompt.sh
     - variables.sh
 
-# - name: change user shell to zsh
-#   become: yes
-#   become_user: root
-#   command: chsh -s /bin/zsh {{ user }} 
 
-# - name: Check for dircolors
+- name: Create .dircolor symbolic link 
+  file:
+   src: "{{ lookup('ansible.builtin.env', 'HOME') }}/bashfiles/dircolors256dark"
+   dest: "{{ lookup('ansible.builtin.env', 'HOME') }}/.dircolors"
+   state: link
+   owner: "{{ user }}" 
+   group: "{{ user }}"  
+
+# - name: TODO Setup dircolors
 #   stat: path=/$HOME/.dircolors
 #   register: dircolors
-
-# - name: Install dircolors
-#   command: curl https://raw.githubusercontent.com/seebi/dircolors-solarized/master/dircolors.ansi-dark --output /$HOME/.dircolors
-#   when: not dircolors.stat.exists
-
-# - name: Check for powerlevel10k
-#   stat: path=/$HOME/.oh-my-zsh/custom/themes/powerlevel10k
-#   register: powerlevel10k
-
-# - name: Clone powerlevel10k
-#   command: git clone --depth=1 https://github.com/romkatv/powerlevel10k.git {{ lookup("env", "HOME") }}/.oh-my-zsh/custom/themes/powerlevel10k
-#   when: not powerlevel10k.stat.exists
+#   eval $(dircolors ~/.dircolors)
 

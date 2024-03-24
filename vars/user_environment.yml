@@ -1,6 +1,7 @@
 ---
 user: snarasim
 repo_directory: code
+user_home: /home/snarasim
 # repos:
 # dotfiles_repo: snarasim/dotfiles
 # dotfiles_branch: master

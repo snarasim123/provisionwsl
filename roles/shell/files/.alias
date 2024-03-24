@@ -79,6 +79,8 @@ alias mvnrun='mvn spring-boot:run -e -X'
 alias tmuxnew='tmux new -n -window'
 alias tmuxls='tmux ls'
 
+#misc aliases
+alias mc='mc -u -X'
 
 #install  colordiff package :)
 #alias diff='colordiff'
