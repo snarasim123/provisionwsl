@@ -1,11 +1,11 @@
 ---
-# TODO install git, github, ssh keys etc before this step
+# TODO ubuntu - install git, github, ssh keys etc before this step
 - name: Install required packages
   package:
     name:
-      - vim-enhanced
+      - vim
       # - powerline-fonts
-    state: installed
+    state: present
   become: yes
   
 - name: remove vim files and directories
@@ -33,13 +33,13 @@
 
 - name: Copy vim files
   copy:
-    src: '{{item}}'
+    src: "{{ item }}"
     dest: "{{ vim_dir }}"
     owner: "{{ user }}"
     group: "{{ user }}"
     mode: 0644
   loop:
-    - "{{ vimrc }}"
+    - .vimrc
     - vim_shortcuts.txt
 
 - name: Create symbolic link 
