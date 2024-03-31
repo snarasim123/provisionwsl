@@ -1,4 +1,5 @@
 ---
+# TODO upgrade/update if necessary
 - name: Print if apt package manager is installed
   ansible.builtin.debug:
     msg: Apt installed as pkg manger
@@ -43,3 +44,5 @@
   apt:
     name: "{{ prerequisite_packages_ubuntu }}"
   
+# TODO install packages for dnf and apk
+# TODO setup package lists for fedora and alpine

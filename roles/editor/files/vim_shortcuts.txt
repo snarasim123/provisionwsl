@@ -1,0 +1,51 @@
+
+Esc + :x + Enter (Save and exit)
+Esc + :qa + Enter (Quit all open files)
+Esc + Shift ZZ (Save and exit)
+Esc + Shift ZQ (Exit without saving)
+
+
+text selection
+
+V                   - selects entire lines 
+v                   - selects range of text
+ctrl-v              - selects columns
+gv                  - reselect block
+
+After selecting the text, try d to delete, or y to copy, or :s/match/replace/, or :center, or !sort, or...
+
+Window commands
+ :e filename      - edit another file
+ :split filename  - split window and load another file
+ ctrl-ww          - move cursor to another window (cycle)
+ ctrl-w,_         - decrease window size
+ ctrl-w,shift+    - increase window size
+ :vsplit file     - vertical split
+ :hide            - close current window
+ :ls              - show current buffers
+ :b 2             - open buffer #2 in this window
+
+Search
+ /pattern       - search forward for pattern
+ ?pattern       - search backward
+ n              - repeat forward search
+ N              - repeat backward
+ *              - search for word currently under cursor
+ g*             - search for partial word under cursor 
+                  (repeat with n)
+ ctrl-o, ctrl-i - go through jump locations
+ [I             - show lines with matching word under cursor
+
+ tags
+Using tags makes it easier to jump to certain parts of your programs. First run ctags from the UNIX command line on your source files (e.g., ctags prog.c or ctags -R to recurse) to generate a "tags" file, then use these while editing your source files:
+
+ :tag TAB            - list the known tags
+ :tag function_name  - jump to that function
+ ctrl-t   - goes to previous spot where you called :tag
+ ctrl-]   - calls :tag on the word under the cursor        
+ :ptag    - open tag in preview window (also ctrl-w })
+ :pclose  - close preview window
+
+
+ To copy when set mouse=a,
+ use shift or function + mouse selection

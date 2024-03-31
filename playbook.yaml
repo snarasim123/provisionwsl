@@ -16,13 +16,15 @@
     - vars/prerequisite_packages_ubuntu.yml
     - vars/tool_versions.yml
     - vars/user_environment.yml
+    - vars/vimvars.yml
   ### Comment out roles you don't need ###
   roles:
     - userfacts
+    - user
     - shell
     - packages    
     # - workspace
     # - ops
     # - dev
   ### Change to your user! ###
-  user: snarasim
+  user: root

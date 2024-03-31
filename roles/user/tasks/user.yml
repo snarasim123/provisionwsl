@@ -1,22 +1,22 @@
 ---
-- name: Print user homedir
+- name: Setting up user
   ansible.builtin.debug:
     msg: Setting root user and default user.
 
 # - name: TODO set root user path
 
-# - name: TODO create default user and set password
+# - name: TODO create  user and set password
+- name: Add the user {{ user }}
+  ansible.builtin.user:
+    name: "{{ user }}"
+    shell: /bin/bash
+    home: "/home/{{ user }}"
+
+# TODO set as default user
 
 # - name: TODO set default user to sudoers
 
 # - name: TODO set default user path
-
-# - name: TODO set default user shell
-
-# - name: TODO change user shell to zsh
-#   become: yes
-#   become_user: root
-#   command: chsh -s /bin/zsh {{ user }} 
 
 
 
