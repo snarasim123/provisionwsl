@@ -16,21 +16,21 @@
 
 # TODO set as default user
 
-# - name: Create SSH directory for baeldung
-#       file:
-#         path: /home/baeldung/.ssh
-#         state: directory
-#         owner: baeldung
-#         group: baeldung
-#         mode: 0700
+- name: Create SSH directory 
+  file:
+    path: "/home/{{ target_user }}/.ssh"
+    state: directory
+    owner: "{{ target_user }}"
+    group: "{{ target_user }}"
+    mode: 0700
 
-# - name: Generate SSH key for baeldung
-#   user:
-#     name: baeldung
-#     generate_ssh_key: yes
-#     ssh_key_type: rsa
-#     ssh_key_bits: 4096
-#     ssh_key_file: /home/baeldung/.ssh/id_rsa  # Full path is needed here
+- name: Generate SSH key 
+  user:
+    name: "{{ target_user }}"
+    generate_ssh_key: yes
+    ssh_key_type: rsa
+    ssh_key_bits: 4096
+    ssh_key_file: "/home/{{ target_user }}/.ssh/id_rsa"  
 
 # - name: Transfer public key to the target host
 #   authorized_key:
