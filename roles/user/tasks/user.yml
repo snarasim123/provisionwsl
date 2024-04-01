@@ -3,20 +3,43 @@
   ansible.builtin.debug:
     msg: Setting root user and default user.
 
-# - name: TODO set root user path
+- name: Ensure sudo group is present
+  group:
+    name: sudo
+    state: present
 
-# - name: TODO create  user and set password
 - name: Add the user {{ user }}
   ansible.builtin.user:
     name: "{{ user }}"
+    password: "{{ user | password_hash('sha512') }}"
+    groups: sudo
     shell: /bin/bash
+    update_password: always
     home: "/home/{{ user }}"
+  become: true
 
 # TODO set as default user
 
-# - name: TODO set default user to sudoers
+# - name: Create SSH directory for baeldung
+#       file:
+#         path: /home/baeldung/.ssh
+#         state: directory
+#         owner: baeldung
+#         group: baeldung
+#         mode: 0700
+# - name: Generate SSH key for baeldung
+#   user:
+#     name: baeldung
+#     generate_ssh_key: yes
+#     ssh_key_type: rsa
+#     ssh_key_bits: 4096
+#     ssh_key_file: /home/baeldung/.ssh/id_rsa  # Full path is needed here
 
-# - name: TODO set default user path
+# - name: Transfer public key to the target host
+#   authorized_key:
+#     user: baeldung
+#     key: "{{ lookup('file', '/home/vagrant/.ssh/id_rsa.pub') }}" 
+
 
 
 

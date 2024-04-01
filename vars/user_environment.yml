@@ -1,5 +1,6 @@
 ---
 user: snarasim
+public_key: ~/.ssh/id_rsa.pub
 repo_directory: code
 user_home: /home/snarasim
 # repos:
