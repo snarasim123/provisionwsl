@@ -1,6 +1,9 @@
+set default user
+setup github ssh keys
 change user to root in variables.sh
 fix path variable for the user
 register variables for different os,pkg mgr, wsl
-create package list for fedora, alpine
+create package list for fedora, alpine/test 
 role for git, github, add ssh keys
 setup passwordless access and run remotely?
+variables to parameters with default values

@@ -20,13 +20,10 @@
   ### Comment out roles you don't need ###
   roles:
     - facts
-    - userfacts    
     - user
     - shell
     - packages
-    - editor    
-    # - workspace
-    # - ops
+    # - editor    
     # - dev
   ### Change to your user! ###
-  user: root
+  # user: root

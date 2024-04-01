@@ -15,7 +15,7 @@
 - name: remove existing vim symlinks
   ansible.builtin.file:
     state: absent
-    path: "{{ lookup('ansible.builtin.env', 'HOME') }}/{{ item }}"
+    path: "{{ user_home }}/{{ item }}"
   with_items:
     - "{{ vimrc }}"
     - vim_shortcuts.txt
@@ -34,8 +34,8 @@
   copy:
     src: "{{ item }}"
     dest: "{{ vim_dir }}"
-    owner: "{{ user }}"
-    group: "{{ user }}"
+    owner: "{{ target_user }}"
+    group: "{{ target_user }}"
     mode: 0644
   loop:
     - .vimrc
@@ -44,10 +44,10 @@
 - name: Create symbolic link 
   file:
    src: "{{ vim_dir }}/{{ item }}"
-   dest: "{{ lookup('ansible.builtin.env', 'HOME') }}/{{ item }}"
+   dest: "{{ user_home }}/{{ item }}"
    state: link
-   owner: "{{ user }}" 
-   group: "{{ user }}"
+   owner: "{{ target_user }}" 
+   group: "{{ target_user }}"
   with_items:
     - .vimrc
     - vim_shortcuts.txt

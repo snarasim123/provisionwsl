@@ -2,7 +2,8 @@
 source ./variables.sh
 source ./secret.sh
 
-code_folder="~/code"
+code_folder="/home/$default_user/code"
+home_folder="/home/$default_user"
 upgrade() {
 sudo apt update -y
 sudo apt upgrade -y
@@ -10,20 +11,22 @@ sudo apt upgrade -y
 
 setup-ssh () {
     echo "#### Setting up ssh keys ."
-    cd $HOME
+    # su - "$default_user"
+    cd $home_folder
 
-    if [ ! -f "$HOME/.ssh/id_rsa" ]; then
+    if [ ! -f "$home_folder/.ssh/id_rsa" ]; then
+        mkdir "$home_folder/.ssh" -p
         eval `ssh-agent -s`
-        ssh-keygen -t rsa -b 4096 -N ''  -f $HOME/.ssh/id_rsa <<< y
-        ssh-add $HOME/.ssh/id_rsa
+        ssh-keygen -t rsa -b 4096 -N ''  -f $home_folder/.ssh/id_rsa <<< y
+        ssh-add $home_folder/.ssh/id_rsa
     fi
     echo "#### Done Setting up ssh keys. "
 }
 
 setup-user () {
     echo "#### Setting up root user and default user '$default_user' for distro '$distro_name'. "
-    echo " export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/usr/lib/wsl/lib" > $HOME/.bashrc
-    source $HOME/.bashrc
+    echo " export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/usr/lib/wsl/lib" > $home_folder/.bashrc
+    source $home_folder/.bashrc
 
     if id "$default_user" >/dev/null 2>&1; then
         echo "User $default_user already exists."
@@ -56,8 +59,8 @@ setup-user () {
 setup-git () {
     echo "#### Setting up Git ####"
     sudo apt install git -y
-    pub=`cat $HOME/.ssh/id_rsa.pub`    
-    cd $HOME
+    pub=`cat $home_folder/.ssh/id_rsa.pub`    
+    cd $home_folder
     git config --global user.email "$default_email"
     git config --global user.name "$default_user"
     git config --global core.editor /usr/bin/vim
@@ -68,11 +71,11 @@ setup-git () {
 setup-github () {
     echo "#### Setting up Github ####"
     echo " Github User/secret=$githubuser,$githubpass"    
-    pub=`cat $HOME/.ssh/id_rsa.pub`
+    pub=`cat $home_folder/.ssh/id_rsa.pub`
     today=$(date +'%Y-%m-%d')    
     keyname=$(hostname)-$distro_name-$today
     curl -u "$githubuser:$githubpass" -X POST -d "{\"title\":\"$keyname\",\"key\":\"$pub\"}" https://api.github.com/user/keys
-    ssh-keyscan -t rsa github.com >> $HOME/.ssh/known_hosts
+    ssh-keyscan -t rsa github.com >> $home_folder/.ssh/known_hosts
     echo "#### Done Setting github. "
 }
 
@@ -96,20 +99,21 @@ setup_ansible(){
 echo "#### Ansible setup."
 
 sudo apt install ansible aptitude -y
-cd "$HOME/code/setup/ansible"
-ansible-playbook -K ./playbook.yaml
+ansible-galaxy collection install community.general
 
-echo "#### Done Ansible setup."
+cd "$HOME/code/setup/ansible"
+ansible-playbook -K ./playbook.yaml -i hosts
+echo "#### Done Preliminary setup."
 }
 
 
 
 # read -p "*** Press to continue.. " -n 1 -r
-# upgrade
- # setup-user
-setup-ssh 
-setup-git
-setup-github
+upgrade
+# setup-user
+# setup-ssh 
+# setup-git
+# setup-github
 clone-repo
 setup_ansible
 exit

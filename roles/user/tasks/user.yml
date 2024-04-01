@@ -4,14 +4,14 @@
     name: sudo
     state: present
 
-- name: Add the user {{ user }}
+- name: Add the user {{ target_user }}
   ansible.builtin.user:
-    name: "{{ user }}"
-    password: "{{ user | password_hash('sha512') }}"
+    name: "{{ target_user }}"
+    password: "{{ target_user | password_hash('sha512') }}"
     groups: sudo
     shell: /bin/bash
     update_password: always
-    home: "/home/{{ user }}"
+    home: "/home/{{ target_user }}"
   become: true
 
 # TODO set as default user

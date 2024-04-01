@@ -23,24 +23,25 @@ if ($match -eq "$install_name") {
     Write-Host ( "##### Instance exists. Skip creating instance with name {0}... " -f $install_name)
 }
 else {
-    Write-Host( "##### Creating new instance with name {0}... " -f "$install_name")
+    Write-Host( "##### Creating new instance with name {0} Step 1... " -f "$install_name")
     mkdir $ps_install_dir  -ea 0
     wsl --import $install_name $ps_install_dir $ps_distro_source
 }
-
-Write-Host( "##### Configuring  {0} Step 1... " -f "$install_name")
-wsl -d $install_name "./kickoff.sh"  -u root
 
 Write-Host( "##### Restarting instance  {0}... " -f "$install_name")
 wsl --terminate $install_name
 wsl -d $install_name lsb_release -d 
 
-Write-Host( "##### Configuring  {0} Step 2... " -f "$install_name")
+Write-Host( "##### Preliminary setup  {0} Step 2... " -f "$install_name")
 wsl -d $install_name "./prelude.sh"  -u "$default_user"
 
 Write-Host( "##### Restarting instance  {0}... " -f "$install_name")
 wsl --terminate $install_name
 wsl -d $install_name lsb_release -d 
+
+# Write-Host( "##### Running ansible setup  {0} Step 3... " -f "$install_name")
+# wsl -d $install_name "./run-ansible.sh"  -u "$default_user"
+
 
 Write-Host( "##### Instance  {0} ready. " -f "$install_name")
 

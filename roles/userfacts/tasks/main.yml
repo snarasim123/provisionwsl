@@ -1,7 +1,0 @@
----
-# - name: determine ssh user homedir
-#   shell: "getent passwd {{ user }} | cut -d: -f6"
-#   register: user_homedir
-#   with_items: "{{ user }}"
-#   changed_when: False
-  

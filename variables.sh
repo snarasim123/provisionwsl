@@ -1,5 +1,5 @@
 # #shared vars
-export distro_name=ubuntu-ansible2
+export distro_name=ubuntu-ansible3
 
 #powershell vars
 export ps_distro_source=d:\soft\wsl\ubuntu2004.tar

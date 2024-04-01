@@ -2,9 +2,9 @@
 - name: remove files and directories
   ansible.builtin.file:
     state: "{{ item }}"
-    path: "{{ lookup('ansible.builtin.env', 'HOME') }}/bashfiles"
-    owner: "{{ user }}" # set your owner, group, and mode accordingly
-    group: "{{ user }}"
+    path: "{{ user_home }}/bashfiles"
+    owner: "{{ target_user }}" # set your owner, group, and mode accordingly
+    group: "{{ target_user }}"
     mode: '0777'
   with_items:
     - absent
@@ -12,16 +12,16 @@
     
 - name: Create a directory if it does not exist
   ansible.builtin.file:
-    path: "{{ lookup('ansible.builtin.env', 'HOME') }}/bashfiles"
+    path: "{{ user_home }}/bashfiles"
     state: directory
     mode: '0755'
 
 - name: Copy files
   copy:
     src: '{{item}}'
-    dest: "{{ lookup('ansible.builtin.env', 'HOME') }}/bashfiles"
-    owner: "{{ user }}"
-    group: "{{ user }}"
+    dest: "{{ user_home }}/bashfiles"
+    owner: "{{ target_user }}"
+    group: "{{ target_user }}"
     mode: 0644
   loop:
     - .alias
@@ -37,7 +37,7 @@
 - name: remove existing bash files from home
   ansible.builtin.file:
     state: absent
-    path: "{{ lookup('ansible.builtin.env', 'HOME') }}/{{ item }}"
+    path: "{{ user_home }}/{{ item }}"
   with_items:
     - .alias
     - .bash_funcs
@@ -50,11 +50,11 @@
 
 - name: Create symbolic link 
   file:
-   src: "{{ lookup('ansible.builtin.env', 'HOME') }}/bashfiles/{{ item }}"
-   dest: "{{ lookup('ansible.builtin.env', 'HOME') }}/{{ item }}"
+   src: "{{ user_home }}/bashfiles/{{ item }}"
+   dest: "{{ user_home }}/{{ item }}"
    state: link
-   owner: "{{ user }}" 
-   group: "{{ user }}"
+   owner: "{{ target_user }}" 
+   group: "{{ target_user }}"
   with_items:
     - .alias
     - .bash_funcs
@@ -67,11 +67,11 @@
 
 - name: Create .dircolor symbolic link 
   file:
-   src: "{{ lookup('ansible.builtin.env', 'HOME') }}/bashfiles/dircolors256dark"
-   dest: "{{ lookup('ansible.builtin.env', 'HOME') }}/.dircolors"
+   src: "{{ user_home }}/bashfiles/dircolors256dark"
+   dest: "{{ user_home }}/.dircolors"
    state: link
-   owner: "{{ user }}" 
-   group: "{{ user }}"  
+   owner: "{{ target_user }}" 
+   group: "{{ target_user }}"  
 
 # - name: TODO Setup dircolors
 #   stat: path=/$HOME/.dircolors

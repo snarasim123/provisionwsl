@@ -37,6 +37,6 @@
 
 - name: Print user homedir
   ansible.builtin.debug:
-    msg: user homedir {{ user_home }} for  {{ user }}
+    msg: user homedir {{ user_home }} for  {{ target_user }}
 
   
