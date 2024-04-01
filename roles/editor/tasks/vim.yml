@@ -4,7 +4,6 @@
   package:
     name:
       - vim
-      # - powerline-fonts
     state: present
   become: yes
   
@@ -62,14 +61,37 @@
     - "{{ vim_dir }}/autoload"
 
 # - name: TODO clone plugins needed from .vimrc
+- name: Deploy plugins
+  git:
+    dest: "{{ vim_dir }}/plugged/{{ item.name }}"
+    repo: "{{ item.url }}"
+    clone: yes
+    update: yes
+    recursive: no
+  loop:
+  - name: delimitMate
+    url: git@github.com:Raimondi/delimitMate.git
+  - name: nerdtree
+    url: git@github.com:preservim/nerdtree
+  - name: minibufexpl.vim
+    url: git@github.com:fholgado/minibufexpl.vim
+  - name: molokai
+    url: git@github.com:tomasr/molokai
+  - name: cobalt
+    url: git@github.com:gkjgh/cobalt.git
+  - name: vim-airline
+    url: git@github.com:vim-airline/vim-airline.git
+  - name: setcolors.vim
+    url: git@github.com:felixhummel/setcolors.vim
+  - name: vim-fugitive
+    url: git@github.com:tpope/vim-fugitive.git
+  - name: vim-gitgutter
+    url: git@github.com:airblade/vim-gitgutter.git
+  - name: vim-quickui
+    url: git@github.com:skywind3000/vim-quickui
+  - name: vim-gutentags
+    url: git@github.com:ludovicchabant/vim-gutentags.git
 
-# - name: TODO Create vim extensions/colorschemes
-#   file:
-#    src: "{{ lookup('ansible.builtin.env', 'HOME') }}/bashfiles/dircolors256dark"
-#    dest: "{{ lookup('ansible.builtin.env', 'HOME') }}/.dircolors"
-#    state: link
-#    owner: "{{ user }}" 
-#    group: "{{ user }}"  
 
 
 

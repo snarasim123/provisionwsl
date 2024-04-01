@@ -22,7 +22,8 @@
     - userfacts
     - user
     - shell
-    - packages    
+    - packages
+    - editor    
     # - workspace
     # - ops
     # - dev
