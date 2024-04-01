@@ -1,8 +1,4 @@
 ---
-- name: Print user homedir
-  ansible.builtin.debug:
-    msg: user homedir {{ user_home }} for  {{ user }}
-
 - name: remove files and directories
   ansible.builtin.file:
     state: "{{ item }}"

@@ -1,6 +1,5 @@
 ---
-prerequisite_packages_ubuntu:
-  - vim
+packages_ubuntu:
   - nano
   - git
   - curl

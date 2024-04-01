@@ -1,11 +1,7 @@
 ---
-- name: determine ssh user homedir
-  shell: "getent passwd {{ user }} | cut -d: -f6"
-  register: user_homedir
-  with_items: "{{ user }}"
-  changed_when: False
-
-# - name: Print user homedir
-#   ansible.builtin.debug:
-#     msg: user_homedir {{ user_homedir }} for  {{ user }}
+# - name: determine ssh user homedir
+#   shell: "getent passwd {{ user }} | cut -d: -f6"
+#   register: user_homedir
+#   with_items: "{{ user }}"
+#   changed_when: False
   

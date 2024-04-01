@@ -1,0 +1,6 @@
+change user to root in variables.sh
+fix path variable for the user
+register variables for different os,pkg mgr, wsl
+create package list for fedora, alpine
+role for git, github, add ssh keys
+setup passwordless access and run remotely?

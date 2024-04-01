@@ -1,8 +1,4 @@
 ---
-- name: Setting up user
-  ansible.builtin.debug:
-    msg: Setting root user and default user.
-
 - name: Ensure sudo group is present
   group:
     name: sudo
@@ -27,6 +23,7 @@
 #         owner: baeldung
 #         group: baeldung
 #         mode: 0700
+
 # - name: Generate SSH key for baeldung
 #   user:
 #     name: baeldung

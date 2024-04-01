@@ -1,20 +1,4 @@
 ---
-# TODO upgrade/update if necessary
-- name: Print if apt package manager is installed
-  ansible.builtin.debug:
-    msg: Apt installed as pkg manger
-  when: ansible_pkg_mgr == "apt"
-
-- name: Print if dnf package manager is installed
-  ansible.builtin.debug:
-    msg: dnf installed as pkg manger
-  when: ansible_pkg_mgr == "dnf"
-
-- name: Print if apk package manager is installed
-  ansible.builtin.debug:
-    msg: apk installed as pkg manger
-  when: ansible_pkg_mgr == "apk"
-
 - name: update apt cache
   become: true  
   apt:
@@ -42,7 +26,7 @@
 - name: Install packages
   become: true  
   apt:
-    name: "{{ prerequisite_packages_ubuntu }}"
+    name: "{{ packages_ubuntu }}"
   
 # TODO install packages for dnf and apk
 # TODO setup package lists for fedora and alpine
