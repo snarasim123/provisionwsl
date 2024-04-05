@@ -102,7 +102,8 @@ sudo apt install ansible aptitude -y
 ansible-galaxy collection install community.general
 
 cd "$HOME/code/setup/ansible"
-ansible-playbook -K ./playbook.yaml -i hosts
+chmod -x secrets.*
+ansible-playbook  -i hosts -e @secrets.yaml --vault-password-file secrets.pass ./playbook.yaml
 echo "#### Done Preliminary setup."
 }
 

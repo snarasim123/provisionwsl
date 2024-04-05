@@ -72,9 +72,3 @@
    state: link
    owner: "{{ target_user }}" 
    group: "{{ target_user }}"  
-
-# - name: TODO Setup dircolors
-#   stat: path=/$HOME/.dircolors
-#   register: dircolors
-#   eval $(dircolors ~/.dircolors)
-

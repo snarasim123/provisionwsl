@@ -14,8 +14,6 @@
     home: "/home/{{ target_user }}"
   become: true
 
-# TODO set as default user
-
 - name: Create SSH directory 
   file:
     path: "/home/{{ target_user }}/.ssh"
@@ -32,11 +30,48 @@
     ssh_key_bits: 4096
     ssh_key_file: "/home/{{ target_user }}/.ssh/id_rsa"  
 
-# - name: Transfer public key to the target host
-#   authorized_key:
-#     user: baeldung
-#     key: "{{ lookup('file', '/home/vagrant/.ssh/id_rsa.pub') }}" 
+- name: Check that the /etc/wsl.conf exists
+  stat:
+    path: /etc/wsl.conf
+  register: wslconf_exists
 
+- name: enable systemd, if wsl.conf exists
+  ansible.builtin.blockinfile:
+    path: /etc/wsl.conf
+    block:  |
+      [boot]
+      systemd=true
+      [user]
+      default={{ target_user }}
+    marker: "## {mark} ANSIBLE MANAGED BLOCK"
+    create: true
 
+- name: Check if /etc/sudoers has the user already
+  ansible.builtin.lineinfile:
+    state: absent
+    path: /etc/sudoers
+    regexp: "^{{ target_user }}"
+  check_mode: true
+  changed_when: false 
+  register: check
 
+- name: Print lineinfile if sudoers has user
+  ansible.builtin.debug:
+    msg: lineinefile found /etc/sudoers has {{ target_user }}
+  when: check.found
 
+- name: Print lineinfile if sudoers does not have user
+  ansible.builtin.debug:
+    msg: lineinefile did not find /etc/sudoers has {{ target_user }}
+  when: not check.found
+
+- name: update sudoers file for user
+  ansible.builtin.lineinfile:
+    path: /etc/sudoers
+    line: '{{ target_user }} ALL=(ALL) NOPASSWD: ALL'
+  when: not check.found
+
+# TODO check if this is wsl2/wsl1 and check if line already exists
+# TODO set as default user for non wsl ubuntu/fedora/alpine    
+# TODO set nopassword for sudo access
+# TODO set facts for os, wsl, wslconf exists etc

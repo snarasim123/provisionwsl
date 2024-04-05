@@ -33,15 +33,11 @@ wsl --terminate $install_name
 wsl -d $install_name lsb_release -d 
 
 Write-Host( "##### Preliminary setup  {0} Step 2... " -f "$install_name")
-wsl -d $install_name "./prelude.sh"  -u "$default_user"
+wsl -d $install_name "./prelude.sh"  -u root
 
 Write-Host( "##### Restarting instance  {0}... " -f "$install_name")
 wsl --terminate $install_name
 wsl -d $install_name lsb_release -d 
-
-# Write-Host( "##### Running ansible setup  {0} Step 3... " -f "$install_name")
-# wsl -d $install_name "./run-ansible.sh"  -u "$default_user"
-
 
 Write-Host( "##### Instance  {0} ready. " -f "$install_name")
 

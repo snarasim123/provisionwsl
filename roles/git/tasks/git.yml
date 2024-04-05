@@ -1,0 +1,5 @@
+---
+- name: Print 
+  ansible.builtin.debug:
+    msg: install git, lazygit and configuring github for {{ target_user }}
+  

@@ -30,3 +30,4 @@
   
 # TODO install packages for dnf and apk
 # TODO setup package lists for fedora and alpine
+# TODO different package lists for light or full install

@@ -1,5 +1,4 @@
 ---
-# TODO ubuntu - install git, github, ssh keys etc before this step
 - name: Install required packages
   package:
     name:
@@ -60,7 +59,6 @@
   with_items:
     - "{{ vim_dir }}/autoload"
 
-# - name: TODO clone plugins needed from .vimrc
 - name: Deploy plugins
   git:
     dest: "{{ vim_dir }}/plugged/{{ item.name }}"

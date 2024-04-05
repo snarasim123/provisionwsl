@@ -49,7 +49,6 @@ alias hg='history | grep -i'
 alias alg='alias | grep -i'
 
 #git aliases
-# TODO
 alias githome='cd $GITHOME'
 alias gitlog='git log -n 3'
 alias gitstatus='git status -s -b --show-stash'
