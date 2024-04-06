@@ -1,0 +1,56 @@
+---
+- name: Print if apt package manager is installed
+  ansible.builtin.debug:
+    msg: Apt installed as pkg manger -> {{ is_apt }}
+  when: is_apt 
+
+- name: Print if dnf package manager is installed
+  ansible.builtin.debug:
+    msg: dnf installed as pkg manger
+  when: is_dnf 
+
+- name: Print if apk package manager is installed
+  ansible.builtin.debug:
+    msg: apk installed as pkg manger
+  when: is_apk
+
+- name: Print user homedir
+  ansible.builtin.debug:
+    msg: user homedir {{ user_home }} for  {{ target_user }}
+
+- name: Print github keyname
+  ansible.builtin.debug:
+    msg: github keyname {{ github_keyname }}
+
+- name: Print github creds
+  ansible.builtin.debug:
+    msg: githubuser "{{ githubuser }}" githubpass  "{{ githubpass }}"
+
+  
+# - name: Print if ubuntu
+#   ansible.builtin.debug:
+#     msg: apk installed as pkg manger
+#   when: ansible_pkg_mgr == "apk"
+
+# - name: Print if fedora
+#   ansible.builtin.debug:
+#     msg: apk installed as pkg manger
+#   when: ansible_pkg_mgr == "apk"
+
+# - name: Print if alpine
+#   ansible.builtin.debug:
+#     msg: apk installed as pkg manger
+#   when: ansible_pkg_mgr == "apk"
+
+# - name: Print if wsl
+#   ansible.builtin.debug:
+#     msg: apk installed as pkg manger
+#   when: ansible_pkg_mgr == "apk"
+
+
+
+
+
+
+
+  

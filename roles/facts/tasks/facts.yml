@@ -1,0 +1,54 @@
+---
+- set_fact: is_apt=false
+- set_fact: is_dnf=false
+- set_fact: is_apk=false
+
+- name: check if apt package manager is installed
+  set_fact:
+    is_apt:  true 
+  when: ansible_pkg_mgr == "apt"
+
+- name: check if dnf package manager is installed
+  set_fact:
+    is_dnf: true 
+  when: ansible_pkg_mgr == "dnf"
+
+- name: check if apk package manager is installed
+  set_fact:
+    is_apk: true
+  when: ansible_pkg_mgr == "apk"
+  
+# - name: Print if ubuntu
+#   ansible.builtin.debug:
+#     msg: apk installed as pkg manger
+#   when: ansible_pkg_mgr == "apk"
+
+# - name: Print if fedora
+#   ansible.builtin.debug:
+#     msg: apk installed as pkg manger
+#   when: ansible_pkg_mgr == "apk"
+
+# - name: Print if alpine
+#   ansible.builtin.debug:
+#     msg: apk installed as pkg manger
+#   when: ansible_pkg_mgr == "apk"
+
+# - name: Print if wsl
+#   ansible.builtin.debug:
+#     msg: apk installed as pkg manger
+#   when: ansible_pkg_mgr == "apk"
+
+- name: Generate a random number
+  set_fact:
+    randome_number: "{{ 10 | random }}"
+  run_once: yes    
+
+- name: Set github keyname
+  set_fact:
+    github_keyname: "{{ ansible_hostname }}-{{inventory_hostname}}-{{ randome_number }}-{{ ansible_date_time.date }}"
+  run_once: yes    
+
+
+
+
+  

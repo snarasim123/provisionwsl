@@ -22,9 +22,9 @@
     - facts
     - user
     - shell
-    # - git
+    - git
     - packages
-    # - editor    
+    - editor    
     # - dev
   ### Change to your user! ###
   # user: root
