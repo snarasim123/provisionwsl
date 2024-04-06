@@ -43,11 +43,15 @@
     randome_number: "{{ 10 | random }}"
   run_once: yes    
 
-- name: Set github keyname
+- name: Set user github keyname
   set_fact:
-    github_keyname: "{{ ansible_hostname }}-{{inventory_hostname}}-{{ randome_number }}-{{ ansible_date_time.date }}"
+    github_keyname: "{{ ansible_hostname }}-{{inventory_hostname}}-{{ target_user }}-{{ randome_number }}"
   run_once: yes    
 
+- name: Set root github keyname
+  set_fact:
+    root_github_keyname: "{{ ansible_hostname }}-{{inventory_hostname}}-{{ root_user }}-{{ randome_number }}"
+  run_once: yes    
 
 
 

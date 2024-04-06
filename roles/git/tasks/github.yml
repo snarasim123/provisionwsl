@@ -1,0 +1,60 @@
+---
+- name: Print 
+  ansible.builtin.debug:
+    msg: install git, lazygit and configuring github for {{ target_user }}
+
+- name: fetch root public ssh key
+  shell: cat "{{ root_user_home }}/.ssh/id_rsa.pub"
+  register: root_ssh_publickey
+
+- name: Setup root github ssh keys
+  uri:
+    url: https://api.github.com/user/keys
+    method: POST
+    body: "{ \"title\":\"{{ root_github_keyname }}\",\"key\":\"{{ root_ssh_publickey.stdout }}\" }"
+    body_format: json
+    headers:
+      Content-Type: application/json
+    user: "{{ githubuser }}"
+    password: "{{ githubpass }}"
+    status_code: [200, 201, 422, 304]
+    force_basic_auth: true
+
+- name: ensure github.com is a known host
+  lineinfile:
+    dest: /root/.ssh/known_hosts
+    create: yes
+    state: present
+    line: "{{ lookup('pipe', 'ssh-keyscan -t rsa github.com') }}"
+    regexp: "^github\\.com"
+    
+# - known_hosts:
+#     name: "{{ item }}"
+#     key: "{{ lookup('pipe', 'ssh-keyscan {{ item }},`dig +short {{ item }}`') }}"
+#   with_items:
+#    - github.com
+
+# - name: Another way to call known_hosts
+#   ansible.builtin.known_hosts:
+#     name: host1.example.com   # or 10.9.8.77
+#     key: host1.example.com,10.9.8.77 ssh-rsa ASDeararAIUHI324324  # some key gibberish
+#     path: /etc/ssh/ssh_known_hosts
+#     state: present
+  
+- name: fetch user public ssh key
+  shell: cat "/home/{{ target_user }}/.ssh/id_rsa.pub"
+  register: ssh_publickey
+
+- name: Setup user github ssh keys
+  uri:
+    url: https://api.github.com/user/keys
+    method: POST
+    body: "{ \"title\":\"{{ github_keyname }}\",\"key\":\"{{ ssh_publickey.stdout }}\" }"
+    body_format: json
+    headers:
+      Content-Type: application/json
+    user: "{{ githubuser }}"
+    password: "{{ githubpass }}"
+    status_code: [200, 201, 422, 304]
+    force_basic_auth: true
+

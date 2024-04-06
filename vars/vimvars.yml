@@ -1,8 +1,6 @@
 ---
-vim_dir: "{{ lookup('ansible.builtin.env', 'HOME') }}/.vim"
-vimrc: "{{ lookup('ansible.builtin.env', 'HOME') }}/.vimrc"
-# repos:
-# dotfiles_repo: snarasim/dotfiles
-# dotfiles_branch: master
-# dotfiles_command: bash install.sh
+vim_dir: "/home/{{ target_user }}/.vim"
+vimrc: "/home/{{ target_user }}/.vimrc"
+root_vim_dir: "/{{ root_user }}/.vim"
+root_vimrc: "/{{ root_vim_dir }}/.vimrc"
 

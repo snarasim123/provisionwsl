@@ -9,14 +9,14 @@
 - name: remove vim files and directories
   ansible.builtin.file:
     state: absent
-    path: "{{ vim_dir }}"
+    path: "{{ root_vim_dir }}"
 
 - name: remove existing vim symlinks
   ansible.builtin.file:
     state: absent
-    path: "{{ user_home }}/{{ item }}"
+    path: "{{ root_user_home }}/{{ item }}"
   with_items:
-    - "{{ vimrc }}"
+    - "{{ root_vimrc }}"
     - vim_shortcuts.txt
         
 - name: Create vim directories
@@ -24,19 +24,19 @@
     path: "{{ item }}"
     state: directory
     mode: '0755'
-    owner: "{{ target_user }}"
-    group: "{{ target_user }}"
+    owner: "{{ root_user }}"
+    group: "{{ root_user }}"
   with_items:
-    - "{{ vim_dir }}"
-    - "{{ vim_dir }}/autoload"
-    - "{{ vim_dir }}/plugged"
+    - "{{ root_vim_dir }}"
+    - "{{ root_vim_dir }}/autoload"
+    - "{{ root_vim_dir }}/plugged"
 
 - name: Copy vim files
   copy:
     src: "{{ item }}"
-    dest: "{{ vim_dir }}"
-    owner: "{{ target_user }}"
-    group: "{{ target_user }}"
+    dest: "{{ root_vim_dir }}"
+    owner: "{{ root_user }}"
+    group: "{{ root_user }}"
     mode: 0644
   loop:
     - .vimrc
@@ -44,11 +44,11 @@
 
 - name: Create symbolic link 
   file:
-   src: "{{ vim_dir }}/{{ item }}"
-   dest: "{{ user_home }}/{{ item }}"
+   src: "{{ root_vim_dir }}/{{ item }}"
+   dest: "{{ root_user_home }}/{{ item }}"
    state: link
-   owner: "{{ target_user }}" 
-   group: "{{ target_user }}"
+   owner: "{{ root_user }}" 
+   group: "{{ root_user }}"
   with_items:
     - .vimrc
     - vim_shortcuts.txt
@@ -59,19 +59,19 @@
     dest: "{{ item }}"
     mode: '0440'
   with_items:
-    - "{{ vim_dir }}/autoload"
+    - "{{ root_vim_dir }}/autoload"
 
 - name: Change plugin mgr file ownership, group and permissions
   ansible.builtin.file:
-    path: "{{ vim_dir }}/autoload/plug.vim"
-    owner: "{{ target_user }}" 
-    group: "{{ target_user }}"
+    path: "{{ root_vim_dir }}/autoload/plug.vim"
+    owner: "{{ root_user }}" 
+    group: "{{ root_user }}"
     mode: '0644'
 
 
 - name: Deploy plugins
   git:
-    dest: "{{ vim_dir }}/plugged/{{ item.name }}"
+    dest: "{{ root_vim_dir }}/plugged/{{ item.name }}"
     repo: "{{ item.url }}"
     clone: yes
     update: yes

@@ -1,0 +1,37 @@
+---
+- name: Ensure sudo group is present
+  group:
+    name: sudo
+    state: present
+
+- name: Create SSH directory 
+  file:
+    path: "/{{ root_user_home }}/.ssh"
+    state: directory
+    owner: "{{ root_user }}"
+    group: "{{ root_user }}"
+    mode: 0700
+
+- name: Generate SSH key 
+  user:
+    name: "{{ root_user }}"
+    generate_ssh_key: yes
+    ssh_key_type: rsa
+    ssh_key_bits: 4096
+    ssh_key_file: "/{{ root_user_home }}/.ssh/id_rsa"  
+
+- name: Check that the /etc/wsl.conf exists
+  stat:
+    path: /etc/wsl.conf
+  register: wslconf_exists
+
+- name: enable systemd, if wsl.conf exists
+  ansible.builtin.blockinfile:
+    path: /etc/wsl.conf
+    block:  |
+      [boot]
+      systemd=true
+      [user]
+      default={{ target_user }}
+    marker: "## {mark} ANSIBLE MANAGED BLOCK"
+    create: true

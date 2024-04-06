@@ -3,8 +3,8 @@ target_user: snarasim
 public_key: /home/snarasim/.ssh/id_rsa.pub
 repo_directory: code
 user_home: /home/snarasim
-# repos:
-# dotfiles_repo: snarasim/dotfiles
-# dotfiles_branch: master
-# dotfiles_command: bash install.sh
+root_user: root
+root_user_key: /root/.ssh/id_rsa.pub
+root_user_home: /root
+
 

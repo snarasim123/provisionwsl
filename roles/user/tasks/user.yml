@@ -30,21 +30,21 @@
     ssh_key_bits: 4096
     ssh_key_file: "/home/{{ target_user }}/.ssh/id_rsa"  
 
-- name: Check that the /etc/wsl.conf exists
-  stat:
-    path: /etc/wsl.conf
-  register: wslconf_exists
+# - name: Check that the /etc/wsl.conf exists
+#   stat:
+#     path: /etc/wsl.conf
+#   register: wslconf_exists
 
-- name: enable systemd, if wsl.conf exists
-  ansible.builtin.blockinfile:
-    path: /etc/wsl.conf
-    block:  |
-      [boot]
-      systemd=true
-      [user]
-      default={{ target_user }}
-    marker: "## {mark} ANSIBLE MANAGED BLOCK"
-    create: true
+# - name: enable systemd, if wsl.conf exists
+#   ansible.builtin.blockinfile:
+#     path: /etc/wsl.conf
+#     block:  |
+#       [boot]
+#       systemd=true
+#       [user]
+#       default={{ target_user }}
+#     marker: "## {mark} ANSIBLE MANAGED BLOCK"
+#     create: true
 
 - name: Check if /etc/sudoers has the user already
   ansible.builtin.lineinfile:
@@ -70,8 +70,3 @@
     path: /etc/sudoers
     line: '{{ target_user }} ALL=(ALL) NOPASSWD: ALL'
   when: not check.found
-
-# TODO check if this is wsl2/wsl1 and check if line already exists
-# TODO set as default user for non wsl ubuntu/fedora/alpine    
-# TODO set nopassword for sudo access
-# TODO set facts for os, wsl, wslconf exists etc

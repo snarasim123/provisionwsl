@@ -18,9 +18,13 @@
   ansible.builtin.debug:
     msg: user homedir {{ user_home }} for  {{ target_user }}
 
-- name: Print github keyname
+- name: Print root github keyname
   ansible.builtin.debug:
-    msg: github keyname {{ github_keyname }}
+    msg: root github keyname {{ root_github_keyname }}
+
+- name: Print user github keyname
+  ansible.builtin.debug:
+    msg: user github keyname {{ github_keyname }}
 
 - name: Print github creds
   ansible.builtin.debug:
