@@ -11,6 +11,7 @@
     owner: "{{ root_user }}"
     group: "{{ root_user }}"
     mode: 0700
+  become: true
 
 - name: Generate SSH key 
   user:
@@ -19,11 +20,13 @@
     ssh_key_type: rsa
     ssh_key_bits: 4096
     ssh_key_file: "/{{ root_user_home }}/.ssh/id_rsa"  
+  become: true
 
 - name: Check that the /etc/wsl.conf exists
   stat:
     path: /etc/wsl.conf
   register: wslconf_exists
+  become: true
 
 - name: enable systemd, if wsl.conf exists
   ansible.builtin.blockinfile:
@@ -35,3 +38,4 @@
       default={{ target_user }}
     marker: "## {mark} ANSIBLE MANAGED BLOCK"
     create: true
+  become: true

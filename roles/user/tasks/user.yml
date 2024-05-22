@@ -54,16 +54,19 @@
   check_mode: true
   changed_when: false 
   register: check
+  become: true
 
 - name: Print lineinfile if sudoers has user
   ansible.builtin.debug:
     msg: lineinefile found /etc/sudoers has {{ target_user }}
   when: check.found
+  become: true
 
 - name: Print lineinfile if sudoers does not have user
   ansible.builtin.debug:
     msg: lineinefile did not find /etc/sudoers has {{ target_user }}
   when: not check.found
+  become: true
 
 - name: update sudoers file for user
   ansible.builtin.lineinfile:

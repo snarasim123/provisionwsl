@@ -14,6 +14,31 @@
     msg: apk installed as pkg manger
   when: is_apk
 
+- name: Print if Ubuntu
+  ansible.builtin.debug:
+    msg: Running ubuntu
+  when: is_ubuntu
+
+- name: Print if Fedora
+  ansible.builtin.debug:
+    msg: Running Fedora
+  when: is_fedora
+
+- name: Print if Alpine
+  ansible.builtin.debug:
+    msg: Running Alpine
+  when: is_alpine
+
+- name: Print if Debian
+  ansible.builtin.debug:
+    msg: Running Debian
+  when: is_debian
+
+- name: Print if Wsl
+  ansible.builtin.debug:
+    msg: Running WSL
+  when: is_wsl
+
 - name: Print user homedir
   ansible.builtin.debug:
     msg: user homedir {{ user_home }} for  {{ target_user }}
@@ -30,26 +55,7 @@
   ansible.builtin.debug:
     msg: githubuser "{{ githubuser }}" githubpass  "{{ githubpass }}"
 
-  
-# - name: Print if ubuntu
-#   ansible.builtin.debug:
-#     msg: apk installed as pkg manger
-#   when: ansible_pkg_mgr == "apk"
 
-# - name: Print if fedora
-#   ansible.builtin.debug:
-#     msg: apk installed as pkg manger
-#   when: ansible_pkg_mgr == "apk"
-
-# - name: Print if alpine
-#   ansible.builtin.debug:
-#     msg: apk installed as pkg manger
-#   when: ansible_pkg_mgr == "apk"
-
-# - name: Print if wsl
-#   ansible.builtin.debug:
-#     msg: apk installed as pkg manger
-#   when: ansible_pkg_mgr == "apk"
 
 
 

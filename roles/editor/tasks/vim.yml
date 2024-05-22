@@ -10,6 +10,7 @@
   ansible.builtin.file:
     state: absent
     path: "{{ vim_dir }}"
+  become: true
 
 - name: remove existing vim symlinks
   ansible.builtin.file:
@@ -30,6 +31,7 @@
     - "{{ vim_dir }}"
     - "{{ vim_dir }}/autoload"
     - "{{ vim_dir }}/plugged"
+  become: true
 
 - name: Copy vim files
   copy:
@@ -41,6 +43,7 @@
   loop:
     - .vimrc
     - vim_shortcuts.txt
+  become: true
 
 - name: Create symbolic link 
   file:
@@ -75,7 +78,7 @@
     repo: "{{ item.url }}"
     clone: yes
     update: yes
-    recursive: no
+    recursive: no  
   loop:
   - name: delimitMate
     url: git@github.com:Raimondi/delimitMate.git
@@ -99,7 +102,7 @@
     url: git@github.com:skywind3000/vim-quickui
   - name: vim-gutentags
     url: git@github.com:ludovicchabant/vim-gutentags.git
-
+  become: true
 
 
 

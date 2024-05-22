@@ -1,4 +1,5 @@
 
+$sw = [Diagnostics.Stopwatch]::StartNew()
 $Path = ".\variables.sh"
 $distro_name = ""
 $file = get-content $Path
@@ -40,5 +41,9 @@ wsl --terminate $install_name
 wsl -d $install_name lsb_release -d 
 
 Write-Host( "##### Instance  {0} ready. " -f "$install_name")
+$sw.Stop()
+$ts = $sw.Elapsed;
+$elapsedTime = [string]::Format("{0:00} Hours :{1:00} Mins",$ts.Hours, $ts.Minutes);
+Write-Host( "##### RunTime  {0}... " -f "$elapsedTime")
 
  
