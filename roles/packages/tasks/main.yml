@@ -31,13 +31,13 @@
   
 - name: Install fedora packages
   become: true  
-  apt:
+  dnf:
     name: "{{ packages_fedora }}"
   when: is_fedora
 
 - name: Install alpine packages
   become: true  
-  apt:
+  community.general.apk:
     name: "{{ packages_alpine }}"
   when: is_alpine
 

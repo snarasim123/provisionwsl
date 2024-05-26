@@ -8,6 +8,11 @@
 - set_fact: is_debian=false
 - set_fact: is_wsl=false
 
+- name: Check distribution
+  shell: cat "/etc/os-release"  | grep ^ID_LIKE=
+  register: distro_name_1
+  become: true
+
 - name: check if apt package manager is installed
   set_fact:
     is_apt:  true 
@@ -23,25 +28,25 @@
     is_apk: true
   when: ansible_pkg_mgr == "apk"
   
-- name: Distribution Ubuntu
+- name: Set Distribution Ubuntu
   set_fact:
     is_ubuntu: true
-  when: ansible_distribution == "Ubuntu"
+  when: "'debian' in distro_name_1.stdout|lower"
 
-- name: Distribution Fedora
+- name: Set Distribution Fedora
   set_fact:
     is_fedora: true
-  when: ansible_distribution == "Fedora"
+  when: "'fedora' in distro_name_1.stdout|lower"
 
-- name: Distribution Alpine
+- name: Set Distribution Alpine
   set_fact:
     is_alpine: true
-  when: ansible_distribution == "Alpine"
+  when: "'alpine' in distro_name_1.stdout|lower"
   
-- name: Distribution Debian
+- name: Set Distribution Debian
   set_fact: 
     is_debian: true
-  when: ansible_distribution == "Debian"
+  when: "'debian' in distro_name_1.stdout|lower"
 
 - name: Run command for wsl
   shell:  "uname -a"

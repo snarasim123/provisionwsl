@@ -17,7 +17,7 @@
     state: absent
     path: "{{ user_home }}/{{ item }}"
   with_items:
-    - "{{ vimrc }}"
+    - .vimrc
     - vim_shortcuts.txt
         
 - name: Create vim directories
@@ -55,6 +55,7 @@
   with_items:
     - .vimrc
     - vim_shortcuts.txt
+  become: true
 
 - name: Download vim plug plugin manager
   ansible.builtin.get_url:
