@@ -80,6 +80,7 @@ alias tmuxls='tmux ls'
 
 #misc aliases
 alias mc='mc -u -X'
+alias by='byobu'
 
 #install  colordiff package :)
 #alias diff='colordiff'

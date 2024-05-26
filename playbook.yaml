@@ -14,6 +14,8 @@
   vars_files:
     - vars/language_versions.yml
     - vars/packages_ubuntu.yml
+    - vars/packages_fedora.yml
+    - vars/packages_alpine.yml
     - vars/tool_versions.yml
     - vars/user_environment.yml
     - vars/vimvars.yml

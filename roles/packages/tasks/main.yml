@@ -23,11 +23,24 @@
     name: "*"
     state: latest
 
-- name: Install packages
+- name: Install ubuntu packages
   become: true  
   apt:
     name: "{{ packages_ubuntu }}"
+  when: is_ubuntu
   
+- name: Install fedora packages
+  become: true  
+  apt:
+    name: "{{ packages_fedora }}"
+  when: is_fedora
+
+- name: Install alpine packages
+  become: true  
+  apt:
+    name: "{{ packages_alpine }}"
+  when: is_alpine
+
 # TODO install packages for dnf and apk
 # TODO setup package lists for fedora and alpine
 # TODO different package lists for light or full install

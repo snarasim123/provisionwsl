@@ -1,5 +1,5 @@
 ---
-packages_ubuntu:
+packages_fedora:
   - nano
   - git
   - curl
@@ -18,4 +18,5 @@ packages_ubuntu:
   - rxvt-unicode
   - fzf
   - byobu
-  - wmaker
+  - WindowMaker
+  - WindowMaker-extra

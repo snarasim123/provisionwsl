@@ -8,11 +8,11 @@ $file | foreach {
   if ($items[0] -eq "export distro_name"){$distro_name = $items[1]}   
   if ($items[0] -eq "export ps_distro_source"){$ps_distro_source = $items[1]}   
   if ($items[0] -eq "export ps_install_dir"){$ps_install_dir = $items[1]+"\"+$distro_name}
-  if ($items[0] -eq "export source_base"){$source_base = $items[1]}  
-  if ($items[0] -eq "export light_install"){$light_install = $items[1]} 
-  if ($items[0] -eq "export install_file"){$install_file = $items[1]} 
-  if ($items[0] -eq "export fedora_source_base"){$fedora_source_base = $items[1]} 
-  if ($items[0] -eq "export default_user"){$default_user = $items[1]} 
+  # if ($items[0] -eq "export source_base"){$source_base = $items[1]}  
+  # if ($items[0] -eq "export light_install"){$light_install = $items[1]} 
+  # if ($items[0] -eq "export install_file"){$install_file = $items[1]} 
+  # if ($items[0] -eq "export fedora_source_base"){$fedora_source_base = $items[1]} 
+  # if ($items[0] -eq "export default_user"){$default_user = $items[1]} 
   }
 
 $install_name=$distro_name

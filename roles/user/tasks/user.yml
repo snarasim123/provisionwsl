@@ -1,10 +1,10 @@
 ---
-- name: Ensure sudo group is present
+- name: User - Ensure sudo group is present
   group:
     name: sudo
     state: present
 
-- name: Add the user {{ target_user }}
+- name: User - Add the user {{ target_user }}
   ansible.builtin.user:
     name: "{{ target_user }}"
     password: "{{ target_user | password_hash('sha512') }}"
@@ -14,7 +14,7 @@
     home: "/home/{{ target_user }}"
   become: true
 
-- name: Create SSH directory 
+- name: User - Create SSH directory 
   file:
     path: "/home/{{ target_user }}/.ssh"
     state: directory
@@ -22,7 +22,7 @@
     group: "{{ target_user }}"
     mode: 0700
 
-- name: Generate SSH key 
+- name: User - Generate SSH key 
   user:
     name: "{{ target_user }}"
     generate_ssh_key: yes
@@ -46,7 +46,7 @@
 #     marker: "## {mark} ANSIBLE MANAGED BLOCK"
 #     create: true
 
-- name: Check if /etc/sudoers has the user already
+- name: User - Check if /etc/sudoers has the user already
   ansible.builtin.lineinfile:
     state: absent
     path: /etc/sudoers
@@ -56,19 +56,19 @@
   register: check
   become: true
 
-- name: Print lineinfile if sudoers has user
+- name: User - Print if sudoers has user
   ansible.builtin.debug:
     msg: lineinefile found /etc/sudoers has {{ target_user }}
   when: check.found
   become: true
 
-- name: Print lineinfile if sudoers does not have user
+- name: User - Print if sudoers does not have user
   ansible.builtin.debug:
     msg: lineinefile did not find /etc/sudoers has {{ target_user }}
   when: not check.found
   become: true
 
-- name: update sudoers file for user
+- name: User - update sudoers file for user
   ansible.builtin.lineinfile:
     path: /etc/sudoers
     line: '{{ target_user }} ALL=(ALL) NOPASSWD: ALL'

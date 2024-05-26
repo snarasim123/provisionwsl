@@ -1,5 +1,5 @@
 ---
-packages_ubuntu:
+packages_alpine:
   - nano
   - git
   - curl
@@ -18,4 +18,3 @@ packages_ubuntu:
   - rxvt-unicode
   - fzf
   - byobu
-  - wmaker
