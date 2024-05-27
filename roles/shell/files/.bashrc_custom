@@ -9,6 +9,8 @@ elif [[ "$OSTYPE" == "msys" ]]; then
         current_env=CYGWIN;
 elif [[ "$OSTYPE" == "cygwin" ]]; then
         current_env=CYGWIN;
+elif [[ "$OSTYPE" == "linux-musl" ]]; then
+        current_env=Linux;
 else
         current_env="Unknown"
 fi

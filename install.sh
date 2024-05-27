@@ -1,14 +1,19 @@
 #!/usr/bin/env bash
 source ./variables.sh
 
-upgrade() {
-    if [[ "$distro_type" == "ubuntu" ]] ; then
-        sudo apt update -y
-        sudo apt upgrade -y
-    elif [[ "$distro_type" == "fedora" ]] ; then
-        echo "fedora upgrade"
-    fi
-}
+# upgrade() {
+#     if [[ "$distro_type" == "ubuntu" ]] ; then
+#         sudo apt update -y
+#         sudo apt upgrade -y
+#     elif [[ "$distro_type" == "fedora" ]] ; then
+#         echo "fedora upgrade"
+#     elif [[ "$distro_type" == "alpine" ]] ; then
+#         echo "alpine upgrade"
+#         apk update                
+#         apk add --no-cache openssh
+#         # apk add --no-cache openssh-keygen
+#     fi
+# }
 
 clone-repo(){
     echo "#### clone repo."
@@ -26,6 +31,8 @@ run-ansible(){
         sudo apt install ansible aptitude -y
     elif [[ "$distro_type" == "fedora" ]] ; then
         sudo dnf install ansible -y
+    elif [[ "$distro_type" == "alpine" ]] ; then
+        sudo apk add ansible
     fi
 
     ansible-galaxy collection install community.general
@@ -37,7 +44,7 @@ run-ansible(){
 }
 
 # read -p "*** Press to continue.. " -n 1 -r
-upgrade
+# upgrade
 clone-repo
 run-ansible
 exit

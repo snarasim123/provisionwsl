@@ -12,6 +12,13 @@
   shell: cat "/etc/os-release"  | grep ^ID_LIKE=
   register: distro_name_1
   become: true
+  ignore_errors: yes
+
+- name: Check distribution
+  shell: cat "/etc/os-release"  | grep ^ID=
+  register: distro_name_2
+  become: true
+  ignore_errors: yes
 
 - name: check if apt package manager is installed
   set_fact:
@@ -41,7 +48,7 @@
 - name: Set Distribution Alpine
   set_fact:
     is_alpine: true
-  when: "'alpine' in distro_name_1.stdout|lower"
+  when: "'alpine' in distro_name_2.stdout|lower"
   
 - name: Set Distribution Debian
   set_fact: 

@@ -6,10 +6,10 @@ packages_alpine:
   - tmux
   - unzip
   - screen
-  - hostname
+  # - hostname
   - wget
-  - util-linux
-  - passwd
+  # - util-linux
+  # - passwd
   - jq
   - make
   - mc
@@ -18,3 +18,5 @@ packages_alpine:
   - rxvt-unicode
   - fzf
   - byobu
+  - windowmaker
+  # - xfce4
