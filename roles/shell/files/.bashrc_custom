@@ -72,15 +72,11 @@ export HISTFILESIZE=20000
 shopt -s histappend
 
 cd $STARTUP_FOLDER
-
-# :$HOME/.poetry/bin
 export PATH=.:$HOME:$HOME/bin:$HOME/.local/bin:/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin:/sbin:$PATH:
 
-
-
-
-export SCREENDIR=/home/snarasim/.screen
-export GOPATH=/home/snarasim/go
-export GOROOT=/usr/local/go
-export PATH=/home/snarasim/go/bin:/usr/local/go/bin:/usr/lib/jvm/java-11-openjdk-amd64/bin/:.:/home/snarasim:/home/snarasim/bin:/home/snarasim/.local/bin:/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin:/sbin:/home/snarasim/go/bin:/usr/local/go/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/usr/lib/wsl/lib:
-export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64/
+# :$HOME/.poetry/bin
+# export SCREENDIR=/home/snarasim/.screen
+# export GOPATH=/home/snarasim/go
+# export GOROOT=/usr/local/go
+# export PATH=/home/snarasim/go/bin:/usr/local/go/bin:/usr/lib/jvm/java-11-openjdk-amd64/bin/:.:/home/snarasim:/home/snarasim/bin:/home/snarasim/.local/bin:/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin:/sbin:/home/snarasim/go/bin:/usr/local/go/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/usr/lib/wsl/lib:
+# export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64/

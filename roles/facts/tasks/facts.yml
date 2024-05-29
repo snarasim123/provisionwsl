@@ -9,17 +9,15 @@
 - set_fact: is_wsl=false
 
 - name: Check distribution
-  shell: cat "/etc/os-release"  | grep ^ID_LIKE=
-  register: distro_name_1
-  become: true
-  ignore_errors: yes
-
-- name: Check distribution
   shell: cat "/etc/os-release"  | grep ^ID=
   register: distro_name_2
   become: true
   ignore_errors: yes
 
+- name: Register id value from /etc/os-release
+  set_fact:
+    os_id: "{{ distro_name_2.stdout }}"
+  
 - name: check if apt package manager is installed
   set_fact:
     is_apt:  true 
@@ -38,22 +36,26 @@
 - name: Set Distribution Ubuntu
   set_fact:
     is_ubuntu: true
-  when: "'debian' in distro_name_1.stdout|lower"
+    os_name: "ubuntu"
+  when: "'ubuntu' in  os_id |lower"
 
 - name: Set Distribution Fedora
   set_fact:
     is_fedora: true
-  when: "'fedora' in distro_name_1.stdout|lower"
+    os_name: "fedora"
+  when: "'fedora' in  os_id |lower"
 
 - name: Set Distribution Alpine
   set_fact:
     is_alpine: true
-  when: "'alpine' in distro_name_2.stdout|lower"
+    os_name: "alpine"
+  when: "'alpine' in  os_id |lower"
   
 - name: Set Distribution Debian
   set_fact: 
     is_debian: true
-  when: "'debian' in distro_name_1.stdout|lower"
+    os_name: "debian"
+  when: "'debian' in  os_id |lower"
 
 - name: Run command for wsl
   shell:  "uname -a"
@@ -71,12 +73,12 @@
 
 - name: Set user github keyname
   set_fact:
-    github_keyname: "{{ ansible_hostname }}-{{inventory_hostname}}-{{ target_user }}-{{ randome_number }}"
+    github_keyname: "{{ ansible_hostname }}-{{ os_name }}-{{inventory_hostname}}-{{ target_user }}-{{ randome_number }}"
   run_once: yes    
 
 - name: Set root github keyname
   set_fact:
-    root_github_keyname: "{{ ansible_hostname }}-{{inventory_hostname}}-{{ root_user }}-{{ randome_number }}"
+    root_github_keyname: "{{ ansible_hostname }}-{{ os_name }}-{{inventory_hostname}}-{{ root_user }}-{{ randome_number }}"
   run_once: yes    
 
 

@@ -1,4 +1,9 @@
 ---
+- name: Print os id
+  ansible.builtin.debug:
+    msg: "################# OS {{ os_id }} #################"
+  when: is_wsl
+
 - name: Print if distro is ubuntu
   ansible.builtin.debug:
     msg: "################# Running Ubuntu #################" 
@@ -24,20 +29,20 @@
     msg: "################# Running WSL #################"
   when: is_wsl
 
-- name: Print if apt package manager is installed
-  ansible.builtin.debug:
-    msg: Apt installed as pkg manger 
-  when: is_apt 
+# - name: Print if apt package manager is installed
+#   ansible.builtin.debug:
+#     msg: Apt installed as pkg manger 
+#   when: is_apt 
 
-- name: Print if dnf package manager is installed
-  ansible.builtin.debug:
-    msg: dnf installed as pkg manger
-  when: is_dnf 
+# - name: Print if dnf package manager is installed
+#   ansible.builtin.debug:
+#     msg: dnf installed as pkg manger
+#   when: is_dnf 
 
-- name: Print if apk package manager is installed
-  ansible.builtin.debug:
-    msg: apk installed as pkg manger
-  when: is_apk
+# - name: Print if apk package manager is installed
+#   ansible.builtin.debug:
+#     msg: apk installed as pkg manger
+#   when: is_apk
 
 - name: Print user homedir
   ansible.builtin.debug:

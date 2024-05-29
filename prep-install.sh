@@ -10,12 +10,10 @@ upgrade() {
         # echo "alpine upgrade"
         apk update
         apk add sudo
-        apk add bash                        
+        apk add bash              
+        apk add lsb-release          
         apk add --no-cache openssh
-        # echo "Installing passlib"
         apk add py3-passlib
-        # apk add py3-pip
-        # python3 -m pip install passlib
     fi
 }
 

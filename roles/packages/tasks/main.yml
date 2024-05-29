@@ -3,45 +3,60 @@
   become: true  
   apt:
     update_cache: yes
+  become: yes
   when: ansible_pkg_mgr == "apt"
 
 - name: update dnf cache
   become: true  
   dnf:
     update_cache: yes
+  become: yes
   when: ansible_pkg_mgr == "dnf"
 
 - name: update apk cache
   become: true  
   community.general.apk:
     update_cache: yes
+  become: yes
   when: ansible_pkg_mgr == "apk"
 
-- name: upgrade all packages
-  become: true
-  package:
+- name: Update all Debian/Ubuntu packages to their latest version
+  ansible.builtin.apt:
     name: "*"
     state: latest
-  ignore_errors: yes
+  become: yes
+  when: is_ubuntu
 
 - name: Install ubuntu packages
   become: true  
   apt:
     name: "{{ packages_ubuntu }}"
+  become: yes
   when: is_ubuntu
   
+- name: Upgrade all fedora packages
+  ansible.builtin.dnf:
+    name: "*"
+    state: latest
+  become: yes
+  when: is_fedora
+
 - name: Install fedora packages
   become: true  
   dnf:
     name: "{{ packages_fedora }}"
+  become: yes
   when: is_fedora
+
+- name: Update all installed alpine packages to the latest versions
+  community.general.apk:
+    upgrade: true
+  become: yes
+  when: is_alpine
 
 - name: Install alpine packages
   become: true  
   community.general.apk:
     name: "{{ packages_alpine }}"
+  become: yes
   when: is_alpine
-
-# TODO install packages for dnf and apk
-# TODO setup package lists for fedora and alpine
-# TODO different package lists for light or full install

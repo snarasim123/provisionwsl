@@ -26,7 +26,8 @@
     - shell
     - git
     - packages
-    - editor    
+    - editor  
+    - gui  
     # - dev
   ### Change to your user! ###
   # user: root
