@@ -24,4 +24,13 @@ packages_alpine:
   # - icewm-lang
   - konsole  
   - coreutils
+  - tree
+  - autoconf
+  - automake
+  - gcc
+  - gettext
+  - groff
+  - make
+  - pkgconf
+  - texinfo
   

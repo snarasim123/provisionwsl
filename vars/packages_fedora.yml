@@ -20,3 +20,13 @@ packages_fedora:
   - byobu
   - WindowMaker
   - WindowMaker-extra
+  - tree
+  - autoconf
+  - automake
+  - gcc
+  - gettext
+  - groff
+  - make
+  - pkgconf
+  - texinfo
+

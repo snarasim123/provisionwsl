@@ -19,3 +19,4 @@ packages_ubuntu:
   - fzf
   - byobu
   - wmaker
+  - tree
