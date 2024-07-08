@@ -1,7 +1,7 @@
 
 #alias setprompt='set prompt="${PWD}% "'
 
-#cd aliases
+# cd aliases
 alias cdhome='cd ~'
 alias cd..='cd ..'
 alias ..='cd ..' 
@@ -38,6 +38,10 @@ alias lsd='ls -al | grep -i ^d'
 
 #process aliases
 alias getzombie='ps -lA | grep Z'
+
+#disk utils
+alias du1='du -mh -d 1 '
+alias du2='du -mh -d 2 '
 
 #grep aliases
 alias envg='env | grep -i'

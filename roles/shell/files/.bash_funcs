@@ -21,4 +21,7 @@ find_file_by_type() {
 find . -name "$1" -exec grep -i "$2" '{}' \; -print
 }
 
+dusort() {
+du -mh  -d 1 "$1" | sort -h
+}
 

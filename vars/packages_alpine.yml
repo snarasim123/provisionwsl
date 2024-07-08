@@ -18,8 +18,8 @@ packages_alpine:
   - rxvt-unicode
   - fzf
   - byobu
-  - xfce4
-  - windowmaker
+  # - xfce4
+  # - windowmaker
   # - icewm
   # - icewm-lang
   - konsole  
