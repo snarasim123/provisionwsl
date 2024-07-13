@@ -20,3 +20,4 @@ packages_ubuntu:
   - byobu
   - wmaker
   - tree
+  - libncurses5-dev
