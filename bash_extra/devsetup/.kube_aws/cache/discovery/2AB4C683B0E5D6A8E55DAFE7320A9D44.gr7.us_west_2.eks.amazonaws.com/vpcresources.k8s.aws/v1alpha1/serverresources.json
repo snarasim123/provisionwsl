@@ -1,0 +1,1 @@
+{"kind":"APIResourceList","apiVersion":"v1","groupVersion":"vpcresources.k8s.aws/v1alpha1","resources":[{"name":"cninodes","singularName":"cninode","namespaced":false,"kind":"CNINode","verbs":["delete","deletecollection","get","list","patch","create","update","watch"],"shortNames":["cnd"],"storageVersionHash":"w5K4FF5Ny3g="}]}

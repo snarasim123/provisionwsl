@@ -1,0 +1,10 @@
+ЅХНeЮэЋ–&­wдbГЂ¤ЦhУs"!w:<Ц“ИHTTP/2.0 200 OK
+Content-Length: 358
+Audit-Id: dcdd0129-84a8-4ffa-8325-f637fb0210a4
+Cache-Control: no-cache, private
+Content-Type: application/json
+Date: Tue, 07 Nov 2023 22:48:32 GMT
+X-Kubernetes-Pf-Flowschema-Uid: ce8851c3-1319-42d8-b1dc-a3eb83188263
+X-Kubernetes-Pf-Prioritylevel-Uid: 92a75931-f40e-49ae-9dec-5b308df816b7
+
+{"kind":"APIResourceList","apiVersion":"v1","groupVersion":"networking.gke.io/v1beta2","resources":[{"name":"managedcertificates","singularName":"managedcertificate","namespaced":true,"kind":"ManagedCertificate","verbs":["delete","deletecollection","get","list","patch","create","update","watch"],"shortNames":["mcrt"],"storageVersionHash":"FD3rYAFSqMY="}]}

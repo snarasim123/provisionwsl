@@ -1,0 +1,40 @@
+#https://docs.docker.com/engine/install/ubuntu/
+#https://docs.docker.com/engine/install/linux-postinstall/
+#https://www.baeldung.com/ops/docker-private-registry
+#run docker ps to see if the registry is up and running
+#run /usr/bin/dockerd to debug startup issues manually
+sudo_pass=$1
+
+sudo apt-get install ca-certificates curl -y
+sudo install -m 0755 -d /etc/apt/keyrings 
+sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+sudo chmod a+r /etc/apt/keyrings/docker.asc
+
+echo \
+  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
+  $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | sudo tee /etc/apt/sources.list.d/docker.list 
+
+sudo apt-get update
+
+sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin -y
+# echo $sudo_pass | sudo -S  docker run hello-world
+
+sudo groupadd docker
+sudo usermod -aG docker $USER && newgrp docker
+# sudo newgrp docker
+sudo systemctl enable docker.service
+
+
+sudo systemctl enable containerd.service
+sudo systemctl start docker
+# docker run hello-world
+
+#setup private registry
+sudo  mkdir -p /etc/docker
+
+echo "{\"insecure-registries\":[\"localhost:5000\"]}" | sudo  tee  /etc/docker/daemon.json
+
+sudo systemctl daemon-reload
+sudo systemctl restart docker
+sudo docker pull registry
+sudo docker run -itd -p 5000:5000 --name snarasim-registry registry
