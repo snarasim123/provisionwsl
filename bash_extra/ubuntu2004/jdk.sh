@@ -1,7 +1,5 @@
 sudo_pass=$1
 source ../ubuntu-variables.sh
-install_log="$source_base/$distro_name-install.txt"
-echo "##    Setting up Jdk..."  >> $install_log 2>&1
 
 echo $sudo_pass | sudo -S apt install openjdk-11-jdk  -y
 echo $sudo_pass | sudo -S apt install openjdk-8-jdk  -y

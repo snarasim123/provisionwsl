@@ -1,7 +1,7 @@
 sudo_pass=$1
 source ../ubuntu-variables.sh
-install_log="$source_base/$distro_name-install.txt"
-echo "## Setting up Redis..."  >> $install_log 2>&1
+# install_log="$source_base/$distro_name-install.txt"
+# echo "## Setting up Redis..."  >> $install_log 2>&1
 #TODO
 #https://download.redis.io/releases/
 cd $temp_dir
