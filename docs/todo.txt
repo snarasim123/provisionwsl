@@ -1,4 +1,7 @@
-fix path variable for the user
+-add ~/tmp dir to both root and user
+-fix path variable for the user
+-setup neovim
+-setup current version of vim
 register variables for different os,pkg mgr, wsl
 create package list for fedora, alpine/test 
 variables to parameters as default default values
