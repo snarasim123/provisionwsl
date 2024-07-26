@@ -1,0 +1,157 @@
+apiVersion: v1
+clusters:
+- cluster:
+    certificate-authority-data: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUN5RENDQWJDZ0F3SUJBZ0lCQURBTkJna3Foa2lHOXcwQkFRc0ZBREFWTVJNd0VRWURWUVFERXdwcmRXSmwKY201bGRHVnpNQjRYRFRJeE1EZ3dOakE0TkRrd01sb1hEVE14TURnd05EQTRORGt3TWxvd0ZURVRNQkVHQTFVRQpBeE1LYTNWaVpYSnVaWFJsY3pDQ0FTSXdEUVlKS29aSWh2Y05BUUVCQlFBRGdnRVBBRENDQVFvQ2dnRUJBTG51CmJjaUZYYTcwQVlhNytlbVA5dGIrVnRSQWg0ZnpJckxsNENuWVc5ZXlVZzR6dDNINi8rWDUydTdGRXZTSjBreU0KZzZ3MXI2OG9ucm9NcU1ZTnM3WW82WFBVRlhlTkgzNXp5Rjkxc1UzOEhxK1RBNnZrSmlsalk3RElmSXVBN09oQwpzY25uWXlEQmw1ZHJ1aHlnRUNOWVNWVDQ5ZHBqWTNzT1cwRFhnSk5hdSthUHg1VDMzWCtVbDhDd0RwV2JEdjRrCmRtV2JLRS9uN3ZpdFVzVjdWNzAyS3hYNnpMQXdYUkpQU2twMkxzaVM5REpsdUptUStQcDhJcTFuTUU4NnlaTGwKVUhkUEtvcndJRW5oVFhwdGVERDF0SmQzbitqU1hWbU52ZGxTV2ZhNUdOdnBXcFRKakdUTThOZWZSdDdtczRtLwpheHFaODBkblZyK0NZYkV5SDNNQ0F3RUFBYU1qTUNFd0RnWURWUjBQQVFIL0JBUURBZ0trTUE4R0ExVWRFd0VCCi93UUZNQU1CQWY4d0RRWUpLb1pJaHZjTkFRRUxCUUFEZ2dFQkFFQVl5UEdOS0lxRERDcGhDK1ROUHVZRktTNWcKWEVOM1dEVmtVcFlRRkt4RUZQVkd1ZFVVNzZISEQvSDgxUm9Sb3dFWDZmSVFHeTZYODA4RzRSUHhPYjAwWXJ6WgpNNVh3cjBMcjluT3FyOWhXdEtibm5OcG1NSjBCaVpDZW13cGRiN2RUZkdHNHdyYlRZT0pGUWM2YTMxWDBySlc2Ck15QnJYVFp2ZzlMcmhjdFArTDEyTnVPa1hYMzJCUGxuWStPMml0MjFXT2NVSUVrYlIwSFhFZVlRUGo4Tm10aWsKWml4REJiSWhoRE5XMzdFUWdOQUlpSm5LVTJMNnVObVhVRkVpVzJnODdWTHZwc3Jya3c2SFZESGJENEhMeFpYVApBQ1VzRGkyNE5OSmRDbHpFa205dkdjNkpZYm52VTIzTk1PRWlnYUFXR0dqdUhsV0FRRFhDeXdtN0VGRT0KLS0tLS1FTkQgQ0VSVElGSUNBVEUtLS0tLQo=
+    server: https://57D33B59FAF023D4890A98E76793CBA4.yl4.ap-south-1.eks.amazonaws.com
+  name: arn:aws:eks:ap-south-1:679329828108:cluster/test-ap-south-1-eks
+- cluster:
+    certificate-authority-data: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUM1ekNDQWMrZ0F3SUJBZ0lCQURBTkJna3Foa2lHOXcwQkFRc0ZBREFWTVJNd0VRWURWUVFERXdwcmRXSmwKY201bGRHVnpNQjRYRFRJeU1ESXdOREU1TVRRek9Wb1hEVE15TURJd01qRTVNVFF6T1Zvd0ZURVRNQkVHQTFVRQpBeE1LYTNWaVpYSnVaWFJsY3pDQ0FTSXdEUVlKS29aSWh2Y05BUUVCQlFBRGdnRVBBRENDQVFvQ2dnRUJBSzBHCndVNzFVWXIrNXZYNUwwS1pmZGFBZ0JxdEJReEYybHZHVnpVUHlhUW1pLzNLSUVVSkJhSkVBVGJBK05uUDJ1cDAKT3FTTGx4R1JkRWJ5NWRqZzB6SUo4ZFYvZDhmVm11ODdPODkyUkRIek0vdEd3eVJSS1NHQ1p4eEIxMndBOUJsQwplRndnd0lxd3N1eUpNMlQ3ckRKazVkdGtZL0p5ZzE3ZEI3VkV2K25WZkdiVUs5WWs4TEI0MnpBN2pjY0ZKM2x3CnU5TUNsdThGelBhenRtTzJzcGljRU41dTY2ZzRlV0d2cGZOWWt0QlI3SFl3MmZPdDRUMVV3bHNYZEY2L1RtOVcKaTFzSGtlaEJBdDdDalRWQkxmWENkMGNQZ2ZrYmRic3JUM2ZGUHNneTdBcUd1Sms2d2NGTW8vdm5BR3g1cHNNYgpjZWJRbmNXdUpab2VmT3dEQzFjQ0F3RUFBYU5DTUVBd0RnWURWUjBQQVFIL0JBUURBZ0trTUE4R0ExVWRFd0VCCi93UUZNQU1CQWY4d0hRWURWUjBPQkJZRUZPd2ZjOU04ZVVEQ0ZlS3lRYSswUzI0dVlpekdNQTBHQ1NxR1NJYjMKRFFFQkN3VUFBNElCQVFCUnhuYmJraWw3MFB1WXFYVUNFU1hTckQxb2JtbGpZNDMraUtVeW9rM01yaEplU0RpTwo1Wmo0Sk1LYWIvdWhtRDkzMnArNVpQSkhuMmRmbGZIb2wxZGhnSzhIZ1YrMHJKN0QwNlhpc1N1Rm9XVktkNkt0CmNGdzZzVkNuc2lnU2hlbGFKbEsrSXRhU0d0TGpiMlZ0VHNJa0cvL0E3RGRCcy9lMzhheElKSURvSnc1UmhtNGYKTzJ5MGpTRFdzL0xaTlVMR2wrRjBRSm1udXAvTHJHa1d3eFh4ZzRPM245bnd3ZHJIUk1FS0dQNEwzaUNxV050Vgozd01tbnZIRFVDUm42ZW5GeVluWTNEaW15NUlHMzhFYnl6SlNvZ3FqOVkyODhTS2kvczBzQ3BGZGVJd3I5R01tCjNJa1FkWFdxZENKYW51c2kzNy9Cd0hpSk1FWmhNNzk0aitmagotLS0tLUVORCBDRVJUSUZJQ0FURS0tLS0tCg==
+    server: https://7A3FD45749F72E755AD72900D8A48FA5.gr7.us-east-1.eks.amazonaws.com
+  name: arn:aws:eks:us-east-1:463221208343:cluster/test-use1-ee-us-east-1-eks
+- cluster:
+    certificate-authority-data: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUN5RENDQWJDZ0F3SUJBZ0lCQURBTkJna3Foa2lHOXcwQkFRc0ZBREFWTVJNd0VRWURWUVFERXdwcmRXSmwKY201bGRHVnpNQjRYRFRJd01USXlPVEE1TkRVeU4xb1hEVE13TVRJeU56QTVORFV5TjFvd0ZURVRNQkVHQTFVRQpBeE1LYTNWaVpYSnVaWFJsY3pDQ0FTSXdEUVlKS29aSWh2Y05BUUVCQlFBRGdnRVBBRENDQVFvQ2dnRUJBS3ZmCnVxQzA3czB1a3REanRmODE5bGhlam40SlV1YmE5bklFMHRqYlZranpyVnRCSlhudUU1WW9HQmNLS0dJZmVNWDkKdUl6cWZORXdRMUFzNmdBV0tmbVJkTHIrRnB6T1ovcVNxQVNweDRMVThDWHdWcUdWcGpOKzN3TUY1VXZBRlQ0bwpocUZHcUZrNWtuVitQakNWUnIvbXlaMUt1djZkQ1MyL2tpT1ovWUw5eHZsZjBiYlBQM1VLUjlLVFQ5R1o2N2tXClBZRkdDSWxRbk5ueXVWbXN4RndDTnNSeXJsV2VFeUthQ2hjSlJ4QUJSZXU4c0I5OENQaTlVYjFYdGYzejJxbkYKVXpkdUx1THhJQUhoWUhQQ2kvcG1WRXZpbDBYQWxjMzJmT2hoczBzbWlVbUxYdUJUUmFwOFBBWXlNL25wWVk0Rwo1WFAxdDB1NjlCblhwb2ZKcDlVQ0F3RUFBYU1qTUNFd0RnWURWUjBQQVFIL0JBUURBZ0trTUE4R0ExVWRFd0VCCi93UUZNQU1CQWY4d0RRWUpLb1pJaHZjTkFRRUxCUUFEZ2dFQkFDZ09BMWV1bGc2ZlVqeGV6eXZSUVFpQlhlQTkKNEliaDFOc1RqUHBLRDFqaklGTGkxVnVIS0J2b29UUVRGSlNQNUZIeGZ3UVlzTW51c0dFWmU4a0IvbEV6alV3YwpBWVVraWMwamY2cFQ3Szl0Tmk1QTgvZkV5ckk0ZmRZOWdhWXppalNvVlZMK0dWU1N3bWE2K2s1UlVSQnQ0d3c5CndXbUZONS9pUEZIL1BHTll0RHhCUDljTC9la2p2N3Rqd1hUNmRqaGZvaVhVQ2tKaWI5bEVqWnNXRWpDQ2JTYi8KaEhpOVBDL0NMNGc0Q2ZBTVR0NkZMSDlFL2ZlWUZBa25CTGoxZnV6K0xxSzJvSkxmQkpzZGVDbW00WWtCdXVSMwpyL240M09vZFZRc1NpQzFPYTJBYmlOeHRNeGhWL09xTjNrVW5aTUxwcGJHQ2RRQmt1TUZ1MjRiaEFlbz0KLS0tLS1FTkQgQ0VSVElGSUNBVEUtLS0tLQo=
+    server: https://DD1A7E045BDD7523038E645F7D6BCAAF.gr7.us-east-1.eks.amazonaws.com
+  name: arn:aws:eks:us-east-1:508714954883:cluster/test-global-us-east-1-eks
+- cluster:
+    certificate-authority-data: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUN5RENDQWJDZ0F3SUJBZ0lCQURBTkJna3Foa2lHOXcwQkFRc0ZBREFWTVJNd0VRWURWUVFERXdwcmRXSmwKY201bGRHVnpNQjRYRFRJd01Ea3hNREV6TWpjeU1Gb1hEVE13TURrd09ERXpNamN5TUZvd0ZURVRNQkVHQTFVRQpBeE1LYTNWaVpYSnVaWFJsY3pDQ0FTSXdEUVlKS29aSWh2Y05BUUVCQlFBRGdnRVBBRENDQVFvQ2dnRUJBTGtnCmx4OG9ucVlxQk1XeVRoM0c2c0k3RTJCeTFobHMwa0s5SG14dFhITmRkSWRGMnVCOVBwTFlNYjVXNDhobktTOG4KQ05WSW0vb0JzeUVzNWFGYklnMkVrYmNra0U1Yy9XYUZoUWd5SGFNNDVUL0FESnJLOElVdUdZSEdOQy94TitOaQpjWWVyMFZIK2JyUGZKaXljR2FtcGl2Y0tlZFVKOWREZWl4bXhNMmEzbGh3YmM4UU9qTzkyUEVHeW5NN0NsREo4CmZWdjRjQVVhdmo1czFlWlhLcVNvajZtM2ROeXhVcWtLUS9uTUxmcnIzSnk5RE1GRlFmRGR0ejl0b1d2S3dsZ3gKY010QUJDYnlhSWI0VWdMcGwxMFRYZ3d4ZXRCdmNJenluRmYrVjBFcDltOUVCOVhsdUVKeEpxWDZvWjlCU2x4WQppRThqd2lTZkh5RzZFc0czVnJFQ0F3RUFBYU1qTUNFd0RnWURWUjBQQVFIL0JBUURBZ0trTUE4R0ExVWRFd0VCCi93UUZNQU1CQWY4d0RRWUpLb1pJaHZjTkFRRUxCUUFEZ2dFQkFKRVpldnhKbWdGelRMK1E1VzYxc1ZCV3p4ZU4KVi9DdWt1UVJaVGx6dHlLVUN5N3hzNzdqN1FLK2JmdlRocE1IZTZFZGU4TWtzRUxGZFl3Mk42QmY5THlydEMyUApmTllyOHRqajVyVmpIK1VjU2JDYSsvUm5EZTVlNU1ySVlFMjE3T1lnUU5pVVhMQzZydGVSbEVzSHN0Y3R1R1UzCi9seW9GRGp5R1RSakpkVW5FclBxdVpqNE9DSytZNTNnTVRlS2VRSFcvbGR0dm1xSE1IalFKR1BOZTZtNldsSFYKbG9MT2huKytMKzc5cmRnOWk1YkJ5SVdHSmgxZ2M3emdYdkhTRlFJcDRWM2tlSUpjeG9uOHR6UW9na1VwRzJPTAp5VE81TkJMVXhDS0krTUl5VjR2VmhJWVFzU1BkL2E1WjZMc3pUQ3ZtUFpML05YYnhpSVJ6MzMzQis0cz0KLS0tLS1FTkQgQ0VSVElGSUNBVEUtLS0tLQo=
+    server: https://2AB4C683B0E5D6A8E55DAFE7320A9D44.gr7.us-west-2.eks.amazonaws.com
+  name: arn:aws:eks:us-west-2:679329828108:cluster/test-us-west-2-eks
+- cluster:
+    certificate-authority-data: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUM1ekNDQWMrZ0F3SUJBZ0lCQURBTkJna3Foa2lHOXcwQkFRc0ZBREFWTVJNd0VRWURWUVFERXdwcmRXSmwKY201bGRHVnpNQjRYRFRJeU1ERXlOREl3TkRZeU5Wb1hEVE15TURFeU1qSXdORFl5TlZvd0ZURVRNQkVHQTFVRQpBeE1LYTNWaVpYSnVaWFJsY3pDQ0FTSXdEUVlKS29aSWh2Y05BUUVCQlFBRGdnRVBBRENDQVFvQ2dnRUJBTUV4Cm9zVHRmUjZRekNXa2g4MmNPTDRmbmpsbjZBM0N0eTVVelY1YWRPZExYYkZxbnppWHU2SHl5c0IrYWJmbzk3RkUKeDA3aGtKYTBYaHh4Vi9tWjlGdTgwOXRuVnJGSnRhYlQ4NGQzN0RFeEwrR2N1Nk1wU3dybU5oUEMxTjFRSUJZZQovMTBWZVZmNUxsK2IrSEN3YWd2SGNRMGs2eTNCQ3NLV0NsZ1RXaW4zS3RSK1lKdEN5MTdFREEveTB4eFc4MkQzCmQ3N1AyOUJ3d1poSUpkMDdSeXhLR1RHNDZjNG1MZXFaVlBBMTNWWDdzck1YREdEVG04V296S1Y0QnBYSmxKbVIKN3puWmIzc0YzcHJNM20zdU05NUNGeFJUVjd0QXNvL2w2dCs3TTF6cTdMY3RUSG1PM1U2bDR1N2krNTBMZUJjQQpTb3h5NDBMOXRWMDViem9LYlg4Q0F3RUFBYU5DTUVBd0RnWURWUjBQQVFIL0JBUURBZ0trTUE4R0ExVWRFd0VCCi93UUZNQU1CQWY4d0hRWURWUjBPQkJZRUZBVW9FYWdDN21FUTZPcW0zbnBONWQ3WGMxTFBNQTBHQ1NxR1NJYjMKRFFFQkN3VUFBNElCQVFDRllidU11ekE0cXFxNTVIUXdxMWFXVlpnKzRUNG9RRmczVU5JN3BLQXdJYmg1Q200UQpUNDNZOEo0Y1hkMk81eVNJU043WmIzVVhXd0tDdVVJUXFNMU9JV2tOUGRBeWM5MjROUzlFVVdnd2tRSXdTVUF6CkJKYVVPOXpTNEExejJiRHo2UkZtVDhGa0lubkxySXgxOXBvT1c2bW40ZGRpenN5Vmp5UlRvRklKNEpDM0pDQ2gKSi90ajhsVkZDWmMzcm0vdHhpemlDTE00NjJoeWwwanBzT0hvQjQ0Z1lxV3pIN1UwWFNPNWppZEtWUmVOVEllegpKd0lyYmFRZHJ1U2ZHWFFIOGdCbUIvd0x3MkNOejNJd2phejhSRjVHUzNDUEdPa1lSclF5YmZRL05SbmdsSzVVCkppV1FmMStUcTU5L29uL0hpR3V2V1lFdVJoRllyamFEWTQ1UgotLS0tLUVORCBDRVJUSUZJQ0FURS0tLS0tCg==
+    server: https://156320573F9DA4F66BCFF01D9847E553.gr7.us-west-2.eks.amazonaws.com
+  name: arn:aws:eks:us-west-2:700352514885:cluster/perf-us-west-2-eks
+- cluster:
+    certificate-authority-data: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUMvakNDQWVhZ0F3SUJBZ0lCQURBTkJna3Foa2lHOXcwQkFRc0ZBREFWTVJNd0VRWURWUVFERXdwcmRXSmwKY201bGRHVnpNQjRYRFRJek1ETXdNVEV5TkRZd09Wb1hEVE16TURJeU5qRXlORFl3T1Zvd0ZURVRNQkVHQTFVRQpBeE1LYTNWaVpYSnVaWFJsY3pDQ0FTSXdEUVlKS29aSWh2Y05BUUVCQlFBRGdnRVBBRENDQVFvQ2dnRUJBS0JRCk83ZEN3YmdjbGdhV0V2aG9rSWlGZ2RTbjg3Vjg0OHlublB5Z2ZnRXdCMFNLTTVvMUZyTGZXYVQvZ0FKeG9TQ3AKT3Y0aVFZQ3JpSWk3cW53UUYzR1cyT0YrMXFZRUhxZHJIclVtMXFkYXltVmowVVZKOWtiRjB6bW1QcFJQTjdzZQo0UENJN1VxREJlM01VVlQvOFI3Mk5GYXllejZpT0t5RWVabUJQNWJiemlNYkJua3h3OGxZRVJtUzFCOTBiNktpCjdmSmwxWTVLZXgwd1JkSTdmb053enpFSUdrS1ZYUFNWRmM0ajUvc3UvSGhUL2VKUWxaTEJBc2hzak1tVmYrM3kKdCtadlNWenUycDFvc1k0cnRRVmVHZnFZekdLcE5lSWZPTVJXSHVMT1Ntb3NwTTZKN2s5MCt5T1QyTWhKd1F2dApGeDVldmhSWlRjN3JGUTM5SFdVQ0F3RUFBYU5aTUZjd0RnWURWUjBQQVFIL0JBUURBZ0trTUE4R0ExVWRFd0VCCi93UUZNQU1CQWY4d0hRWURWUjBPQkJZRUZOQjZOU0tBVlRQL0VIWS93ZGhhQ2gxci9nSC9NQlVHQTFVZEVRUU8KTUF5Q0NtdDFZbVZ5Ym1WMFpYTXdEUVlKS29aSWh2Y05BUUVMQlFBRGdnRUJBSW13bytoRlk2eGFEbnpoNGV4NwovQ0tEWTZrZ29rbFhibkZxVExBMXBKVkVueGlCUHcxK1Z5Um9yRWNzTng3NDhJaGREdlBnS01BQWJJMVNUYW5hCi93Qkp0aFZYczRtV1J1UXpCdVRkZWZ0alQ3aWtXSExSV21CYkFkM29iWGJUMGRpZ25oS09hdXVvVFpmRUpnUW4KZXEzVHFRRzRKRkN1b29nZ0dUcHF2NWphSFRWTk1aZkRHQnFXUmFQcWJVZWw5eXNNMmRwb2d5cHdYWTQ2Q0Zmbwo0YVNVazhXRkpad2tWcDdLSk5pN2RiNE4vN29SVGw2WC9PZFNmOC9XVnFibUZPY0hFVm5yMUl5T3oyb243Q1NDClVkbDgzS0NwSlZ3cm1hNURhYXJhMHRCaGxuTnE5QmlZVEF1WXBvTXJYNEhXUzdoMElsalFhRjBmdWZKVE0wc2wKWVJvPQotLS0tLUVORCBDRVJUSUZJQ0FURS0tLS0tCg==
+    server: https://C89D84BD13FE92937A897D2743058B72.gr7.us-west-2.eks.amazonaws.com
+  name: arn:aws:eks:us-west-2:727376579312:cluster/test-usw2-ee-us-west-2-eks
+contexts:
+- context:
+    cluster: arn:aws:eks:ap-south-1:679329828108:cluster/test-ap-south-1-eks
+    user: arn:aws:eks:ap-south-1:679329828108:cluster/test-ap-south-1-eks
+  name: aaedev-mumbai
+- context:
+    cluster: arn:aws:eks:us-west-2:679329828108:cluster/test-us-west-2-eks
+    user: arn:aws:eks:us-west-2:679329828108:cluster/test-us-west-2-eks
+  name: aaedev-oregon
+- context:
+    cluster: arn:aws:eks:us-west-2:727376579312:cluster/test-usw2-ee-us-west-2-eks
+    user: arn:aws:eks:us-west-2:727376579312:cluster/test-usw2-ee-us-west-2-eks
+  name: ba-headless
+- context:
+    cluster: arn:aws:eks:us-east-1:463221208343:cluster/test-use1-ee-us-east-1-eks
+    user: arn:aws:eks:us-east-1:463221208343:cluster/test-use1-ee-us-east-1-eks
+  name: esp-cluster
+- context:
+    cluster: arn:aws:eks:us-west-2:700352514885:cluster/perf-us-west-2-eks
+    user: arn:aws:eks:us-west-2:700352514885:cluster/perf-us-west-2-eks
+  name: performance
+- context:
+    cluster: arn:aws:eks:us-east-1:508714954883:cluster/test-global-us-east-1-eks
+    user: arn:aws:eks:us-east-1:508714954883:cluster/test-global-us-east-1-eks
+  name: test-global
+current-context: aaedev-oregon
+kind: Config
+preferences: {}
+users:
+- name: arn:aws:eks:ap-south-1:679329828108:cluster/test-ap-south-1-eks
+  user:
+    exec:
+      apiVersion: client.authentication.k8s.io/v1beta1
+      args:
+      - --region
+      - ap-south-1
+      - eks
+      - get-token
+      - --cluster-name
+      - test-ap-south-1-eks
+      - --role
+      - arn:aws:iam::679329828108:role/global-engineer-role
+      command: aws
+      env: null
+      interactiveMode: IfAvailable
+      provideClusterInfo: false
+- name: arn:aws:eks:us-east-1:463221208343:cluster/test-use1-ee-us-east-1-eks
+  user:
+    exec:
+      apiVersion: client.authentication.k8s.io/v1beta1
+      args:
+      - --region
+      - us-east-1
+      - eks
+      - get-token
+      - --cluster-name
+      - test-use1-ee-us-east-1-eks
+      - --role
+      - arn:aws:iam::463221208343:role/global-engineer-role
+      command: aws
+      env: null
+      interactiveMode: IfAvailable
+      provideClusterInfo: false
+- name: arn:aws:eks:us-east-1:508714954883:cluster/test-global-us-east-1-eks
+  user:
+    exec:
+      apiVersion: client.authentication.k8s.io/v1beta1
+      args:
+      - --region
+      - us-east-1
+      - eks
+      - get-token
+      - --cluster-name
+      - test-global-us-east-1-eks
+      - --role
+      - arn:aws:iam::508714954883:role/global-engineer-role
+      command: aws
+      env: null
+      interactiveMode: IfAvailable
+      provideClusterInfo: false
+- name: arn:aws:eks:us-west-2:679329828108:cluster/test-us-west-2-eks
+  user:
+    exec:
+      apiVersion: client.authentication.k8s.io/v1beta1
+      args:
+      - --region
+      - us-west-2
+      - eks
+      - get-token
+      - --cluster-name
+      - test-us-west-2-eks
+      - --role
+      - arn:aws:iam::679329828108:role/global-engineer-role
+      command: aws
+      env: null
+      interactiveMode: IfAvailable
+      provideClusterInfo: false
+- name: arn:aws:eks:us-west-2:700352514885:cluster/perf-us-west-2-eks
+  user:
+    exec:
+      apiVersion: client.authentication.k8s.io/v1beta1
+      args:
+      - --region
+      - us-west-2
+      - eks
+      - get-token
+      - --cluster-name
+      - perf-us-west-2-eks
+      - --role
+      - arn:aws:iam::700352514885:role/global-engineer-role
+      command: aws
+      env: null
+      interactiveMode: IfAvailable
+      provideClusterInfo: false
+- name: arn:aws:eks:us-west-2:727376579312:cluster/test-usw2-ee-us-west-2-eks
+  user:
+    exec:
+      apiVersion: client.authentication.k8s.io/v1beta1
+      args:
+      - --region
+      - us-west-2
+      - eks
+      - get-token
+      - --cluster-name
+      - test-usw2-ee-us-west-2-eks
+      - --role
+      - arn:aws:iam::727376579312:role/global-engineer-role
+      command: aws
+      env: null
+      interactiveMode: IfAvailable
+      provideClusterInfo: false

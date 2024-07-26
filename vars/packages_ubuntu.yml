@@ -21,3 +21,5 @@ packages_ubuntu:
   - wmaker
   - tree
   - libncurses5-dev
+  - pkg-config
+  - build-essential

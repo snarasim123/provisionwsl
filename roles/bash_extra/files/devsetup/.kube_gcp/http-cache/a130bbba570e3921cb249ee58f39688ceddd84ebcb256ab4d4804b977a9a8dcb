@@ -1,0 +1,10 @@
+ƒ©C<bòfB ¦$"š›ëöÛT™y§¼’¦‡½WHTTP/2.0 200 OK
+Content-Length: 362
+Audit-Id: 61cdfcb1-1ba5-4a8c-a3da-31239f5e178d
+Cache-Control: no-cache, private
+Content-Type: application/json
+Date: Tue, 07 Nov 2023 22:48:32 GMT
+X-Kubernetes-Pf-Flowschema-Uid: ce8851c3-1319-42d8-b1dc-a3eb83188263
+X-Kubernetes-Pf-Prioritylevel-Uid: 92a75931-f40e-49ae-9dec-5b308df816b7
+
+{"kind":"APIResourceList","apiVersion":"v1","groupVersion":"internal.autoscaling.gke.io/v1alpha1","resources":[{"name":"capacityrequests","singularName":"capacityrequest","namespaced":true,"kind":"CapacityRequest","verbs":["delete","deletecollection","get","list","patch","create","update","watch"],"shortNames":["capreq"],"storageVersionHash":"ctXw/5qaaTc="}]}

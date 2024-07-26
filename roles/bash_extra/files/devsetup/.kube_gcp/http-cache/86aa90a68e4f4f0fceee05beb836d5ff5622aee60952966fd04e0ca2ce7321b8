@@ -1,0 +1,10 @@
+¿*íQÕÌÅ¾'ÚL,Bc*¢u6ÿs‰uª-ÿýHTTP/2.0 200 OK
+Content-Length: 301
+Audit-Id: 26d7aeb3-484b-402e-ba75-0c238fa7ea2c
+Cache-Control: no-cache, private
+Content-Type: application/json
+Date: Tue, 07 Nov 2023 22:48:32 GMT
+X-Kubernetes-Pf-Flowschema-Uid: ce8851c3-1319-42d8-b1dc-a3eb83188263
+X-Kubernetes-Pf-Prioritylevel-Uid: 92a75931-f40e-49ae-9dec-5b308df816b7
+
+{"kind":"APIResourceList","apiVersion":"v1","groupVersion":"hub.gke.io/v1","resources":[{"name":"memberships","singularName":"membership","namespaced":false,"kind":"Membership","verbs":["delete","deletecollection","get","list","patch","create","update","watch"],"storageVersionHash":"ID/RDO2GyFE="}]}

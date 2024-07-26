@@ -33,4 +33,5 @@ packages_alpine:
   - make
   - pkgconf
   - texinfo
+  - build-base
   

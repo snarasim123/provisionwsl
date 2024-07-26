@@ -1,0 +1,10 @@
+º‡ù5Øöè™Ý±?)Õß&9’ØÇ¹vâXŒd)ÈîHTTP/2.0 200 OK
+Content-Length: 1081
+Audit-Id: 259dfa65-57ee-426a-a0e8-ef6e9d1ee0db
+Cache-Control: no-cache, private
+Content-Type: application/json
+Date: Thu, 02 Nov 2023 17:17:35 GMT
+X-Kubernetes-Pf-Flowschema-Uid: e5efd7e7-c8a3-4110-ba75-c1c8246b10cb
+X-Kubernetes-Pf-Prioritylevel-Uid: e2c03a31-710f-401a-8b40-fbb990b8e1ba
+
+{"kind":"APIResourceList","apiVersion":"v1","groupVersion":"opentelemetry.io/v1alpha1","resources":[{"name":"instrumentations","singularName":"instrumentation","namespaced":true,"kind":"Instrumentation","verbs":["delete","deletecollection","get","list","patch","create","update","watch"],"shortNames":["otelinst","otelinsts"],"storageVersionHash":"FeOFC7hWWjc="},{"name":"instrumentations/status","singularName":"","namespaced":true,"kind":"Instrumentation","verbs":["get","patch","update"]},{"name":"opentelemetrycollectors","singularName":"opentelemetrycollector","namespaced":true,"kind":"OpenTelemetryCollector","verbs":["delete","deletecollection","get","list","patch","create","update","watch"],"shortNames":["otelcol","otelcols"],"storageVersionHash":"HC4/vEfyrrc="},{"name":"opentelemetrycollectors/status","singularName":"","namespaced":true,"kind":"OpenTelemetryCollector","verbs":["get","patch","update"]},{"name":"opentelemetrycollectors/scale","singularName":"","namespaced":true,"group":"autoscaling","version":"v1","kind":"Scale","verbs":["get","patch","update"]}]}

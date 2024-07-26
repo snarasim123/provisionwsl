@@ -27,7 +27,8 @@
     - git
     - packages
     - editor  
-    - gui  
+    - gui
+    - bash_extra
     # - dev
   ### Change to your user! ###
   # user: root

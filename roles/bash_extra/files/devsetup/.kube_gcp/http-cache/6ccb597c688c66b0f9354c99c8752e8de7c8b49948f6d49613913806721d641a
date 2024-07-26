@@ -1,0 +1,10 @@
+Üa†£jó‡†j¡£LÊþgV“–§Éˆ½‚â=AOzHTTP/2.0 200 OK
+Content-Length: 335
+Audit-Id: 4818215b-7d08-482d-996f-0bae6e3a3625
+Cache-Control: no-cache, private
+Content-Type: application/json
+Date: Tue, 07 Nov 2023 22:48:32 GMT
+X-Kubernetes-Pf-Flowschema-Uid: ce8851c3-1319-42d8-b1dc-a3eb83188263
+X-Kubernetes-Pf-Prioritylevel-Uid: 92a75931-f40e-49ae-9dec-5b308df816b7
+
+{"kind":"APIResourceList","apiVersion":"v1","groupVersion":"auto.gke.io/v1alpha1","resources":[{"name":"allowlistedworkloads","singularName":"allowlistedworkload","namespaced":false,"kind":"AllowlistedWorkload","verbs":["delete","deletecollection","get","list","patch","create","update","watch"],"storageVersionHash":"4mdg6DE8D0g="}]}

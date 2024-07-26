@@ -1,0 +1,10 @@
+ˆ:pfzÎ”üaWê^’Oúÿ"0@çèÀÙo÷#ƒ"HTTP/2.0 200 OK
+Content-Length: 335
+Audit-Id: b6e2c54b-1a49-440e-860e-ae0678067dd8
+Cache-Control: no-cache, private
+Content-Type: application/json
+Date: Tue, 07 Nov 2023 22:43:24 GMT
+X-Kubernetes-Pf-Flowschema-Uid: ce8851c3-1319-42d8-b1dc-a3eb83188263
+X-Kubernetes-Pf-Prioritylevel-Uid: 92a75931-f40e-49ae-9dec-5b308df816b7
+
+{"kind":"APIResourceList","apiVersion":"v1","groupVersion":"cloud.google.com/v1","resources":[{"name":"backendconfigs","singularName":"backendconfig","namespaced":true,"kind":"BackendConfig","verbs":["delete","deletecollection","get","list","patch","create","update","watch"],"shortNames":["bc"],"storageVersionHash":"iT6Z2sUMGkM="}]}
