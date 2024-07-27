@@ -29,7 +29,5 @@ packages_fedora:
   - make
   - pkgconf
   - texinfo
-  - @development-tools 
-  - @development-libraries
-  
-
+  - '@Development tools'
+  # - '@development-libraries'

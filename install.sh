@@ -27,15 +27,15 @@ clone-repo(){
 
 run-ansible(){
     echo "#### Ansible setup."
-    if [[ "$distro_type" == "ubuntu" ]] ; then
-        sudo apt install ansible aptitude -y
-    elif [[ "$distro_type" == "fedora" ]] ; then
-        sudo dnf install ansible -y
-    elif [[ "$distro_type" == "alpine" ]] ; then
-        sudo apk add ansible
-    fi
+    # if [[ "$distro_type" == "ubuntu" ]] ; then
+    #     sudo apt install ansible aptitude -y
+    # elif [[ "$distro_type" == "fedora" ]] ; then
+    #     sudo dnf install ansible -y
+    # elif [[ "$distro_type" == "alpine" ]] ; then
+    #     sudo apk add ansible
+    # fi
 
-    ansible-galaxy collection install community.general
+    # ansible-galaxy collection install community.general
 
     cd "$HOME/code/setup/ansible"
     chmod -x secrets.*
@@ -45,6 +45,8 @@ run-ansible(){
 
 # read -p "*** Press to continue.. " -n 1 -r
 # upgrade
+distro_type=$1
+read -p "*** install for $distro_type, Press to continue.. " -n 1 -r
 clone-repo
 run-ansible
 exit
