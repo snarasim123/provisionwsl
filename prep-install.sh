@@ -26,7 +26,7 @@ upgrade() {
 
 
 distro_type=$1
-read -p "*** Prelim installs for $distro_type, Press to continue.. " -n 1 -r
+# read -p "*** Prelim installs for $distro_type, Press to continue.. " -n 1 -r
 upgrade
 exit
 

@@ -46,7 +46,7 @@ run-ansible(){
 # read -p "*** Press to continue.. " -n 1 -r
 # upgrade
 distro_type=$1
-read -p "*** install for $distro_type, Press to continue.. " -n 1 -r
+# read -p "*** install for $distro_type, Press to continue.. " -n 1 -r
 clone-repo
 run-ansible
 exit
