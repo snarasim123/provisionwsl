@@ -1,0 +1,43 @@
+---
+- name: remove nvim config files and directories
+  ansible.builtin.file:
+    state: absent
+    path: "{{ root_user_home }}/.config/nvim"
+  become: true
+
+- name: Create nvim config directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    mode: '0755'
+    owner: "{{ root_user }}"
+    group: "{{ root_user }}"
+  with_items:
+    - "{{ root_user_home }}/.config/nvim"
+  become: true
+
+- name: Copy init.lua file
+  copy:
+    src: "{{ item }}"
+    dest: "{{ root_user_home }}/.config/nvim"
+    owner: "{{ root_user }}"
+    group: "{{ root_user }}"
+    mode: 0644
+  loop:
+    - init.lua
+  become: true
+
+- name: Copy initcolors.lua file
+  copy:
+    src: "{{ item }}"
+    dest: "{{ root_user_home }}/.config/nvim/lua/"
+    owner: "{{ root_user }}"
+    group: "{{ root_user }}"
+    mode: 0644
+  loop:
+    - initcolors.lua
+  become: true
+
+
+
+

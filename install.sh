@@ -39,8 +39,9 @@ run-ansible(){
 
     cd "$HOME/code/setup/ansible"
     chmod -x secrets.*
-    ansible-playbook  -i hosts -e @secrets.yaml --vault-password-file secrets.pass ./playbook.yaml
-    echo "#### Done Preliminary setup."
+    ansible-playbook  -i hosts -e @secrets.yaml --vault-password-file secrets.pass ./playbook.yaml 
+    # --skip-tags=upgrade
+    echo "#### Done setup."
 }
 
 # read -p "*** Press to continue.. " -n 1 -r

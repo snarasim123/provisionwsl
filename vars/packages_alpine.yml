@@ -34,4 +34,6 @@ packages_alpine:
   - pkgconf
   - texinfo
   - build-base
-  
+  - ripgrep
+  - xclip
+  - openjdk11

@@ -1,4 +1,6 @@
 ---
 - include_tasks: vim.yml
 - include_tasks: root_vim.yml
+- include_tasks: nvim.yml
+- include_tasks: root_nvim.yml
 

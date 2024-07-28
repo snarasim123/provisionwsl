@@ -3,4 +3,5 @@ vim_dir: "/home/{{ target_user }}/.vim"
 vimrc: "/home/{{ target_user }}/.vimrc"
 root_vim_dir: "/{{ root_user }}/.vim"
 root_vimrc: "/{{ root_vim_dir }}/.vimrc"
+nvim_dir: "/opt/nvim-linux64"
 

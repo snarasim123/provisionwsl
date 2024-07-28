@@ -41,10 +41,13 @@ if ($distro_type_param -eq "ubuntu"){
       } 
 
 Write-Host ( 
-    "#####  Teardown params 
-        distro type : {0} 
-        distro_name : {1} 
-        distro source : {2} " -f $distro_type, $distro_name, $ps_distro_source)
+"#####  Teardown params 
+
+          distro type   : {0} 
+          distro_name   : {1} 
+          distro source : {2} 
+
+#####   " -f $distro_type, $distro_name, $ps_distro_source)
 Read-Host -Prompt "Press any key to continue"
 
 $install_name=$distro_name

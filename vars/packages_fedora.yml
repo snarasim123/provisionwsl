@@ -30,4 +30,7 @@ packages_fedora:
   - pkgconf
   - texinfo
   - '@Development tools'
+  - ripgrep
+  - xclip
+  - java-11-openjdk.x86_64 
   # - '@development-libraries'

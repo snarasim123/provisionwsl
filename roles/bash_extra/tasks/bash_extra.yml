@@ -6,6 +6,7 @@
     owner: "{{ target_user }}"
     group: "{{ target_user }}"
     mode: '0744'
+  tags: upgrade
   become: true
 
 - name: Copy content of directory 'files'
@@ -15,6 +16,7 @@
     owner: "{{ target_user }}"
     group: "{{ target_user }}"
     mode: '0744'
+  tags: upgrade
   become: true
 
 - name: Copy file with owner and permissions
@@ -24,60 +26,9 @@
     owner: "{{ target_user }}"
     group: "{{ target_user }}"
     mode: '0744'
+  tags: upgrade
   become: true
 
-
-# - name: Create vim directories
-#   ansible.builtin.file:
-#     path: "{{ item }}"
-#     state: directory
-#     mode: '0755'
-#     owner: "{{ target_user }}"
-#     group: "{{ target_user }}"
-#   with_items:
-#     - "{{ vim_dir }}"
-#     - "{{ vim_dir }}/autoload"
-#     - "{{ vim_dir }}/plugged"
-#   become: true
-
-# - name: Copy vim files
-#   copy:
-#     src: "{{ item }}"
-#     dest: "{{ vim_dir }}"
-#     owner: "{{ target_user }}"
-#     group: "{{ target_user }}"
-#     mode: 0644
-#   loop:
-#     - .vimrc
-#     - vim_shortcuts.txt
-#   become: true
-
-# - name: Create symbolic link 
-#   file:
-#    src: "{{ vim_dir }}/{{ item }}"
-#    dest: "{{ user_home }}/{{ item }}"
-#    state: link
-#    owner: "{{ target_user }}" 
-#    group: "{{ target_user }}"
-#   with_items:
-#     - .vimrc
-#     - vim_shortcuts.txt
-#   become: true
-
-# - name: Download vim plug plugin manager
-#   ansible.builtin.get_url:
-#     url: https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
-#     dest: "{{ item }}"
-#     mode: '0440'
-#   with_items:
-#     - "{{ vim_dir }}/autoload"
-
-# - name: Change plugin mgr file ownership, group and permissions
-#   ansible.builtin.file:
-#     path: "{{ vim_dir }}/autoload/plug.vim"
-#     owner: "{{ target_user }}" 
-#     group: "{{ target_user }}"
-#     mode: '0644'
 
 
 

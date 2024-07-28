@@ -48,11 +48,14 @@ $install_name=$distro_name
 $ps_install_dir = $ps_install_dir+"\"+$distro_name
 
 Write-Host ( 
-  "#####  Spinup params - 
-        distro type : {0} 
-        distro_name : {1} 
-        distro source : {2} 
-        install location: {3}" -f $distro_type, $install_name, $ps_distro_source,$ps_install_dir)
+"#####  Spinup params 
+
+          distro type       : {0} 
+          distro_name       : {1} 
+          distro source     : {2} 
+          install location  : {3}
+          
+#####  " -f $distro_type, $install_name, $ps_distro_source,$ps_install_dir)
 # Write-Host ( "##### Creating  {0} from source {1} to dir {2} " -f $install_name,$ps_distro_source, $ps_install_dir)
 Read-Host -Prompt "Press any key to continue"
 

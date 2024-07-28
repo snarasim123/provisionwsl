@@ -72,7 +72,7 @@ export HISTFILESIZE=20000
 shopt -s histappend
 
 cd $STARTUP_FOLDER
-export PATH=.:$HOME:$HOME/bin:$HOME/.local/bin:/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin:/sbin:$PATH:
+export PATH=.:$HOME:$HOME/bin:$HOME/.local/bin:/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin:/sbin:/opt/nvim-linux64/bin:/usr/lib/jvm/java-11-openjdk-amd64/bin/:$PATH:
 
 # :$HOME/.poetry/bin
 # export SCREENDIR=/home/snarasim/.screen
