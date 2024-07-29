@@ -3,31 +3,37 @@
   ansible.builtin.debug:
     msg: "################# OS {{ os_id }} #################"
   when: is_wsl
+  tags: print
 
 - name: Print if distro is ubuntu
   ansible.builtin.debug:
     msg: "################# Running Ubuntu #################" 
   when: is_ubuntu
+  tags: print
     
 - name: Print if distro is debian
   ansible.builtin.debug:
     msg: "################# Running Debian #################"
   when: is_debian
+  tags: print
 
 - name: Print if distro is fedora
   ansible.builtin.debug:
     msg: "################# Running Fedora #################"
   when: is_fedora
+  tags: print
 
 - name: Print if distro is alpine
   ansible.builtin.debug:
     msg: "################# Running Alpine #################" 
   when: is_alpine
+  tags: print
 
 - name: Print if Wsl
   ansible.builtin.debug:
     msg: "################# Running WSL #################"
   when: is_wsl
+  tags: print
 
 # - name: Print if apt package manager is installed
 #   ansible.builtin.debug:
@@ -47,18 +53,22 @@
 - name: Print user homedir
   ansible.builtin.debug:
     msg: user homedir {{ user_home }} for  {{ target_user }}
+  tags: print
 
 - name: Print root github keyname
   ansible.builtin.debug:
     msg: root github keyname {{ root_github_keyname }}
+  tags: print
 
 - name: Print user github keyname
   ansible.builtin.debug:
     msg: user github keyname {{ github_keyname }}
+  tags: print
 
 - name: Print github creds
   ansible.builtin.debug:
     msg: githubuser "{{ githubuser }}" githubpass  "{{ githubpass }}"
+  tags: print
 
 
 

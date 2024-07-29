@@ -4,12 +4,14 @@
     name:
       - vim
     state: present
+  tags: vim
   become: true
   
 - name: remove vim files and directories
   ansible.builtin.file:
     state: absent
     path: "{{ root_vim_dir }}"
+  tags: vim
 
 - name: remove existing vim symlinks
   ansible.builtin.file:
@@ -18,6 +20,7 @@
   with_items:
     - "{{ root_vimrc }}"
     - vim_shortcuts.txt
+  tags: vim
         
 - name: Create vim directories for root
   ansible.builtin.file:
@@ -30,6 +33,7 @@
     - "{{ root_vim_dir }}"
     - "{{ root_vim_dir }}/autoload"
     - "{{ root_vim_dir }}/plugged"
+  tags: vim
   become: true
 
 - name: Copy vim files
@@ -42,6 +46,7 @@
   loop:
     - .vimrc
     - vim_shortcuts.txt
+  tags: vim
   become: true
 
 - name: Create symbolic link 
@@ -54,6 +59,7 @@
   with_items:
     - .vimrc
     - vim_shortcuts.txt
+  tags: vim
   become: true
 
 - name: Download vim plug plugin manager
@@ -63,6 +69,7 @@
     mode: '0440'
   with_items:
     - "{{ root_vim_dir }}/autoload"
+  tags: vim
   become: true
 
 - name: Change plugin mgr file ownership, group and permissions
@@ -71,6 +78,7 @@
     owner: "{{ root_user }}" 
     group: "{{ root_user }}"
     mode: '0644'
+  tags: vim
   become: true
 
 
@@ -104,6 +112,7 @@
     url: git@github.com:skywind3000/vim-quickui
   - name: vim-gutentags
     url: git@github.com:ludovicchabant/vim-gutentags.git
+  tags: vim
   become: true
 
 

@@ -28,6 +28,7 @@
     - packages
     - editor  
     - gui
+    - cloud
     - bash_extra
     # - dev
   ### Change to your user! ###

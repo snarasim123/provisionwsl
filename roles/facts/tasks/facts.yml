@@ -14,6 +14,7 @@
   become: true
   ignore_errors: yes
 
+
 - name: Register id value from /etc/os-release
   set_fact:
     os_id: "{{ distro_name_2.stdout }}"

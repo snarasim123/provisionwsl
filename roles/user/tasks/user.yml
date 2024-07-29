@@ -3,6 +3,7 @@
   group:
     name: sudo
     state: present
+  tags: user
 
 - name: User - Add the user {{ target_user }}
   ansible.builtin.user:
@@ -12,6 +13,7 @@
     shell: /bin/bash
     update_password: always
     home: "/home/{{ target_user }}"
+  tags: user
   become: true
 
 - name: User - Create SSH directory 
@@ -21,6 +23,7 @@
     owner: "{{ target_user }}"
     group: "{{ target_user }}"
     mode: 0700
+  tags: user
 
 - name: User - Generate SSH key 
   user:
@@ -29,6 +32,7 @@
     ssh_key_type: rsa
     ssh_key_bits: 4096
     ssh_key_file: "/home/{{ target_user }}/.ssh/id_rsa"  
+  tags: user
 
 # - name: Check that the /etc/wsl.conf exists
 #   stat:
@@ -54,18 +58,21 @@
   check_mode: true
   changed_when: false 
   register: check
+  tags: user
   become: true
 
 - name: User - Print if sudoers has user
   ansible.builtin.debug:
     msg: lineinefile found /etc/sudoers has {{ target_user }}
   when: check.found
+  tags: user
   become: true
 
 - name: User - Print if sudoers does not have user
   ansible.builtin.debug:
     msg: lineinefile did not find /etc/sudoers has {{ target_user }}
   when: not check.found
+  tags: user
   become: true
 
 - name: User - update sudoers file for user
@@ -73,3 +80,4 @@
     path: /etc/sudoers
     line: '{{ target_user }} ALL=(ALL) NOPASSWD: ALL'
   when: not check.found
+  tags: user

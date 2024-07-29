@@ -3,6 +3,7 @@
   ansible.builtin.file:
     state: absent
     path: "{{ root_user_home }}/.config/nvim"
+  tags: nvim
   become: true
 
 - name: Create nvim config directories
@@ -14,6 +15,7 @@
     group: "{{ root_user }}"
   with_items:
     - "{{ root_user_home }}/.config/nvim"
+  tags: nvim
   become: true
 
 - name: Copy init.lua file
@@ -25,6 +27,7 @@
     mode: 0644
   loop:
     - init.lua
+  tags: nvim
   become: true
 
 - name: Copy initcolors.lua file
@@ -36,6 +39,7 @@
     mode: 0644
   loop:
     - initcolors.lua
+  tags: nvim
   become: true
 
 
