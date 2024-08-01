@@ -29,6 +29,7 @@
     - editor  
     - gui
     - cloud
+    - container
     - bash_extra
     # - dev
   ### Change to your user! ###

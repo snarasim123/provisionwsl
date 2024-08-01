@@ -4,3 +4,36 @@
 # wget https://github.com/derailed/k9s/releases/download/v0.27.4/k9s_Linux_amd64.tar.gz
 # tar -xvf k9s_Linux_amd64.tar.gz
 # mv ./k9s $HOME/bin
+
+---
+- name: remove existing k9s 
+  ansible.builtin.file:
+    state: absent
+    path: "/home/{{ target_user }}/bin/k9s"
+  tags: k9s_install
+  become: true
+
+- name: Download the k9s
+  get_url: url=https://github.com/derailed/k9s/releases/download/v0.27.4/k9s_Linux_amd64.tar.gz dest="/home/{{ target_user }}/tmp/"
+  tags: k9s_install
+
+- name: Unarchive k9s
+  unarchive: src="/home/{{ target_user }}/tmp/k9s_Linux_amd64.tar.gz" dest="/home/{{ target_user }}/tmp" 
+  tags: k9s_install
+
+- name: Install k9s package
+  copy:
+    src: "/home/{{ target_user }}/tmp/k9s"
+    dest: "{{ user_home }}/bin/"
+    mode: 0755
+    owner: "{{ target_user }}" 
+    group: "{{ target_user }}"
+  tags: k9s_install
+  become: true
+
+- name: remove existing k9s file
+  ansible.builtin.file:
+    state: absent
+    path: "/home/{{ target_user }}/tmp/k9s"
+  tags: k9s_install
+  become: true

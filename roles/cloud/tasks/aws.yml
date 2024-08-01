@@ -24,7 +24,7 @@
   tags: aaws_install
 
 - name: Install awscli package.
-  shell:  "/home/{{ target_user }}/tmp/aws/install"
+  shell:  "/home/{{ target_user }}/tmp/aws/install --update"
   tags: aws_install
   become: true
 
