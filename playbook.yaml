@@ -23,6 +23,7 @@
   roles:
     - facts
     - user
+    - folders
     - shell
     - git
     - packages

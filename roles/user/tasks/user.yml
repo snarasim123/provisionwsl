@@ -34,22 +34,6 @@
     ssh_key_file: "/home/{{ target_user }}/.ssh/id_rsa"  
   tags: user
 
-# - name: Check that the /etc/wsl.conf exists
-#   stat:
-#     path: /etc/wsl.conf
-#   register: wslconf_exists
-
-# - name: enable systemd, if wsl.conf exists
-#   ansible.builtin.blockinfile:
-#     path: /etc/wsl.conf
-#     block:  |
-#       [boot]
-#       systemd=true
-#       [user]
-#       default={{ target_user }}
-#     marker: "## {mark} ANSIBLE MANAGED BLOCK"
-#     create: true
-
 - name: User - Check if /etc/sudoers has the user already
   ansible.builtin.lineinfile:
     state: absent

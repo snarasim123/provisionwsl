@@ -57,7 +57,7 @@ Write-Host (
           
 #####  " -f $distro_type, $install_name, $ps_distro_source,$ps_install_dir)
 # Write-Host ( "##### Creating  {0} from source {1} to dir {2} " -f $install_name,$ps_distro_source, $ps_install_dir)
-Read-Host -Prompt "Press any key to continue"
+# Read-Host -Prompt "Press any key to continue"
 
 $match=((wsl -l | Where {$_.Replace("`0","") -match "$install_name"}))
 if ($match -eq "$install_name") {

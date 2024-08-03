@@ -79,22 +79,22 @@
    group: "{{ target_user }}"  
   tags: upgrade
 
-- name: Create bin directory if it does not exist
-  ansible.builtin.file:
-    path: "{{ user_home }}/bin"
-    state: directory
-    owner: "{{ target_user }}"
-    group: "{{ target_user }}"
-    mode: '0755'
-  tags: upgrade
-  become: true
+# - name: Create bin directory if it does not exist
+#   ansible.builtin.file:
+#     path: "{{ user_home }}/bin"
+#     state: directory
+#     owner: "{{ target_user }}"
+#     group: "{{ target_user }}"
+#     mode: '0755'
+#   tags: upgrade
+#   become: true
 
-- name: Create temp directory if it does not exist
-  ansible.builtin.file:
-    path: "{{ user_home }}/tmp"
-    state: directory
-    owner: "{{ target_user }}"
-    group: "{{ target_user }}"
-    mode: '0755'
-  tags: upgrade
-  become: true
+# - name: Create temp directory if it does not exist
+#   ansible.builtin.file:
+#     path: "{{ user_home }}/tmp"
+#     state: directory
+#     owner: "{{ target_user }}"
+#     group: "{{ target_user }}"
+#     mode: '0755'
+#   tags: upgrade
+#   become: true

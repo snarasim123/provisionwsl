@@ -1,20 +1,9 @@
 ---
-- name: remove $HOME/bin directory if it exists
-  ansible.builtin.file:
-    state: "{{ item }}"
-    path: "{{ user_home }}/bin"
-    owner: "{{ target_user }}" # set your owner, group, and mode accordingly
-    group: "{{ target_user }}"
-    mode: '0777'
-  with_items:
-    - absent
-    - directory  
-    
-- name: Create $HOME/bin directory if it does not exist
-  ansible.builtin.file:
-    path: "{{ user_home }}/bin"
-    state: directory
-    mode: '0755'
+# - name: Create $HOME/bin directory if it does not exist
+#   ansible.builtin.file:
+#     path: "{{ user_home }}/bin"
+#     state: directory
+#     mode: '0755'
 
 - name: Copy files
   copy:
