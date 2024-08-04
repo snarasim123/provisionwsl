@@ -48,7 +48,14 @@ Write-Host (
           distro source : {2} 
 
 #####   " -f $distro_type, $distro_name, $ps_distro_source)
-Read-Host -Prompt "Press any key to continue"
+$i=15
+Write-Host ( "Wait {0} Seconds"  -f $i)
+while ($i -gt 0){
+    write-host -nonewline ("#")
+    sleep 1
+    $i--
+}
+# Read-Host -Prompt "Press any key to continue"
 
 $install_name=$distro_name
 

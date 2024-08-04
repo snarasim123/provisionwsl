@@ -5,6 +5,7 @@ packages_alpine:
   - curl
   - tmux
   - unzip
+  - shadow
   - screen
   # - hostname
   - wget
@@ -15,6 +16,7 @@ packages_alpine:
   - mc
   - dos2unix
   - zip
+  - tar
   - rxvt-unicode
   - fzf
   - byobu
@@ -31,9 +33,13 @@ packages_alpine:
   - gettext
   - groff
   - make
+  - cmake
+  # - gettext-tiny-dev-0.3.2-r3
   - pkgconf
   - texinfo
   - build-base
   - ripgrep
   - xclip
   - openjdk11
+  - neovim
+  - aws-cli

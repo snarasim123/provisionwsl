@@ -59,3 +59,4 @@
     creates: /opt/nvim-linux64
   tags: nvim
   become: true
+  when: is_fedora or  is_ubuntu

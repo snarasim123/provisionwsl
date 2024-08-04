@@ -12,6 +12,7 @@
     state: absent
     path: "{{ root_vim_dir }}"
   tags: vim
+  become: true
 
 - name: remove existing vim symlinks
   ansible.builtin.file:
@@ -21,6 +22,7 @@
     - "{{ root_vimrc }}"
     - vim_shortcuts.txt
   tags: vim
+  become: true
         
 - name: Create vim directories for root
   ansible.builtin.file:

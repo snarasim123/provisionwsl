@@ -1,4 +1,6 @@
 ---
+# https://books.stuartherbert.com/putting-ansible-to-work/building-software-from-source.html
+
 
 # - name: Compile NGINX from sources
 #   hosts: webserver

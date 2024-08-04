@@ -1,0 +1,86 @@
+---
+- name: remove files and directories
+  ansible.builtin.file:
+    state: "{{ item }}"
+    path: "{{ root_user_home }}/bashfiles"
+    owner: "{{ root_user }}" # set your owner, group, and mode accordingly
+    group: "{{ root_user }}"
+    mode: '0777'
+  tags: upgrade
+  with_items:
+    - absent
+    - directory  
+  become: true
+    
+- name: Create a directory if it does not exist
+  ansible.builtin.file:
+    path: "{{ root_user_home }}/bashfiles"
+    state: directory
+    mode: '0755'
+  tags: upgrade
+  become: true
+
+- name: Copy files
+  copy:
+    src: '{{item}}'
+    dest: "{{ root_user_home }}/bashfiles"
+    owner: "{{ root_user }}"
+    group: "{{ root_user }}"
+    mode: 0644
+  tags: upgrade
+  loop:
+    - .alias
+    - .bash_funcs
+    - .bash_profile
+    - .bashrc
+    - .bashrc_custom
+    - prompt.sh
+    - variables.sh
+    - dircolors256dark
+    - dircolorsansi-light
+  become: true
+
+- name: remove existing bash files from home
+  ansible.builtin.file:
+    state: absent
+    path: "{{ root_user_home }}/{{ item }}"
+  tags: upgrade
+  with_items:
+    - .alias
+    - .bash_funcs
+    - .bash_profile
+    - .bashrc
+    - .bashrc_custom
+    - prompt.sh
+    - variables.sh
+    - .dircolors
+  become: true
+
+- name: Create symbolic link 
+  file:
+    src: "{{ root_user_home }}/bashfiles/{{ item }}"
+    dest: "{{ root_user_home }}/{{ item }}"
+    state: link
+    owner: "{{ root_user }}" 
+    group: "{{ root_user }}"
+  tags: upgrade
+  with_items:
+    - .alias
+    - .bash_funcs
+    - .bash_profile
+    - .bashrc
+    - .bashrc_custom
+    - prompt.sh
+    - variables.sh
+  become: true
+
+
+- name: Create .dircolor symbolic link 
+  file:
+   src: "{{ root_user_home }}/bashfiles/dircolors256dark"
+   dest: "{{ root_user_home }}/.dircolors"
+   state: link
+   owner: "{{ root_user }}" 
+   group: "{{ root_user }}"  
+  tags: upgrade
+  become: true

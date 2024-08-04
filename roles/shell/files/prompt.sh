@@ -6,7 +6,7 @@ function nonzero_return() {
 	[ $RETVAL -ne 0 ] && echo "($RETVAL Err) "
 }
 
-export	PS1="\[\e[41m\]\`nonzero_return\`\[\e[m\]\[\e[105m\]\D{%m/%d/%y}@\[\e[97m\]\t\[\e[39m\]<\[\e[97m\]\W>\[\e[0m\]"
+export	PS1="\[\e[105m\]\D{%m/%d/%y}@\[\e[97m\]\t<\[\e[39m\]\u@\[\e[97m\]\W>\[\e[0m\]"
 
 export LS_COLORS=$LS_COLORS:'di=1;37:' ;
 export LS_COLORS=$LS_COLORS:'ex=1;31:' ;

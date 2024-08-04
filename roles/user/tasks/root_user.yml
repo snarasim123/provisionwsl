@@ -44,3 +44,12 @@
     create: true
   tags: user
   become: true
+
+- name: change default shell to /bin/bash for root
+  ansible.builtin.user:
+    name: "{{ root_user }}"
+    shell: /bin/bash
+  tags: user
+  become: true
+  become_user: "{{ root_user }}"
+  when: is_alpine
