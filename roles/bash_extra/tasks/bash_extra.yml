@@ -1,8 +1,11 @@
 ---
 - name: Remove devsetup.zip file if present
   ansible.builtin.file:
-    path: "{{ user_home }}/tmp/devsetup.zip"
+    path: "{{ user_home }}/tmp/{{ item }}"
     state: absent
+  with_items:
+    - devsetup.zip
+    - ubuntu2004.zip
   tags: bash_extra
   become: true
 
@@ -24,13 +27,6 @@
   tags: bash_extra
   become: true
 
-- name: Remove ubuntu2004.zip file if present
-  ansible.builtin.file:
-    path: "{{ user_home }}/tmp/ubuntu2004.zip"
-    state: absent
-  tags: bash_extra
-  become: true
-
 - name: Copy ubuntu2004.zip file
   copy:
     src: ubuntu2004.zip    
@@ -49,13 +45,23 @@
   tags: bash_extra
   become: true
 
-- name: Copy file with owner and permissions
+- name: Copy ubuntu-variables.sh file with owner and permissions
   ansible.builtin.copy:
     src: ubuntu-variables.sh 
     dest: "{{ user_home }}/tmp"
     owner: "{{ target_user }}"
     group: "{{ target_user }}"
     mode: '0744'
+  tags: bash_extra
+  become: true
+
+- name: Remove install files
+  ansible.builtin.file:
+    path: "{{ user_home }}/tmp/{{ item }}"
+    state: absent
+  with_items:
+    - devsetup.zip
+    - ubuntu2004.zip
   tags: bash_extra
   become: true
 

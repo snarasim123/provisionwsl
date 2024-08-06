@@ -48,6 +48,17 @@
 - name: remove existing k9s file
   ansible.builtin.file:
     state: absent
-    path: "{{ user_home }}/tmp/k9s"
+    path: "{{ user_home }}/tmp/{{item}}"
+  with_items:
+    - k9s
+    - LICENSE
+    - README.md
+  tags: k9s_install
+  become: true
+
+- name: remove existing  k9s archive
+  ansible.builtin.file:
+    state: absent
+    path: "{{ user_home }}/tmp/k9s_Linux_amd64.tar.gz"
   tags: k9s_install
   become: true
