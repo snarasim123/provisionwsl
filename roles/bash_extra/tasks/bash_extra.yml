@@ -1,22 +1,52 @@
 ---
-- name: Copy content of directory 'files'
-  copy:
-    src: devsetup    
-    dest: "{{ user_home }}/tmp"
-    owner: "{{ target_user }}"
-    group: "{{ target_user }}"
-    mode: '0744'
-  tags: upgrade
+- name: Remove devsetup.zip file if present
+  ansible.builtin.file:
+    path: "{{ user_home }}/tmp/devsetup.zip"
+    state: absent
+  tags: bash_extra
   become: true
 
-- name: Copy content of directory 'files'
+- name: Copy devsetup.zip file
   copy:
-    src: ubuntu2004    
+    src: devsetup.zip    
     dest: "{{ user_home }}/tmp"
     owner: "{{ target_user }}"
     group: "{{ target_user }}"
     mode: '0744'
-  tags: upgrade
+  tags: bash_extra
+  become: true
+
+- name: Extract devsetup.zip into {userhome}/tmp
+  ansible.builtin.unarchive:
+    src: "{{ user_home }}/tmp/devsetup.zip"
+    dest: "{{ user_home }}/tmp"
+    mode: '0744'
+  tags: bash_extra
+  become: true
+
+- name: Remove ubuntu2004.zip file if present
+  ansible.builtin.file:
+    path: "{{ user_home }}/tmp/ubuntu2004.zip"
+    state: absent
+  tags: bash_extra
+  become: true
+
+- name: Copy ubuntu2004.zip file
+  copy:
+    src: ubuntu2004.zip    
+    dest: "{{ user_home }}/tmp"
+    owner: "{{ target_user }}"
+    group: "{{ target_user }}"
+    mode: '0744'
+  tags: bash_extra
+  become: true
+
+- name: Extract ubuntu2004.zip into {userhome}/tmp
+  ansible.builtin.unarchive:
+    src: "{{ user_home }}/tmp/ubuntu2004.zip"
+    dest: "{{ user_home }}/tmp"
+    mode: '0744'
+  tags: bash_extra
   become: true
 
 - name: Copy file with owner and permissions
@@ -26,7 +56,7 @@
     owner: "{{ target_user }}"
     group: "{{ target_user }}"
     mode: '0744'
-  tags: upgrade
+  tags: bash_extra
   become: true
 
 

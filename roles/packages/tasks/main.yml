@@ -4,6 +4,7 @@
   apt:
     update_cache: yes
   become: yes
+  tags: packages
   when: ansible_pkg_mgr == "apt"
 
 - name: update dnf cache
@@ -11,6 +12,7 @@
   dnf:
     update_cache: yes
   become: yes
+  tags: packages
   when: ansible_pkg_mgr == "dnf"
 
 - name: update apk cache
@@ -18,6 +20,7 @@
   community.general.apk:
     update_cache: yes
   become: yes
+  tags: packages
   when: ansible_pkg_mgr == "apk"
 
 - name: Update all Debian/Ubuntu packages to their latest version
@@ -25,6 +28,7 @@
     name: "*"
     state: latest
   become: yes
+  tags: packages
   when: is_ubuntu
 
 - name: Install ubuntu packages
@@ -32,6 +36,7 @@
   apt:
     name: "{{ packages_ubuntu }}"
   become: yes
+  tags: packages
   when: is_ubuntu
   
 - name: Upgrade all fedora packages

@@ -1,6 +1,21 @@
+---
+- name: Remove previous docker dependencies
+  ansible.builtin.apt:
+    name: "{{ item }}"
+    state: absent
+  with_items:
+    - docker.io
+    - docker-compose
+    - docker-compose-v2
+    - docker-doc
+    - podman-docker
+    - containerd
+    - runc
+  tags: docker,cloud
+
 # #https://docs.docker.com/engine/install/ubuntu/
 # #https://docs.docker.com/engine/install/linux-postinstall/
-# #https://www.baeldung.com/ops/docker-private-registry
+
 # #run docker ps to see if the registry is up and running
 # #run /usr/bin/dockerd to debug startup issues manually
 # sudo_pass=$1

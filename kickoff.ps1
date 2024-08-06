@@ -1,4 +1,5 @@
 $distro_type_param=$args[0]
+$skip_upgrade_param=$args[1]
 
 $sw = [Diagnostics.Stopwatch]::StartNew()
 $Path = ".\variables.sh"
@@ -74,7 +75,8 @@ wsl --terminate $install_name
 # wsl -d $install_name lsb_release -d 
 
 Write-Host( "##### Preliminary setup  {0} Step 2... " -f "$install_name")
-wsl -d $install_name ./prep-install.sh $distro_type -u root
+wsl -d $install_name ./prep-install.sh $distro_type $skip_upgrade_param -u root
+Write-Host( "##### Main setup  {0} Step 3... " -f "$install_name")
 wsl -d $install_name  ./install.sh  $distro_type -u root
 
 Write-Host( "##### Restarting instance  {0}... " -f "$install_name")

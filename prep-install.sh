@@ -1,5 +1,5 @@
 source ./variables.sh
-distro_type=$1
+
 upgrade() {
     if [[ "$distro_type" == "ubuntu" ]] ; then
         sudo apt update -y
@@ -24,9 +24,16 @@ upgrade() {
     fi
 }
 
-
 distro_type=$1
+skip_upgrade=$2
+
 # read -p "*** Prelim installs for $distro_type, Press to continue.. " -n 1 -r
-upgrade
+if [[ "$skip_upgrade" != "false" ]] ; then
+    echo "###### Upgrade distro $distro_type ....."
+    upgrade
+else 
+    echo "###### Skipping $distro_type upgrade ....."
+fi
+
 exit
 
