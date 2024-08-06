@@ -27,6 +27,17 @@
   tags: bash_extra
   become: true
 
+- name: Recursively change ownership of devsetup directory
+  ansible.builtin.file:
+    path: "{{ user_home }}/tmp/devsetup"
+    state: directory
+    recurse: yes
+    owner: "{{ target_user }}"
+    group: "{{ target_user }}"
+  tags: bash_extra
+  become: true
+
+
 - name: Copy ubuntu2004.zip file
   copy:
     src: ubuntu2004.zip    
@@ -42,6 +53,16 @@
     src: "{{ user_home }}/tmp/ubuntu2004.zip"
     dest: "{{ user_home }}/tmp"
     mode: '0744'
+  tags: bash_extra
+  become: true
+
+- name: Recursively change ownership of ubuntu2004 directory
+  ansible.builtin.file:
+    path: "{{ user_home }}/tmp/ubuntu2004"
+    state: directory
+    recurse: yes
+    owner: "{{ target_user }}"
+    group: "{{ target_user }}"
   tags: bash_extra
   become: true
 
