@@ -21,7 +21,7 @@ clone-repo(){
     cd "$HOME/code"
     rm -rf ./*
     rm -rf ./.*
-    cp -r /mnt/d/code/setup "$HOME/code"
+    cp -r $code_src "$HOME/code"
     echo "#### Done Clone repo."
 }
 
