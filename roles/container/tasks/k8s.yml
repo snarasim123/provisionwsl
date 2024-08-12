@@ -1,11 +1,133 @@
+---
+- name: remove existing bin k8s 
+  ansible.builtin.file:
+    state: absent
+    path: "{{ user_home }}/bin/kubectl"
+  tags: k8s_install
+  become: true
 
-# cd $temp_folder
-# curl -O https://s3.us-west-2.amazonaws.com/amazon-eks/1.25.6/2023-01-30/bin/linux/amd64/kubectl
-# chmod +x ./kubectl
-# cp ./kubectl $HOME/bin/kubectl
-# rm ./kubectl
-# mkdir ${HOME}/.kube -p
-# # echo 'export KUBECONFIG=${HOME}/.kube/config' >> ~/.bash_profile
+- name: remove existing bin kube_aws 
+  ansible.builtin.file:
+    state: absent
+    path: "{{ user_home }}/bin/kube_aws.sh"
+  tags: k8s_install
+  become: true
 
+- name: remove existing bin kube_gcp 
+  ansible.builtin.file:
+    state: absent
+    path: "{{ user_home }}/bin/kube_gcp.sh"
+  tags: k8s_install
+  become: true
 
+- name: remove existing .kube_aws.zip
+  ansible.builtin.file:
+    state: absent
+    path: "{{ user_home }}/.kube_aws.zip"
+  tags: k8s_install
+  become: true
 
+- name: remove existing .kube_gcp.zip
+  ansible.builtin.file:
+    state: absent
+    path: "{{ user_home }}/.kube_gcp.zip"
+  tags: k8s_install
+  become: true
+
+- name: Download the k8s
+  get_url: url=https://s3.us-west-2.amazonaws.com/amazon-eks/1.25.6/2023-01-30/bin/linux/amd64/kubectl dest="{{ user_home }}/bin/"
+  tags: k8s_install
+  become: true
+
+- name: Give  permissions to k8s
+  ansible.builtin.file:
+    path: "{{ user_home }}/bin/kubectl"
+    owner: "{{ target_user }}" 
+    group: "{{ target_user }}" 
+    mode: '0755'
+  tags: k8s_install
+  become: true
+
+- name: Copy .kube_aws.zip file
+  copy:
+    src: .kube_aws.zip    
+    dest: "{{ user_home }}"
+    owner: "{{ target_user }}"
+    group: "{{ target_user }}"
+    mode: '0744'
+  tags: k8s_install
+  become: true
+
+- name: Copy .kube_gcp.zip file
+  copy:
+    src: .kube_gcp.zip    
+    dest: "{{ user_home }}"
+    owner: "{{ target_user }}"
+    group: "{{ target_user }}"
+    mode: '0744'
+  tags: k8s_install
+  become: true
+
+- name: Extract .kube_aws.zip into {userhome}/.kube_aws
+  ansible.builtin.unarchive:
+    src: "{{ user_home }}/.kube_aws.zip"
+    dest: "{{ user_home }}"
+    mode: '0744'
+  tags: k8s_install
+  become: true
+
+- name: Extract .kube_gcp.zip into {userhome}/.kube_aws
+  ansible.builtin.unarchive:
+    src: "{{ user_home }}/.kube_gcp.zip"
+    dest: "{{ user_home }}"
+    mode: '0744'
+  tags: k8s_install
+  become: true
+
+- name: Create a symbolic link
+  ansible.builtin.file:
+    src: "{{ user_home }}/.kube_aws"
+    dest: "{{ user_home }}/.kube"
+    owner: "{{ target_user }}" 
+    group: "{{ target_user }}" 
+    state: link
+    follow: False
+  tags: k8s_install
+  become: true
+
+- name: remove existing .kube_aws.zip
+  ansible.builtin.file:
+    state: absent
+    path: "{{ user_home }}/.kube_aws.zip"
+  tags: k8s_install
+  become: true
+
+- name: remove existing .kube_gcp.zip
+  ansible.builtin.file:
+    state: absent
+    path: "{{ user_home }}/.kube_gcp.zip"
+  tags: k8s_install
+  become: true
+  
+- name: Copy kube_gcp.sh file
+  copy:
+    src: kube_gcp.sh    
+    dest: "{{ user_home }}/bin"
+    owner: "{{ target_user }}"
+    group: "{{ target_user }}"
+    mode: '0744'
+  tags: k8s_install
+  become: true
+
+- name: Copy kube_aws.sh file
+  copy:
+    src: kube_aws.sh    
+    dest: "{{ user_home }}/bin"
+    owner: "{{ target_user }}"
+    group: "{{ target_user }}"
+    mode: '0744'
+  tags: k8s_install
+  become: true
+
+# ln -s  /home/snarasim/.kube_gcp .kube
+# ln -s  /home/snarasim/.kube_aws .kube

@@ -82,7 +82,7 @@ wsl -d $install_name  ./install.sh  $distro_type -u root
 Write-Host( "##### Restarting instance  {0}... " -f "$install_name")
 wsl --terminate $install_name
 wsl -d $install_name lsb_release -d 
-
+wsl -d $install_name ls /
 Write-Host( "##### Instance  {0} ready. " -f "$install_name")
 $sw.Stop()
 $ts = $sw.Elapsed;

@@ -55,6 +55,7 @@
    src: "{{ vim_dir }}/{{ item }}"
    dest: "{{ user_home }}/{{ item }}"
    state: link
+   follow: False
    owner: "{{ target_user }}" 
    group: "{{ target_user }}"
   with_items:
