@@ -76,11 +76,29 @@
   tags: k8s_install
   become: true
 
+- name: Give  permissions to .kube_aws folder
+  ansible.builtin.file:
+    path: "{{ user_home }}/.kube_aws"
+    owner: "{{ target_user }}" 
+    group: "{{ target_user }}" 
+    mode: '0755'
+  tags: k8s_install
+  become: true
+
 - name: Extract .kube_gcp.zip into {userhome}/.kube_aws
   ansible.builtin.unarchive:
     src: "{{ user_home }}/.kube_gcp.zip"
-    dest: "{{ user_home }}"
+    dest: "{{ user_home }}"    
     mode: '0744'
+  tags: k8s_install
+  become: true
+
+- name: Give  permissions to .kube_gcp folder
+  ansible.builtin.file:
+    path: "{{ user_home }}/.kube_gcp"
+    owner: "{{ target_user }}" 
+    group: "{{ target_user }}" 
+    mode: '0755'
   tags: k8s_install
   become: true
 
