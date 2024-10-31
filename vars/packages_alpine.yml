@@ -3,6 +3,7 @@ packages_alpine:
   - nano
   - git
   - curl
+  - net-tools
   - tmux
   - unzip
   - shadow

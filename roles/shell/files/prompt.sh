@@ -17,7 +17,7 @@ export PS1="\[\e[48;5;57m\]\D{%m/%d/%y}-\[\e[97m\]\t<\u\[\e[39m\]:\[\e[97m\]\w>\
 }
 
 # export PS1="\[\e[105m\]\D{%m/%d/%y}@\[\e[97m\]\t<\[\e[39m\]\u@\[\e[97m\]\W>\[\e[0m\]"
-prompt_shortpath()
+prompt_shortpath
 
 export LS_COLORS=$LS_COLORS:'di=1;37:' ;
 export LS_COLORS=$LS_COLORS:'ex=1;31:' ;
