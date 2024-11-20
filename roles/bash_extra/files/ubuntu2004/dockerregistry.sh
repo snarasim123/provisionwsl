@@ -3,6 +3,7 @@
 #https://www.baeldung.com/ops/docker-private-registry
 #run docker ps to see if the registry is up and running
 #run /usr/bin/dockerd to debug startup issues manually
+#if error about docker not running, sudo service docker start
 sudo_pass=$1
 
 # docker run hello-world

@@ -1,6 +1,63 @@
-# sudo_pass=$1
-# source ../ubuntu-variables.sh
+---
+- name: remove existing helm
+  ansible.builtin.file:
+    state: absent
+    path: "{{ user_home }}/bin/kubectl"
+  tags: k8s_install
+  become: true
 
+- name: remove existing helm temp files
+  ansible.builtin.file:
+    state: absent
+    path: "{{ user_home }}/bin/kube_aws.sh"
+  tags: k8s_install
+  become: true
+
+- name: Download helm
+  get_url: url=https://s3.us-west-2.amazonaws.com/amazon-eks/1.25.6/2023-01-30/bin/linux/amd64/kubectl dest="{{ user_home }}/bin/"
+  tags: k8s_install
+  become: true
+
+- name: unzip/untar helm
+  ansible.builtin.file:
+    path: "{{ user_home }}/bin/kubectl"
+    owner: "{{ target_user }}" 
+    group: "{{ target_user }}" 
+    mode: '0755'
+  tags: k8s_install
+  become: true
+
+- name: install helm files to binary folder
+  copy:
+    src: .kube_aws.zip    
+    dest: "{{ user_home }}"
+    owner: "{{ target_user }}"
+    group: "{{ target_user }}"
+    mode: '0744'
+  tags: k8s_install
+  become: true
+
+- name: install helm plugins
+  copy:
+    src: .kube_gcp.zip    
+    dest: "{{ user_home }}"
+    owner: "{{ target_user }}"
+    group: "{{ target_user }}"
+    mode: '0744'
+  tags: k8s_install
+  become: true
+
+- name: remove existing helm temp files
+  ansible.builtin.file:
+    state: absent
+    path: "{{ user_home }}/bin/kube_aws.sh"
+  tags: k8s_install
+  become: true
+
+
+
+# ln -s  /home/snarasim/.kube_gcp .kube
+# ln -s  /home/snarasim/.kube_aws .kube
 # cd $temp_folder
 # curl -O "https://get.helm.sh/helm-v3.7.2-linux-amd64.tar.gz" 
 # tar xvzf helm-v3.7.2-linux-amd64.tar.gz
