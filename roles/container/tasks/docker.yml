@@ -13,6 +13,8 @@
     - runc
   tags: docker,cloud
 
+# https://medium.com/@GarisSpace/how-to-install-docker-using-ansible-01a674086f8c
+# https://github.com/geerlingguy/ansible-role-docker/blob/master/tasks/setup-Debian.yml
 # #https://docs.docker.com/engine/install/ubuntu/
 # #https://docs.docker.com/engine/install/linux-postinstall/
 

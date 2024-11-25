@@ -1,10 +1,11 @@
 ---
-# - name: Remove Helm env plugin
-#   kubernetes.core.helm_plugin:
-#     plugin_name: helm-s3
-#     state: absent
-#   tags: helm_install
-#   become: true
+- name:  Remove Helm plugins
+  ansible.builtin.file:
+    path: "{{ user_home }}/.local/share/helm/plugins/"
+    state: absent
+  tags: helm_install
+  become: true
+
 
 - name: remove existing helm
   ansible.builtin.file:
@@ -34,24 +35,24 @@
     dest: "/usr/local/bin"
     owner: "{{ target_user }}"
     group: "{{ target_user }}"
-    mode: '0744'
+    mode: '0755'
   tags: helm_install
   become: true
 
-- name: Install Helm env plugin
-  kubernetes.core.helm_plugin:
-    plugin_path: https://github.com/adamreese/helm-env
-    state: present
+- name: Install helm-s3 plugin
+  ansible.builtin.git:
+    repo: 'https://github.com/hypnoglow/helm-s3.git'
+    dest: "{{ user_home }}/.local/share/helm/plugins/helm-s3.git"
   tags: helm_install
   become: true
 
-- name: install helm plugins
-  kubernetes.core.helm_plugin:
-    # binary_path: "{{ user_home }}/bin"
-    plugin_path: https://github.com/hypnoglow/helm-s3.git
-    state: present
+- name: Install helm-env plugin
+  ansible.builtin.git:
+    repo: 'https://github.com/adamreese/helm-env'
+    dest: "{{ user_home }}/.local/share/helm/plugins/helm-env"
   tags: helm_install
   become: true
+
 
 - name: remove existing helm temp files
   ansible.builtin.file:
