@@ -21,7 +21,7 @@
 
 - name: Unarchive the installer.
   unarchive: src="/home/{{ target_user }}/tmp/awscli-bundle.zip" dest="/home/{{ target_user }}/tmp" 
-  tags: aaws_install
+  tags: aws_install
 
 - name: Install awscli package.
   shell:  "/home/{{ target_user }}/tmp/aws/install --update"

@@ -1,69 +1,66 @@
 ---
+# - name: Remove Helm env plugin
+#   kubernetes.core.helm_plugin:
+#     plugin_name: helm-s3
+#     state: absent
+#   tags: helm_install
+#   become: true
+
 - name: remove existing helm
   ansible.builtin.file:
     state: absent
-    path: "{{ user_home }}/bin/kubectl"
-  tags: k8s_install
+    path: "/usr/local/bin/helm"
+  tags: helm_install
   become: true
 
-- name: remove existing helm temp files
-  ansible.builtin.file:
-    state: absent
-    path: "{{ user_home }}/bin/kube_aws.sh"
-  tags: k8s_install
-  become: true
-
-- name: Download helm
-  get_url: url=https://s3.us-west-2.amazonaws.com/amazon-eks/1.25.6/2023-01-30/bin/linux/amd64/kubectl dest="{{ user_home }}/bin/"
-  tags: k8s_install
+- name: Download helm to temp folder
+  get_url: url=https://get.helm.sh/helm-v3.7.2-linux-amd64.tar.gz dest="{{ user_home }}/tmp/"
+  tags: helm_install
   become: true
 
 - name: unzip/untar helm
-  ansible.builtin.file:
-    path: "{{ user_home }}/bin/kubectl"
+  ansible.builtin.unarchive:
+    src: "{{ user_home }}/tmp/helm-v3.7.2-linux-amd64.tar.gz"
+    dest: "{{ user_home }}/tmp"
     owner: "{{ target_user }}" 
     group: "{{ target_user }}" 
     mode: '0755'
-  tags: k8s_install
+  tags: helm_install
   become: true
 
 - name: install helm files to binary folder
   copy:
-    src: .kube_aws.zip    
-    dest: "{{ user_home }}"
+    src: "{{ user_home }}/tmp/linux-amd64/helm"
+    dest: "/usr/local/bin"
     owner: "{{ target_user }}"
     group: "{{ target_user }}"
     mode: '0744'
-  tags: k8s_install
+  tags: helm_install
+  become: true
+
+- name: Install Helm env plugin
+  kubernetes.core.helm_plugin:
+    plugin_path: https://github.com/adamreese/helm-env
+    state: present
+  tags: helm_install
   become: true
 
 - name: install helm plugins
-  copy:
-    src: .kube_gcp.zip    
-    dest: "{{ user_home }}"
-    owner: "{{ target_user }}"
-    group: "{{ target_user }}"
-    mode: '0744'
-  tags: k8s_install
+  kubernetes.core.helm_plugin:
+    # binary_path: "{{ user_home }}/bin"
+    plugin_path: https://github.com/hypnoglow/helm-s3.git
+    state: present
+  tags: helm_install
   become: true
 
 - name: remove existing helm temp files
   ansible.builtin.file:
     state: absent
-    path: "{{ user_home }}/bin/kube_aws.sh"
-  tags: k8s_install
+    path: "{{ user_home }}/tmp/linux-amd64"
+  tags: helm_install
   become: true
 
 
-
-# ln -s  /home/snarasim/.kube_gcp .kube
-# ln -s  /home/snarasim/.kube_aws .kube
-# cd $temp_folder
-# curl -O "https://get.helm.sh/helm-v3.7.2-linux-amd64.tar.gz" 
-# tar xvzf helm-v3.7.2-linux-amd64.tar.gz
-# echo $sudo_pass | sudo -S  mv ./linux-amd64/helm /usr/local/bin
-
-# helm plugin install https://github.com/hypnoglow/helm-s3.git
 # #helm repo add aa-charts s3://aa-helm-charts
 # #helm search aa-charts
 # #helm list

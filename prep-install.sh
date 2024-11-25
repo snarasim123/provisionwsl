@@ -6,6 +6,8 @@ upgrade() {
         sudo apt upgrade -y
         sudo apt install ansible aptitude -y
         ansible-galaxy collection install community.general
+        ansible-galaxy collection install kubernetes.core
+        # ansible-galaxy collection install community.kubernetes
     # elif [[ "$distro_type" == "fedora" ]] ; then
         # echo "fedora upgrade"
     elif [[ "$distro_type" == "alpine" ]] ; then
