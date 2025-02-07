@@ -1,3 +1,8 @@
+fix git config
+explicit install of git
+install .kc_funcs and source it
+clone code from github instead of localcopy
+
 -add ~/tmp dir to both root and user
 -fix path variable for the user
 -setup neovim

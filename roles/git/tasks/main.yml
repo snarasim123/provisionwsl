@@ -6,3 +6,9 @@
 # https://github.com/dandavison/delta
 # https://docs.ansible.com/ansible/2.8/modules/git_config_module.html
 
+# git config  --global user.name snarasim
+# git config  --global user.email snarasim123@gmail.com
+# git config  --global core.editor /usr/bin/vim
+# git config  --global core.autocrlf false
+# git config  --global core.eol native
+
