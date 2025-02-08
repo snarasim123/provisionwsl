@@ -1,7 +1,4 @@
-# distro specific vars
-# export distro_type=ubuntu
-# export distro_type=fedora
-# export distro_type=alpine
+
 
 export distro_name_ubuntu=ubuntu2004-a1
 export distro_name_fedora=fedora_3704-a1
@@ -17,6 +14,8 @@ export ps_distro_source_alpine=C:\Users\srinivasa.narasimha\wsl-src\alpine-minir
 export ps_install_dir=C:\Users\srinivasa.narasimha\wsl
 export default_user=snarasim
 #export code_src=C:\Users\srinivasa.narasimha\code\setup
-export code_src=/mnt/c/Users/srinivasa.narasimha/code/setup2
+export code_base=/mnt/c/Users/srinivasa.narasimha/code
+export code_root=setup2
+export code_src="$code_base/$code_root"
 
 
