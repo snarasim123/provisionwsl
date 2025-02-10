@@ -2,12 +2,16 @@
 - name: Print 
   ansible.builtin.debug:
     msg: install git, lazygit and configuring github for {{ target_user }}
-  tags: git
+  tags: 
+    - github
+    - git
 
 - name: fetch root public ssh key
   shell: cat "{{ root_user_home }}/.ssh/id_rsa.pub"
   register: root_ssh_publickey
-  tags: git
+  tags: 
+    - github
+    - git
   become: true
 
 - name: Setup root github ssh keys
@@ -22,7 +26,9 @@
     password: "{{ githubpass }}"
     status_code: [200, 201, 422, 304]
     force_basic_auth: true
-  tags: git
+  tags: 
+    - github
+    - git
 
 - name: ensure github.com is a known host
   lineinfile:
@@ -31,13 +37,17 @@
     state: present
     line: "{{ lookup('pipe', 'ssh-keyscan -t rsa github.com') }}"
     regexp: "^github\\.com"
-  tags: git
+  tags: 
+    - github
+    - git
   become: true
   
 - name: fetch user public ssh key
   shell: cat "/home/{{ target_user }}/.ssh/id_rsa.pub"
   register: ssh_publickey
-  tags: git
+  tags: 
+    - github
+    - git
   become: true
 
 - name: Setup user github ssh keys
@@ -52,5 +62,7 @@
     password: "{{ githubpass }}"
     status_code: [200, 201, 422, 304]
     force_basic_auth: true
-  tags: git
+  tags: 
+    - github
+    - git
 

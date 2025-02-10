@@ -1,4 +1,5 @@
 ---
+- include_tasks: gitcore.yml
 - include_tasks: github.yml
 # git config --global core.autocrlf false
 # git config --global core.eol native

@@ -48,7 +48,7 @@ Write-Host (
           distro source : {2} 
 
 #####   " -f $distro_type, $distro_name, $ps_distro_source)
-$i=15
+$i=5
 Write-Host ( "Wait {0} Seconds"  -f $i)
 while ($i -gt 0){
     write-host -nonewline ("#")

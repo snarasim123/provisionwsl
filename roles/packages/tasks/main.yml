@@ -23,13 +23,13 @@
   tags: packages
   when: ansible_pkg_mgr == "apk"
 
-- name: Update all Debian/Ubuntu packages to their latest version
-  ansible.builtin.apt:
-    name: "*"
-    state: latest
-  become: yes
-  tags: packages
-  when: is_ubuntu
+# - name: Update all Debian/Ubuntu packages to their latest version
+#   ansible.builtin.apt:
+#     name: "*"
+#     state: latest
+#   become: yes
+#   tags: packages
+#   when: is_ubuntu
 
 - name: Install ubuntu packages
   become: true  
@@ -39,12 +39,12 @@
   tags: packages
   when: is_ubuntu
   
-- name: Upgrade all fedora packages
-  ansible.builtin.dnf:
-    name: "*"
-    state: latest
-  become: yes
-  when: is_fedora
+# - name: Upgrade all fedora packages
+#   ansible.builtin.dnf:
+#     name: "*"
+#     state: latest
+#   become: yes
+#   when: is_fedora
 
 - name: Install fedora packages
   become: true  
@@ -53,11 +53,11 @@
   become: yes
   when: is_fedora
 
-- name: Update all installed alpine packages to the latest versions
-  community.general.apk:
-    upgrade: true
-  become: yes
-  when: is_alpine
+# - name: Update all installed alpine packages to the latest versions
+#   community.general.apk:
+#     upgrade: true
+#   become: yes
+#   when: is_alpine
 
 - name: Install alpine packages
   become: true  

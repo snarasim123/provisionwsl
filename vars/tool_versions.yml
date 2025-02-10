@@ -1,4 +1,6 @@
 ---
-helm_version: "3.5.4"
+helm_version: "v3.7.2"
+helm_s3plugin_version: "s3_0.16.2"
 doctl_version: "1.61.0"
+git_version: "2.48.0"
 

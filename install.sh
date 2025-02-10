@@ -39,8 +39,8 @@ run-ansible(){
 
     cd "$HOME/code/$code_root/ansible"
     chmod -x secrets.*
-    ansible-playbook  -i hosts -e @secrets.yaml --vault-password-file secrets.pass ./playbook.yaml 
-    # --skip-tags=aws_install,bash,bash_extra,k9s_install,vim,nvim,folders,git,packages,upgrade,user,print,
+    ansible-playbook  -i hosts -e @secrets.yaml --vault-password-file secrets.pass ./playbook.yaml
+    # --skip-tags=aws_install,bash,bash_extra,k9s_install,vim,nvim,folders,git,packages,upgrade,user,print, --step
     echo "#### Done setup."
 }
 

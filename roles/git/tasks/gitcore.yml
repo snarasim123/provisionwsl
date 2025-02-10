@@ -1,0 +1,162 @@
+---
+- set_fact: git_reinstall_from_source=false
+
+- name: Print Task msg
+  ansible.builtin.debug:
+    msg: install/update git and configure 
+  tags: 
+    - git
+    - gitcore
+
+- name: Get installed version.
+  command: git --version
+  changed_when: false
+  failed_when: false
+  check_mode: false
+  register: git_installed_version
+  tags: 
+    - git
+    - gitcore
+
+- name: Print git installed version
+  ansible.builtin.debug:
+    msg: git version "{{ git_installed_version.stdout }}"
+  # when:
+    # - (git_installed_version.rc == 0) 
+  tags: 
+    - git
+    - gitcore
+
+- name: Force git install if the version numbers do not match.
+  set_fact:
+    git_reinstall_from_source: true
+  when:
+    - (git_installed_version.rc == 0) and (git_installed_version.stdout | regex_replace("^.*?([0-9\.]+)$", "\\1") is version(git_version, operator="!="))
+    - (git_installed_version.stdout != 0)
+  become: true
+  tags: 
+    - git
+    - gitcore
+
+- name: Ensure git is uninstalled (Debian).
+  ansible.builtin.apt:
+    name: "git"
+    state: absent
+  when: 
+    - git_reinstall_from_source | bool
+    - is_ubuntu
+  become: true
+  tags: 
+    - git
+    - gitcore
+
+- name: Ensure git is uninstalled (fedora).
+  ansible.builtin.dnf:
+    name: "git"
+    state: absent  
+  when: 
+    - git_reinstall_from_source | bool
+    - is_fedora
+  become: true
+  tags: 
+    - git
+    - gitcore
+
+- name: Ensure git is uninstalled (alpine).
+  community.general.apk:
+    name: "git"
+    state: absent
+  when: 
+    - git_reinstall_from_source | bool
+    - is_alpine
+  become: true
+  tags: 
+    - git
+    - gitcore
+
+- name: Download git.
+  get_url:
+    url: "https://www.kernel.org/pub/software/scm/git/git-{{ git_version }}.tar.gz"
+    dest: "{{ user_home }}/tmp/git-{{ git_version }}.tar.gz"
+    owner: "{{ target_user }}"
+    group: "{{ target_user }}"
+    mode: "0777"
+  when: 
+    (git_installed_version.rc != 0) or (git_reinstall_from_source | bool)
+  become: true
+  tags: 
+    - git
+    - gitcore
+
+- name: Change file ownership, group and permissions
+  ansible.builtin.file:
+    path: "{{ user_home }}/tmp/git-{{ git_version }}.tar.gz"
+    owner: "{{ target_user }}"
+    group: "{{ target_user }}"
+    mode: "0777"
+  become: true
+  tags: 
+    - git
+    - gitcore
+
+- name: Expand git archive.
+  unarchive:
+    src: "{{ user_home }}/tmp/git-{{ git_version }}.tar.gz"
+    dest: "{{ user_home }}/tmp"
+    creates: "{{ user_home }}/tmp/git-{{ git_version }}"
+    owner: "{{ target_user }}"
+    group: "{{ target_user }}"
+    mode: "0777"
+  when: (git_installed_version.rc != 0) or (git_reinstall_from_source | bool)
+  become: true
+  tags: 
+    - git
+    - gitcore
+
+- name: Change file ownership, group and permissions
+  ansible.builtin.file:
+    path: "{{ user_home }}/tmp/git-{{ git_version }}"
+    owner: "{{ target_user }}"
+    group: "{{ target_user }}"
+    mode: "0777"
+  become: true
+  tags: 
+    - git
+    - gitcore
+
+- name: configure git build.
+  command:     
+    sudo "{{ user_home }}/tmp/git-{{ git_version }}/configure" --prefix="{{ git_install_path }}"
+    chdir="{{ user_home }}/tmp/git-{{ git_version }}"
+  when: (git_installed_version.rc != 0) or (git_reinstall_from_source | bool)
+  become: true
+  # become_user: "{{ root_user }}"
+  tags: 
+    - git
+    - gitcore
+
+- name: git build.
+  command:     
+    sudo make {{ item }}
+    chdir="{{ user_home }}/tmp/git-{{ git_version }}"
+  with_items:
+    - all
+  when: (git_installed_version.rc != 0) or (git_reinstall_from_source | bool)
+  become: true
+  tags: 
+    - git
+    - gitcore
+
+- name: git install.
+  command:     
+    sudo make {{ item }}
+    chdir="{{ user_home }}/tmp/git-{{ git_version }}"
+  with_items:
+    - install
+  when: (git_installed_version.rc != 0) or (git_reinstall_from_source | bool)
+  become: true
+  tags: 
+    - git
+    - gitcore
+
+

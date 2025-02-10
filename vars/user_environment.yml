@@ -6,5 +6,5 @@ user_home: /home/snarasim
 root_user: root
 root_user_key: /root/.ssh/id_rsa.pub
 root_user_home: /root
-
+git_install_path: /usr
 

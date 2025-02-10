@@ -12,12 +12,12 @@ upgrade() {
         # echo "fedora upgrade"
     elif [[ "$distro_type" == "alpine" ]] ; then
         # echo "alpine upgrade"
-        apk update
         apk add sudo
-        apk add bash              
-        apk add lsb-release          
-        apk add --no-cache openssh
-        apk add py3-passlib
+        sudo apk update
+        sudo apk add bash              
+        sudo apk add lsb-release          
+        sudo apk add --no-cache openssh
+        sudo apk add py3-passlib
         sudo apk add ansible
         ansible-galaxy collection install community.general
     elif [[ "$distro_type" == "fedora" ]] ; then

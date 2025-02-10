@@ -20,13 +20,14 @@
     - vars/user_environment.yml
     - vars/vimvars.yml
   ### Comment out roles you don't need ###
+  # Packages need to be installed before git, for building git #
   roles:
     - facts
     - user
     - folders
     - shell
+    - packages    
     - git
-    - packages
     - editor  
     - gui
     - cloud

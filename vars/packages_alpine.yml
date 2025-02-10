@@ -8,10 +8,7 @@ packages_alpine:
   - unzip
   - shadow
   - screen
-  # - hostname
-  - wget
-  # - util-linux
-  # - passwd
+  - wget  
   - jq
   - make
   - mc
@@ -20,11 +17,6 @@ packages_alpine:
   - tar
   - rxvt-unicode
   - fzf
-  - byobu
-  # - xfce4
-  # - windowmaker
-  # - icewm
-  # - icewm-lang
   - konsole  
   - coreutils
   - tree
@@ -35,7 +27,11 @@ packages_alpine:
   - groff
   - make
   - cmake
-  # - gettext-tiny-dev-0.3.2-r3
+  - curl-dev
+  - expat-dev
+  # - libressl-dev
+  # - openssl-dev
+  - zlib-dev
   - pkgconf
   - texinfo
   - build-base
@@ -44,3 +40,5 @@ packages_alpine:
   - openjdk11
   - neovim
   - aws-cli
+  - xfce4
+  - windowmaker
