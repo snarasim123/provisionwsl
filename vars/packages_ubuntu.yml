@@ -18,12 +18,18 @@ packages_ubuntu:
   - zip
   - rxvt-unicode
   - fzf
-  - byobu
   - wmaker
   - tree
   - libncurses5-dev
+  - libcurl4-gnutls-dev
+  - libexpat1-dev
+  - libssl-dev
   - pkg-config
   - build-essential
+  - gettext
+  - zlib1g-dev
+  - build-essential
+  - gcc
   - ripgrep
   - xclip
   # - openjdk-8-jdk

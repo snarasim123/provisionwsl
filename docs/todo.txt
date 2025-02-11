@@ -1,12 +1,42 @@
-fix git config
-explicit install of git
-install .kc_funcs and source it
-clone code from github instead of localcopy
 
--add ~/tmp dir to both root and user
--fix path variable for the user
--setup neovim
--setup current version of vim
-register variables for different os,pkg mgr, wsl
-create package list for fedora, alpine/test 
+    done - add nvim path from ansible, remove from hardcoded bashrc (user/root)
+nvim for alpine using release binaries
+    done - update nvim color them, fix error msg
+add nvim path for root user
+check and uninstalled prev nvim if versions mismatch
+
+fix git config
+
+Parameterize setup to skip tags
+
+setup newer version of vim
+download release version of vim
+check and upgrade vim if versions mismatch
+
+other window mgrs - xfce4
+xwin apps
+
+remove github ssh key during teardown
+remove empty folder during teardown
+change ssh key name to include distro fullname
+multiple tags for tasks
+remove sudo and use become
+review 'become' from all tasks and remove unnecessary entries
+change nvim install dir to variable
+
+https://github.com/geerlingguy/ansible-role-redis
+https://github.com/geerlingguy/ansible-role-java
+
+install .kc_funcs and source it
+
+java other versions
+sdkman
+python
+virtualbox integration
+
+
+clone code from github instead of localcopy
+add ~/tmp dir to both root and user
 variables to parameters as default default values
+
+https://github.com/geerlingguy/ansible-role-ansible

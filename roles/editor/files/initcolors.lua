@@ -1,9 +1,9 @@
 function set_colors()
     -- enable_bamboo()
-    -- enable_catpuccin()
+    enable_catpuccin()
     -- enable_kanagawa()
     -- enable_oxocarbon()
-        enable_moonfly()
+    -- enable_moonfly()
     end
     
     function enable_moonfly()

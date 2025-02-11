@@ -2,16 +2,22 @@
 - name: remove nvim files and directories
   ansible.builtin.file:
     state: absent
-    path: "{{ nvim_dir }}"
-  tags: nvim
+    path: /opt/nvim-linux-x86_64
+  tags: 
+    - nvim
+    - editor
   become: true
+  when: is_fedora or is_ubuntu
 
 - name: remove nvim config files and directories
   ansible.builtin.file:
     state: absent
     path: "{{ user_home }}/.config/nvim"
-  tags: nvim
+  tags: 
+    - nvim
+    - editor
   become: true
+  
 
 - name: Create nvim config directories
   ansible.builtin.file:
@@ -22,7 +28,9 @@
     group: "{{ target_user }}"
   with_items:
     - "{{ user_home }}/.config/nvim"
-  tags: nvim
+  tags: 
+    - nvim
+    - editor
   become: true
 
 - name: Copy init.lua file
@@ -34,7 +42,9 @@
     mode: 0644
   loop:
     - init.lua
-  tags: nvim
+  tags: 
+    - nvim
+    - editor
   become: true
 
 - name: Copy initcolors.lua file
@@ -46,17 +56,33 @@
     mode: 0644
   loop:
     - initcolors.lua
-  tags: nvim
+  tags: 
+    - nvim
+    - editor
   become: true
 
 - name: Download/unarchive nvim Package
   unarchive:
-    src: https://github.com/neovim/neovim/releases/latest/download/nvim-linux64.tar.gz
+    src: "https://github.com/neovim/neovim/releases/download/{{ nvim_version }}/nvim-linux-x86_64.tar.gz"
     dest: /opt
     owner: "{{ target_user }}"
     group: "{{ target_user }}"
     remote_src: yes
-    creates: /opt/nvim-linux64
-  tags: nvim
+    # creates: /opt/nvim-linux64
+  tags: 
+    - nvim
+    - editor
   become: true
-  when: is_fedora or  is_ubuntu
+  when: is_fedora or is_ubuntu
+
+#  apk add --no-cache neovim=0.10.4-r0
+
+- name: Add nvim path to .bashrc
+  ansible.builtin.lineinfile:
+    path: "{{ user_home }}/.bashrc_custom"
+    line: export PATH=$PATH:/opt/nvim-linux-x86_64/bin
+  tags: 
+    - nvim
+    - editor
+  become: true
+  when: is_fedora or is_ubuntu

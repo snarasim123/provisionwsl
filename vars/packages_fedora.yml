@@ -5,6 +5,7 @@ packages_fedora:
   - curl
   - tmux
   - unzip
+  - tar
   - screen
   - hostname
   - net-tools
@@ -12,26 +13,31 @@ packages_fedora:
   - util-linux
   - passwd
   - jq
-  - make
   - mc
   - dos2unix
   - zip
   - rxvt-unicode
   - fzf
-  - byobu
   - WindowMaker
   - WindowMaker-extra
   - tree
   - autoconf
   - automake
-  - gcc
   - gettext
   - groff
-  - make
   - pkgconf
   - texinfo
   - '@Development tools'
   - ripgrep
   - xclip
   - java-11-openjdk.x86_64 
-  # - '@development-libraries'
+  - gettext-devel
+  - expat-devel
+  - curl-devel
+  - zlib-devel
+  - perl-devel
+  - openssl-devel
+  - subversion-perl
+  - make
+  - gcc
+# - '@development-libraries'
