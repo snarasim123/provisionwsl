@@ -3,7 +3,9 @@
   ansible.builtin.file:
     state: absent
     path: "/home/{{ target_user }}/tmp/aws"
-  tags: aws_install
+  tags: 
+    - aws
+    - cloud
   become: true
 
 - name: remove existing aws file
@@ -12,27 +14,37 @@
     path: "/home/{{ target_user }}/tmp/{{ item }}"
   with_items:
     - awscli-bundle.zip
-  tags: aws_install
+  tags: 
+    - aws
+    - cloud
   become: true
 
 - name: Download the awscli bundle.
   get_url: url=https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip dest="/home/{{ target_user }}/tmp/awscli-bundle.zip"
-  tags: aws_install
+  tags: 
+    - aws
+    - cloud
 
 - name: Unarchive the installer.
   unarchive: src="/home/{{ target_user }}/tmp/awscli-bundle.zip" dest="/home/{{ target_user }}/tmp" 
-  tags: aws_install
+  tags: 
+    - aws
+    - cloud
 
 - name: Install awscli package.
   shell:  "/home/{{ target_user }}/tmp/aws/install --update"
-  tags: aws_install
+  tags: 
+    - aws
+    - cloud
   become: true
 
 - name: remove existing aws folder
   ansible.builtin.file:
     state: absent
     path: "/home/{{ target_user }}/tmp/aws"
-  tags: aws_install
+  tags: 
+    - aws
+    - cloud
   become: true
 
 - name: remove existing aws file
@@ -41,5 +53,7 @@
     path: "/home/{{ target_user }}/tmp/{{ item }}"
   with_items:
     - awscli-bundle.zip
-  tags: aws_install
+  tags: 
+    - aws
+    - cloud
   become: true

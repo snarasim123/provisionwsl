@@ -7,7 +7,10 @@ check and uninstalled prev nvim if versions mismatch
 
 fix git config
 
-Parameterize setup to skip tags
+Parameterize setup to 
+    skip tags
+    step through tasks
+    done - check the tasks
 
 setup newer version of vim
 download release version of vim
@@ -15,6 +18,9 @@ check and upgrade vim if versions mismatch
 
 other window mgrs - xfce4
 xwin apps
+
+use db to track current installed instances?
+add support for profiles?
 
 remove github ssh key during teardown
 remove empty folder during teardown

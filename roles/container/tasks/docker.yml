@@ -11,7 +11,9 @@
     - podman-docker
     - containerd
     - runc
-  tags: docker,cloud
+  tags: 
+    - docker
+    - container
 
 # https://medium.com/@GarisSpace/how-to-install-docker-using-ansible-01a674086f8c
 # https://github.com/geerlingguy/ansible-role-docker/blob/master/tasks/setup-Debian.yml

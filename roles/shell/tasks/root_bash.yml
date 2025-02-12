@@ -6,19 +6,23 @@
     owner: "{{ root_user }}" # set your owner, group, and mode accordingly
     group: "{{ root_user }}"
     mode: '0777'
-  tags: bash
   with_items:
     - absent
     - directory  
   become: true
+  tags: 
+    - shell
+    - bash    
     
 - name: Create a directory if it does not exist
   ansible.builtin.file:
     path: "{{ root_user_home }}/bashfiles"
     state: directory
     mode: '0755'
-  tags: bash
   become: true
+  tags: 
+    - shell
+    - bash    
 
 - name: Copy files
   copy:
@@ -27,7 +31,6 @@
     owner: "{{ root_user }}"
     group: "{{ root_user }}"
     mode: 0644
-  tags: bash
   loop:
     - .alias
     - .bash_funcs
@@ -39,12 +42,14 @@
     - dircolors256dark
     - dircolorsansi-light
   become: true
+  tags: 
+    - shell
+    - bash    
 
 - name: remove existing bash files from home
   ansible.builtin.file:
     state: absent
     path: "{{ root_user_home }}/{{ item }}"
-  tags: bash
   with_items:
     - .alias
     - .bash_funcs
@@ -55,6 +60,9 @@
     - variables.sh
     - .dircolors
   become: true
+  tags: 
+    - shell
+    - bash    
 
 - name: Create symbolic link 
   file:
@@ -63,7 +71,6 @@
     state: link
     owner: "{{ root_user }}" 
     group: "{{ root_user }}"
-  tags: bash
   with_items:
     - .alias
     - .bash_funcs
@@ -73,6 +80,9 @@
     - prompt.sh
     - variables.sh
   become: true
+  tags: 
+    - shell
+    - bash    
 
 
 - name: Create .dircolor symbolic link 
@@ -82,5 +92,7 @@
    state: link
    owner: "{{ root_user }}" 
    group: "{{ root_user }}"  
-  tags: bash
   become: true
+  tags: 
+    - shell
+    - bash    

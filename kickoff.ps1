@@ -1,5 +1,5 @@
 $distro_type_param=$args[0]
-$skip_upgrade_param=$args[1]
+$debug_mode=$args[1]
 
 $sw = [Diagnostics.Stopwatch]::StartNew()
 $Path = ".\variables.sh"
@@ -57,8 +57,11 @@ Write-Host (
           install location  : {3}
           
 #####  " -f $distro_type, $install_name, $ps_distro_source,$ps_install_dir)
-# Write-Host ( "##### Creating  {0} from source {1} to dir {2} " -f $install_name,$ps_distro_source, $ps_install_dir)
-# Read-Host -Prompt "Press any key to continue"
+if ($debug_mode -eq "--check"){  
+      Write-Host ( "##### Running in check mode.  ")      
+      wsl -d $install_name  ./install.sh  $distro_type --check -u root
+      exit
+  }
 
 $match=((wsl -l | Where {$_.Replace("`0","") -match "$install_name"}))
 if ($match -eq "$install_name") {
@@ -89,4 +92,5 @@ $ts = $sw.Elapsed;
 $elapsedTime = [string]::Format("{0:00} Hours :{1:00} Mins",$ts.Hours, $ts.Minutes);
 Write-Host( "##### RunTime  {0}... " -f "$elapsedTime")
 
- 
+ # Write-Host ( "##### Creating  {0} from source {1} to dir {2} " -f $install_name,$ps_distro_source, $ps_install_dir)
+# Read-Host -Prompt "Press any key to continue"

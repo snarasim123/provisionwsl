@@ -3,7 +3,8 @@
   group:
     name: sudo
     state: present
-  tags: user
+  tags: 
+    - user
 
 - name: root_user - Create SSH directory 
   file:
@@ -12,8 +13,9 @@
     owner: "{{ root_user }}"
     group: "{{ root_user }}"
     mode: 0700
-  tags: user
   become: true
+  tags: 
+    - user  
 
 - name: root_user - Generate SSH key 
   user:
@@ -22,15 +24,17 @@
     ssh_key_type: rsa
     ssh_key_bits: 4096
     ssh_key_file: "/{{ root_user_home }}/.ssh/id_rsa"  
-  tags: user
   become: true
+  tags: 
+    - user    
 
 - name: root_user - Check that the /etc/wsl.conf exists
   stat:
     path: /etc/wsl.conf
   register: wslconf_exists
-  tags: user
   become: true
+  tags: 
+    - user    
 
 - name: root_user - enable systemd, if wsl.conf exists
   ansible.builtin.blockinfile:
@@ -42,14 +46,16 @@
       default={{ target_user }}
     marker: "## {mark} ANSIBLE MANAGED BLOCK"
     create: true
-  tags: user
   become: true
+  tags: 
+    - user    
 
 - name: change default shell to /bin/bash for root
   ansible.builtin.user:
     name: "{{ root_user }}"
     shell: /bin/bash
-  tags: user
   become: true
   become_user: "{{ root_user }}"
   when: is_alpine
+  tags: 
+    - user    

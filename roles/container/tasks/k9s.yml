@@ -10,30 +10,40 @@
   ansible.builtin.file:
     state: absent
     path: "{{ user_home }}/bin/k9s"
-  tags: k9s_install
+  tags: 
+    - k9s
+    - container  
   become: true
 
 - name: remove existing tmp k9s 
   ansible.builtin.file:
     state: absent
     path: "{{ user_home }}/tmp/k9s"
-  tags: k9s_install
+  tags: 
+    - k9s
+    - container  
   become: true
 
 - name: remove existing  k9s archive
   ansible.builtin.file:
     state: absent
     path: "{{ user_home }}/tmp/k9s_Linux_amd64.tar.gz"
-  tags: k9s_install
+  tags: 
+    - k9s
+    - container  
   become: true
 
 - name: Download the k9s
   get_url: url=https://github.com/derailed/k9s/releases/download/v0.27.4/k9s_Linux_amd64.tar.gz dest="{{ user_home }}/tmp/"
-  tags: k9s_install
+  tags: 
+    - k9s
+    - container  
 
 - name: Unarchive k9s
   unarchive: src="{{ user_home }}/tmp/k9s_Linux_amd64.tar.gz" dest="{{ user_home }}/tmp" 
-  tags: k9s_install
+  tags: 
+    - k9s
+    - container  
 
 - name: Install k9s package
   copy:
@@ -42,7 +52,9 @@
     mode: 0755
     owner: "{{ target_user }}" 
     group: "{{ target_user }}"
-  tags: k9s_install
+  tags: 
+    - k9s
+    - container  
   become: true
 
 - name: remove existing k9s file
@@ -53,12 +65,16 @@
     - k9s
     - LICENSE
     - README.md
-  tags: k9s_install
+  tags: 
+    - k9s
+    - container  
   become: true
 
 - name: remove existing  k9s archive
   ansible.builtin.file:
     state: absent
     path: "{{ user_home }}/tmp/k9s_Linux_amd64.tar.gz"
-  tags: k9s_install
+  tags: 
+    - k9s
+    - container  
   become: true
