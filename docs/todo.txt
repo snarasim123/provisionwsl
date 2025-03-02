@@ -1,11 +1,11 @@
 
     done - add nvim path from ansible, remove from hardcoded bashrc (user/root)
-nvim for alpine using release binaries
     done - update nvim color them, fix error msg
-add nvim path for root user
-check and uninstalled prev nvim if versions mismatch
+    *add nvim path for root user
+    *fix git config
 
-fix git config
+nvim for alpine using release binaries
+check and uninstall prev nvim if versions mismatch
 
 Parameterize setup to 
     skip tags

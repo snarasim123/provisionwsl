@@ -1,8 +1,8 @@
 
 
-export distro_name_ubuntu=ubuntu2004-a1
-export distro_name_fedora=fedora_3704-a1
-export distro_name_alpine=alpine317-a1
+export distro_name_ubuntu=ubuntu-temp1
+export distro_name_fedora=fedora_temp1
+export distro_name_alpine=alpine317-temp1
 
 export ps_distro_source_ubuntu=d:\soft\wsl\ubuntu2004.tar
 # export ps_distro_source_ubuntu=C:\Users\srinivasa.narasimha\wsl-src\ubuntu2004.tar

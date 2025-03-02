@@ -1,8 +1,7 @@
 ---
 - include_tasks: gitcore.yml
 - include_tasks: github.yml
-# git config --global core.autocrlf false
-# git config --global core.eol native
+
 # set user email, set editor, diff tool, install diff tool
 # https://github.com/dandavison/delta
 # https://docs.ansible.com/ansible/2.8/modules/git_config_module.html

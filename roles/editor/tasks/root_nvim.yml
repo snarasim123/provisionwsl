@@ -50,6 +50,17 @@
     - editor
   become: true
 
+# binary installed by user commont to root and user.
+- name: Add nvim path to .bashrc
+  ansible.builtin.lineinfile:
+    path: "{{ root_user_home }}/.bashrc_custom"
+    line: export PATH=$PATH:/opt/nvim-linux-x86_64/bin
+  tags: 
+    - nvim
+    - editor
+  become: true
+  when: is_fedora or is_ubuntu
+
 
 
 
