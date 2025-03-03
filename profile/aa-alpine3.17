@@ -1,0 +1,21 @@
+#common params
+export distro_type=alpine
+export distro_name=alpinea317-temp1
+
+#powershell specific vars
+export ps_distro_source=C:\Users\srinivasa.narasimha\wsl-src\alpine-minirootfs-3.17.0-x86_64.tar
+export ps_install_dir=C:\Users\srinivasa.narasimha\wsl
+
+# check or nocheck
+# export debug_mode=nocheck
+export default_user=snarasim
+export code_base=/mnt/c/Users/srinivasa.narasimha/code
+export code_root=setup2
+export code_src="$code_base/$code_root"
+
+export run_as_user=root
+export upgrade=true
+
+
+
+

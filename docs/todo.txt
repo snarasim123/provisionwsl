@@ -1,47 +1,33 @@
 
-    done - add nvim path from ansible, remove from hardcoded bashrc (user/root)
-    done - update nvim color them, fix error msg
-    *add nvim path for root user
-    *fix git config
-
-nvim for alpine using release binaries
-check and uninstall prev nvim if versions mismatch
-
-Parameterize setup to 
+1. auto download tar files based on profile
+2. vbox support/linux support
+3.Parameterize setup to 
     skip tags
     step through tasks
     done - check the tasks
+4.setup newer version of vim
+    check and upgrade vim if versions mismatch
+5.xwin apps,other window mgrs - xfce4
+6.remove github ssh key during teardown
+7.remove sudo and use become
+    review 'become' from all tasks and remove unnecessary entries
+8.clone code from github instead of localcopy
+9.multiple tags for tasks
 
-setup newer version of vim
-download release version of vim
-check and upgrade vim if versions mismatch
-
-other window mgrs - xfce4
-xwin apps
-
+*add nvim path for root user
+*fix git config
+nvim for alpine using release binaries
+check and uninstall prev nvim if versions mismatch
 use db to track current installed instances?
-
-remove github ssh key during teardown
 remove empty folder during teardown
 change ssh key name to include distro fullname
-multiple tags for tasks
-remove sudo and use become
-review 'become' from all tasks and remove unnecessary entries
 change nvim install dir to variable
-
 https://github.com/geerlingguy/ansible-role-redis
 https://github.com/geerlingguy/ansible-role-java
-
 install .kc_funcs and source it
-
 java other versions
-sdkman
+    sdkman
 python
-virtualbox integration
 
-
-clone code from github instead of localcopy
 add ~/tmp dir to both root and user
 variables to parameters as default default values
-
-https://github.com/geerlingguy/ansible-role-ansible

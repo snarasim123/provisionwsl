@@ -1,4 +1,3 @@
-# source ./variables.sh
 
 upgrade() {
     if [[ "$distro_type" == "ubuntu" ]] ; then
