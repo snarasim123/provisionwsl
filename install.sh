@@ -28,12 +28,15 @@ run-ansible-check(){
 }
 
 # read -p "*** Press to continue.. " -n 1 -r
-# upgrade
-distro_type=$1
-debug_mode=$2
+profile_path=$1
+source $profile_path
+echo "###### install.sh, reading profile  $profile_path ....."
+echo "###### Setting instance, type  $distro_type , upgrade true/false? $upgrade....."
+# distro_type=$1
+# debug_mode=$2
 # read -p "*** install for $distro_type, Press to continue.. " -n 1 -r
 clone-repo
-if [[ "$debug_mode" == "--check" ]] ; then
+if [[ "$debug_mode" == "check" ]] ; then
     run-ansible-check        
 else
     run-ansible

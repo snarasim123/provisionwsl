@@ -1,4 +1,4 @@
-source ./variables.sh
+# source ./variables.sh
 
 upgrade() {
     if [[ "$distro_type" == "ubuntu" ]] ; then
@@ -26,11 +26,13 @@ upgrade() {
     fi
 }
 
-distro_type=$1
-skip_upgrade=$2
+profile_path=$1
+source $profile_path
+echo "###### Prepinstall.sh, reading profile  $profile_path ....."
+echo "###### Preparing instance, type  $distro_type , upgrade true/false? $upgrade....."
 
 # read -p "*** Prelim installs for $distro_type, Press to continue.. " -n 1 -r
-if [[ "$skip_upgrade" != "false" ]] ; then
+if [[ "$upgrade" == "true" ]] ; then
     echo "###### Upgrade distro $distro_type ....."
     upgrade
 else 

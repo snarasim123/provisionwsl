@@ -5,7 +5,7 @@
     update_cache: yes
   become: yes
   tags: packages
-  when: ansible_pkg_mgr == "apt"
+  when: is_ubuntu
 
 - name: update dnf cache
   become: true  
@@ -13,7 +13,7 @@
     update_cache: yes
   become: yes
   tags: packages
-  when: ansible_pkg_mgr == "dnf"
+  when: is_fedora
 
 - name: update apk cache
   become: true  
@@ -21,7 +21,7 @@
     update_cache: yes
   become: yes
   tags: packages
-  when: ansible_pkg_mgr == "apk"
+  when: is_alpine
 
 # - name: Update all Debian/Ubuntu packages to their latest version
 #   ansible.builtin.apt:

@@ -1,67 +1,30 @@
-$distro_type_param=$args[0]
-$debug_mode=$args[1]
+$profile_name=$args[0]
 
 $sw = [Diagnostics.Stopwatch]::StartNew()
-$Path = ".\variables.sh"
+$Profile_Path = ".\profile\"+$profile_name
+Write-Host ( "#####  Install Profile {0} ##### " -f $Profile_Path)
+
 $distro_name = ""
-$file = get-content $Path
+$file = get-content $Profile_Path
 $file | foreach {
   $items = $_.split("=")
-  if ($items[0] -eq "export distro_name_ubuntu"){$distro_name_ubuntu = $items[1]}   
-  if ($items[0] -eq "export distro_name_fedora"){$distro_name_fedora = $items[1]}   
-  if ($items[0] -eq "export distro_name_alpine"){$distro_name_alpine = $items[1]}   
-
-  if ($items[0] -eq "export ps_distro_source_ubuntu"){$ps_distro_source_ubuntu = $items[1]}   
-  if ($items[0] -eq "export ps_distro_source_fedora"){$ps_distro_source_fedora = $items[1]}   
-  if ($items[0] -eq "export ps_distro_source_alpine"){$ps_distro_source_alpine = $items[1]}   
-
+  if ($items[0] -eq "export distro_type"){$distro_type = $items[1]}
+  if ($items[0] -eq "export distro_name"){$distro_name = $items[1]}
+  if ($items[0] -eq "export ps_distro_source"){$ps_distro_source = $items[1]}
   if ($items[0] -eq "export ps_install_dir"){$ps_install_dir = $items[1]}
-  # if ($items[0] -eq "export source_base"){$source_base = $items[1]}  
-  # if ($items[0] -eq "export light_install"){$light_install = $items[1]} 
-  # if ($items[0] -eq "export install_file"){$install_file = $items[1]} 
-  # if ($items[0] -eq "export fedora_source_base"){$fedora_source_base = $items[1]} 
-  # if ($items[0] -eq "export default_user"){$default_user = $items[1]} 
-  }
-
-if ($distro_type_param -eq "ubuntu"){  
-      # Write-Host ( "##### distro type  {0}  " -f $distro_type_param)
-      $distro_name = $distro_name_ubuntu
-      $distro_type = "ubuntu"
-      $ps_distro_source = $ps_distro_source_ubuntu      
-  } elseif ($distro_type_param -eq "fedora"){  
-        # Write-Host ( "##### distro type  {0}  " -f $distro_type_param)
-        $distro_name = $distro_name_fedora
-        $distro_type = "fedora"
-        $ps_distro_source = $ps_distro_source_fedora
-    } elseif ($distro_type_param -eq "alpine"){  
-        # Write-Host ( "##### distro type  {0}  " -f $distro_type_param)
-        $distro_name = $distro_name_alpine
-        $distro_type = "alpine"
-        $ps_distro_source = $ps_distro_source_alpine
-      } else {
-        Write-Host ( "##### Specify a distro type as param (ubuntu/fedora/alpine) " )
-        Exit 
-      } 
-
-
+  if ($items[0] -eq "export debug_mode"){$debug_mode = $items[1]}
+}
 
 $install_name=$distro_name
 $ps_install_dir = $ps_install_dir+"\"+$distro_name
 
 Write-Host ( 
-"#####  Spinup params 
-
+"#####  Spinup params
           distro type       : {0} 
           distro_name       : {1} 
           distro source     : {2} 
           install location  : {3}
-          
 #####  " -f $distro_type, $install_name, $ps_distro_source,$ps_install_dir)
-if ($debug_mode -eq "--check"){  
-      Write-Host ( "##### Running in check mode.  ")      
-      wsl -d $install_name  ./install.sh  $distro_type --check -u root
-      exit
-  }
 
 $match=((wsl -l | Where {$_.Replace("`0","") -match "$install_name"}))
 if ($match -eq "$install_name") {
@@ -75,12 +38,22 @@ else {
 
 Write-Host( "##### Restarting instance  {0}... " -f "$install_name")
 wsl --terminate $install_name
-# wsl -d $install_name lsb_release -d 
+wsl -d $install_name lsb_release -d
+
+if ($debug_mode -eq "check"){
+      Write-Host ( "##### Running in check mode.  ")
+      # todo turn it on
+      # wsl -d $install_name  ./install.sh  $distro_type --check -u root
+      exit
+  }
+
 
 Write-Host( "##### Preliminary setup  {0} Step 2... " -f "$install_name")
-wsl -d $install_name ./prep-install.sh $distro_type $skip_upgrade_param -u root
+$Profile_Path_unix = $Profile_Path.replace('\','/')
+wsl -d $install_name ./prep-install.sh $Profile_Path_unix -u root
+
 Write-Host( "##### Main setup  {0} Step 3... " -f "$install_name")
-wsl -d $install_name  ./install.sh  $distro_type -u root
+wsl -d $install_name  ./install.sh  $Profile_Path_unix -u root
 
 Write-Host( "##### Restarting instance  {0}... " -f "$install_name")
 wsl --terminate $install_name
