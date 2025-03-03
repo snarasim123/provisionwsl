@@ -20,7 +20,6 @@ other window mgrs - xfce4
 xwin apps
 
 use db to track current installed instances?
-add support for profiles?
 
 remove github ssh key during teardown
 remove empty folder during teardown
