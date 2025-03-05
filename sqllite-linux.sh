@@ -1,10 +1,5 @@
 #!/bin/bash
 
-# Variables (default values, can be overridden by caller)
-SQLITE_URL="https://www.sqlite.org/2023/sqlite-tools-linux-x86-3420000.zip"
-SQLITE_ZIP="sqlite-tools-linux-x86-3420000.zip"
-DEFAULT_SQLITE_DIR="sqlite"
-
 # Function to check if SQLite is already installed
 is_sqlite_installed() {
     local install_dir="$1"
@@ -95,25 +90,19 @@ check_row() {
 # Main script execution
 echo "Starting SQLite installation and database setup..."
 
-# Step 1: Set the installation directory (parameterized)
-echo "default sqllite install dir: $DEFAULT_SQLITE_DIR"
-INSTALL_DIR="${1:-$DEFAULT_SQLITE_DIR}"  # Use the first argument or default to $DEFAULT_SQLITE_DIR
-echo " install dir: $INSTALL_DIR"
+
 
 # Step 2: Download and install SQLite (only if not already installed)
-install_sqlite "$INSTALL_DIR"
 
-# Step 3: Create a database and table
-DB_NAME="mydatabase.db"
-TABLE_NAME="users"
-create_database "$DB_NAME" "$TABLE_NAME" "$INSTALL_DIR"
 
 # Step 4: Insert a row into the table
-INSERT_NAME="John Doe"
-INSERT_EMAIL="john@example.com"
-insert_row "$DB_NAME" "$TABLE_NAME" "$INSERT_NAME" "$INSERT_EMAIL" "$INSTALL_DIR"
+# image_hash=$(/bin/echo "test" | /usr/bin/md5sum | /bin/cut -f1 -d" ")
+
+# INSERT_NAME=$image_hash
+# INSERT_EMAIL="john@example.com"
+# insert_row "$DB_NAME" "$TABLE_NAME" "$INSERT_NAME" "$INSERT_EMAIL" "$INSTALL_DIR"
 
 # Step 5: Check if the row exists
-check_row "$DB_NAME" "$TABLE_NAME" "$INSERT_NAME" "$INSERT_EMAIL" "$INSTALL_DIR"
+# check_row "$DB_NAME" "$TABLE_NAME" "$INSERT_NAME" "$INSERT_EMAIL" "$INSTALL_DIR"
 
-echo "SQLite installation and database setup complete."
+# echo "SQLite installation and database setup complete."

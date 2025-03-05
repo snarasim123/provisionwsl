@@ -7,6 +7,18 @@ VM_NAME="Ubuntu_Focal_Server"
 DOWNLOAD_DIR="$HOME/Downloads"
 OVA_FILE="$DOWNLOAD_DIR/$(basename $IMAGE_URL)"
 
+#sqllite vars
+DEFAULT_SQLITE_DIR="sqlite"
+SQLITE_URL="https://www.sqlite.org/2023/sqlite-tools-linux-x86-3420000.zip"
+SQLITE_ZIP="sqlite-tools-linux-x86-3420000.zip"
+DB_NAME="mydatabase.db"
+TABLE_NAME="users"
+create_database "$DB_NAME" "$TABLE_NAME" "$INSTALL_DIR"
+
+source $(dirname "$0")/sqllite-linux.sh
+
+
+
 # Function to download the Ubuntu VirtualBox image
 download_image() {
     echo "Downloading Ubuntu VirtualBox image..."
@@ -43,7 +55,12 @@ start_vm() {
 # Main script execution
 echo "Setting up Ubuntu VirtualBox image..."
 
-# Step 1: Download the OVA file
+# Step 1: Set the installation directory (parameterized)
+echo "default sqllite install dir: $DEFAULT_SQLITE_DIR"
+INSTALL_DIR="$DEFAULT_SQLITE_DIR"  
+echo " install dir: $INSTALL_DIR"
+install_sqlite "$INSTALL_DIR"
+
 download_image
 
 # Step 2: Import the OVA file into VirtualBox
