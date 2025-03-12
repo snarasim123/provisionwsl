@@ -1,6 +1,6 @@
 #common params
 export distro_type=fedora
-export distro_name=fedora-temp1
+export distro_name=fedora-a2
 
 #powershell specific vars
 export ps_distro_source=d:\soft\wsl\fedora_3704.tar

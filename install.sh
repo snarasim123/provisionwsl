@@ -14,7 +14,18 @@ run-ansible(){
     echo "#### Ansible setup."
     cd "$HOME/code/$code_root/ansible"
     chmod -x secrets.*
-    ansible-playbook  -i hosts -e @secrets.yaml --vault-password-file secrets.pass ./playbook.yaml
+    if [ -z ${skipsteps+x} ]; 
+    then 
+        echo "skipsteps is unset"; 
+        ansible-playbook  -i hosts -e @secrets.yaml --vault-password-file secrets.pass ./playbook.yaml
+    else 
+        echo "skipsteps is set to '$skiptags'"; 
+        echo "executing ansible command..."
+        echo "ansible-playbook  -i hosts -e @secrets.yaml --vault-password-file secrets.pass ./playbook.yaml --skip-tags=$skipsteps"
+        ansible-playbook  -i hosts -e @secrets.yaml --vault-password-file secrets.pass ./playbook.yaml  --skip-tags="$skipsteps"
+    fi
+    
+    # ansible-playbook  -i hosts -e @secrets.yaml --vault-password-file secrets.pass ./playbook.yaml
     # --skip-tags=aws_install,bash,bash_extra,k9s_install,vim,nvim,folders,git,packages,upgrade,user,print, --step
     echo "#### Done setup."
 }
