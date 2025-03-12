@@ -6,7 +6,6 @@ upgrade() {
         sudo apt install ansible aptitude -y
         ansible-galaxy collection install community.general
         ansible-galaxy collection install kubernetes.core
-        # ansible-galaxy collection install community.kubernetes
     # elif [[ "$distro_type" == "fedora" ]] ; then
         # echo "fedora upgrade"
     elif [[ "$distro_type" == "alpine" ]] ; then
@@ -14,10 +13,10 @@ upgrade() {
         apk add sudo
         sudo apk update
         sudo apk add bash              
-        sudo apk add lsb-release          
+        sudo apk add lsb-release     
         sudo apk add --no-cache openssh
-        sudo apk add py3-passlib
         sudo apk add ansible
+
         ansible-galaxy collection install community.general
     elif [[ "$distro_type" == "fedora" ]] ; then
         sudo dnf install ansible -y
