@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-source ./variables.sh
 
 clone-repo(){
     echo "#### clone repo."

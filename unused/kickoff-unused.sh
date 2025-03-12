@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-source ./variables.sh
+
 
 upgrade() {
 sudo apt update -y
