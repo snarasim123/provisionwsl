@@ -1,6 +1,6 @@
 $profile_name=$args[0]
 
-$Path = ".\profile\"+$profile_name
+$Path = $profile_name
 Write-Host ( "#####  Install Profile {0} ##### " -f $Path)
 
 $distro_name = ""

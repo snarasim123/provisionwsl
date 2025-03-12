@@ -1,7 +1,7 @@
 $profile_name=$args[0]
 
 $sw = [Diagnostics.Stopwatch]::StartNew()
-$Profile_Path = ".\profile\"+$profile_name
+$Profile_Path = $profile_name
 Write-Host ( "#####  Install Profile {0} ##### " -f $Profile_Path)
 
 $distro_name = ""
