@@ -1,6 +1,6 @@
 #common params
 export distro_type=ubuntu
-export distro_name=ubuntuaa-temp1
+export distro_name=ubuntuaa-a1
 
 #powershell specific vars
 export ps_distro_source=C:\Users\srinivasa.narasimha\wsl-src\ubuntu2004.tar
