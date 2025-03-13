@@ -1,0 +1,4 @@
+ubuntu 
+1604 http://cloud-images.ubuntu.com/releases/xenial/release/
+1810 http://cloud-images.ubuntu.com/releases/cosmic/release/
+2004 http://cloud-images.ubuntu.com/releases/focal/release/

@@ -80,19 +80,19 @@
 
 - name: Generate a random number
   set_fact:
-    randome_number: "{{ 100 | random }}"
+    random_number: "{{ 100 | random }}"
   run_once: yes    
   check_mode: no
 
 - name: Set user github keyname
   set_fact:
-    github_keyname: "{{ ansible_hostname }}-{{ os_name }}-{{inventory_hostname}}-{{ target_user }}-{{ randome_number }}"
+    github_keyname: "{{ ansible_hostname }}-{{ os_name }}-{{inventory_hostname}}-{{ target_user }}-{{ random_number }}"
   run_once: yes
   check_mode: no    
 
 - name: Set root github keyname
   set_fact:
-    root_github_keyname: "{{ ansible_hostname }}-{{ os_name }}-{{inventory_hostname}}-{{ root_user }}-{{ randome_number }}"
+    root_github_keyname: "{{ ansible_hostname }}-{{ os_name }}-{{inventory_hostname}}-{{ root_user }}-{{ random_number }}"
   run_once: yes    
   check_mode: no
 

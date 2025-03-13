@@ -1,9 +1,9 @@
 #common params
-export distro_type=alpine
-export distro_name=alpineaa-temp1
+export distro_type=fedora
+export distro_name=fedora3704-mini
 
 #powershell specific vars
-export ps_distro_source=C:\Users\srinivasa.narasimha\wsl-src\alpine-minirootfs-3.17.0-x86_64.tar
+export ps_distro_source=C:\Users\srinivasa.narasimha\wsl-src\fedora_3704.tar
 export ps_install_dir=C:\Users\srinivasa.narasimha\wsl
 
 # check or nocheck
@@ -15,7 +15,5 @@ export code_src="$code_base/$code_root"
 
 export run_as_user=root
 export upgrade=true
-
-
-
+export skipsteps=packages,cloud,editor,git,container
 

@@ -19,7 +19,7 @@ run-ansible(){
         echo "skipsteps is unset"; 
         ansible-playbook  -i hosts -e @secrets.yaml --vault-password-file secrets.pass ./playbook.yaml
     else 
-        echo "skipsteps is set to '$skiptags'"; 
+        echo "skipsteps is set to '$skipsteps'"; 
         echo "executing ansible command..."
         echo "ansible-playbook  -i hosts -e @secrets.yaml --vault-password-file secrets.pass ./playbook.yaml --skip-tags=$skipsteps"
         ansible-playbook  -i hosts -e @secrets.yaml --vault-password-file secrets.pass ./playbook.yaml  --skip-tags="$skipsteps"
