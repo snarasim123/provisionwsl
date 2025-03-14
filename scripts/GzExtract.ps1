@@ -35,20 +35,15 @@ function Extract-Tar {
     }
 }
 
-# Start timer
-$sw = [Diagnostics.Stopwatch]::StartNew()
-# start_time=$(date +%s)
 
-$rel_infile='.\ubuntu-16.04-server-cloudimg-amd64.tar.gz'
-Write-Host( "##### rel_infile  {0}  " -f "$rel_infile")
+# $rel_infile='.\ubuntu-16.04-server-cloudimg-amd64.tar.gz'
+# Write-Host( "##### rel_infile  {0}  " -f "$rel_infile")
 
-Write-Host( "##### cur path  {0}  " -f "$pwd")
-$infile=[IO.Path]::GetFullPath(($pwd).path+$rel_infile)
-Write-Host( "##### infile  {0}  " -f "$infile")
-DeGZip-File $infile 
+# Write-Host( "##### cur path  {0}  " -f "$pwd")
+# $infile=[IO.Path]::GetFullPath(($pwd).path+$rel_infile)
+# Write-Host( "##### infile  {0}  " -f "$infile")
+# DeGZip-File $infile 
 
-$sw.Stop()
-$ts = $sw.Elapsed;
-$elapsedTime = [string]::Format("{0:00} Hours :{1:00} Mins",$ts.Hours, $ts.Minutes);
-Write-Host( "##### RunTime  {0}... " -f "$elapsedTime")
+
+# Write-Host( "##### RunTime  {0}... " -f "$elapsedTime")
 
