@@ -1,6 +1,5 @@
 $scriptpath = $MyInvocation.MyCommand.Path
 $dir = Split-Path $scriptpath
-
 . $dir\Dict.ps1
 
 # Prompt the user for the dictionary file path
