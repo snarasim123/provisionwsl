@@ -60,6 +60,7 @@ wsl --terminate $install_name
 wsl -d $install_name lsb_release -d 
 wsl -d $install_name ls /
 Write-Host( "##### Instance  {0} ready. " -f "$install_name")
+
 $sw.Stop()
 $ts = $sw.Elapsed;
 $elapsedTime = [string]::Format("{0:00} Hours :{1:00} Mins",$ts.Hours, $ts.Minutes);

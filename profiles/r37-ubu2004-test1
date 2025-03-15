@@ -1,0 +1,25 @@
+#common params
+export distro_type=ubuntu
+export distro_name=ubu2004-test1
+
+#powershell specific vars
+export ps_distro_source=
+export ps_install_dir=C:\Users\snara\wsl
+
+# check or nocheck
+# export debug_mode=nocheck
+
+# cleanup this var
+export default_user=snarasim
+
+# cleanup the following vars/names
+export code_base=/mnt/d/code
+export code_root=setup
+export code_src="$code_base/$code_root"
+
+# cleanup the following var
+export run_as_user=root
+
+export upgrade=true
+
+export skipsteps=cloud,editor,git,container

@@ -1,10 +1,0 @@
-Eè	 êSIè|öÍÉê‘»2xˆ§"hHæ,	Ÿ÷¡HTTP/2.0 200 OK
-Content-Length: 453
-Audit-Id: 81e8b229-bce7-4588-bc6c-f0d4dd950bd3
-Cache-Control: no-cache, private
-Content-Type: application/json
-Date: Wed, 08 Nov 2023 18:29:20 GMT
-X-Kubernetes-Pf-Flowschema-Uid: e5efd7e7-c8a3-4110-ba75-c1c8246b10cb
-X-Kubernetes-Pf-Prioritylevel-Uid: e2c03a31-710f-401a-8b40-fbb990b8e1ba
-
-{"kind":"APIResourceList","apiVersion":"v1","groupVersion":"networking.k8s.aws/v1alpha1","resources":[{"name":"policyendpoints","singularName":"policyendpoint","namespaced":true,"kind":"PolicyEndpoint","verbs":["delete","deletecollection","get","list","patch","create","update","watch"],"storageVersionHash":"x9WLGHGKClk="},{"name":"policyendpoints/status","singularName":"","namespaced":true,"kind":"PolicyEndpoint","verbs":["get","patch","update"]}]}

@@ -1,10 +1,0 @@
-4è“{yÀÏÿ1‡ûiˆˆØõ+Î’3PI∏·Q|B˘˙HTTP/2.0 200 OK
-Content-Length: 573
-Audit-Id: b493722e-3b71-4165-a095-a45e63aa123a
-Cache-Control: no-cache, private
-Content-Type: application/json
-Date: Tue, 07 Nov 2023 22:43:24 GMT
-X-Kubernetes-Pf-Flowschema-Uid: ce8851c3-1319-42d8-b1dc-a3eb83188263
-X-Kubernetes-Pf-Prioritylevel-Uid: 92a75931-f40e-49ae-9dec-5b308df816b7
-
-{"kind":"APIResourceList","apiVersion":"v1","groupVersion":"auto.gke.io/v1","resources":[{"name":"allowlistedv2workloads","singularName":"allowlistedv2workload","namespaced":false,"kind":"AllowlistedV2Workload","verbs":["delete","deletecollection","get","list","patch","create","update","watch"],"storageVersionHash":"bqbJdLnHpkA="},{"name":"allowlistedworkloads","singularName":"allowlistedworkload","namespaced":false,"kind":"AllowlistedWorkload","verbs":["delete","deletecollection","get","list","patch","create","update","watch"],"storageVersionHash":"4mdg6DE8D0g="}]}

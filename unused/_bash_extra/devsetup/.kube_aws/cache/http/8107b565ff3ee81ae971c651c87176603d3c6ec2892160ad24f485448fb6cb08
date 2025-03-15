@@ -1,10 +1,0 @@
-œnieBÙ)xc“.§÷≤ -ôd¡ïÇ/“Íj HTTP/2.0 200 OK
-Content-Length: 329
-Audit-Id: 70f62d21-291c-4364-9595-d00ad536e700
-Cache-Control: no-cache, private
-Content-Type: application/json
-Date: Wed, 08 Nov 2023 18:29:20 GMT
-X-Kubernetes-Pf-Flowschema-Uid: e5efd7e7-c8a3-4110-ba75-c1c8246b10cb
-X-Kubernetes-Pf-Prioritylevel-Uid: e2c03a31-710f-401a-8b40-fbb990b8e1ba
-
-{"kind":"APIResourceList","apiVersion":"v1","groupVersion":"vpcresources.k8s.aws/v1alpha1","resources":[{"name":"cninodes","singularName":"cninode","namespaced":false,"kind":"CNINode","verbs":["delete","deletecollection","get","list","patch","create","update","watch"],"shortNames":["cnd"],"storageVersionHash":"w5K4FF5Ny3g="}]}
