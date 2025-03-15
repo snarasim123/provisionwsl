@@ -2,7 +2,7 @@ $scriptpath = $MyInvocation.MyCommand.Path
 $dir = Split-Path $scriptpath
 $DictionaryFilePath = "$dir\urls.csv"
 $global:UrlDict = @{}
-function New-CsvLookupTable {
+function Init-CloudImageDb {
     $data = Import-Csv -Path $DictionaryFilePath
 
     foreach ($row in $data) {
@@ -15,7 +15,7 @@ function New-CsvLookupTable {
     return $global:UrlDict
 }
 
-function Get-CsvLookupURL {
+function Get-CloudImageURL {
     param (
         [string]$ID
     )
@@ -27,7 +27,7 @@ function Get-CsvLookupURL {
     return $result
 }
 
-function Get-CsvMD5 {
+function Get-CloudImageMD5 {
     param (
         [string]$ID
     )
