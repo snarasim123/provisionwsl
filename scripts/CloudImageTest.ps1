@@ -1,31 +1,23 @@
 
 
-# $profile_name=$args[0]
-$CWD = [Environment]::CurrentDirectory
-[Environment]::CurrentDirectory = "\"
-
 $scriptpath = $MyInvocation.MyCommand.Path
 $dir = Split-Path $scriptpath
+. $dir\CloudImageCSV.ps1
+. $dir\Assert.ps1
 
-function Assert {
-    param (
-        [bool]$Condition,
-        [string]$Message = "Assertion failed"
-    )
-    if (-not $Condition) {
-        throw $Message
-    }
-}
-
-. $dir\CloudImage.ps1
-
-$test1="ubuntu1604"
+$test1="ubuntu1604-wsl"
 $result1="http://cloud-images.ubuntu.com/releases/xenial/release/ubuntu-16.04-server-cloudimg-amd64-wsl.rootfs.tar.gz"
-$url = Get-ImageURL $test1
-Assert ($url -eq $result1) "test1 failed"
-Write-Host "test1 passed"
+$md5="913d522e612424350b80c3c5651047af"
 
-$url = Get-ImageURL "mint"
-Assert ($url -eq "") "test2 failed"
-Write-Host "test2 passed"
+# Init
+New-CsvLookupTable
+$imageurl1 = Get-CsvLookupURL  -ID $test1
+Assert ( $imageurl1 -eq $result1) "test1 failed"
+
+$mdresult = Get-CsvMD5  -ID $test1
+Assert ( $md5 -eq $mdresult) "test2 failed"
+
+$url = Get-CsvLookupURL  -ID  "mint"
+Assert ($url -eq "") "test3 failed"
+Write-Host "3 tests passed"
 

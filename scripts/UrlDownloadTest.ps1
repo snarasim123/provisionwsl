@@ -19,7 +19,7 @@ $dir = Split-Path $scriptpath
 
 # $rel_infile='.\ubuntu-16.04-server-cloudimg-amd64.tar.gz'
 # Write-Host( "##### rel_infile  {0}  " -f "$rel_infile")
-$test1="ubuntu1604"
+$test1="ubuntu1604-wsl"
 $result1="http://cloud-images.ubuntu.com/releases/xenial/release/ubuntu-16.04-server-cloudimg-amd64-wsl.rootfs.tar.gz"
 $url = Get-ImageURL $test1
 

@@ -40,7 +40,6 @@ function Download-URL {
 
     try {
         Write-Output "Downloading file from $Url to $destinationPath..."
-        # Invoke-WebRequest -Uri $Url -OutFile $destinationPath
         (New-Object Net.WebClient).DownloadFile($Url, $destinationPath)
         Write-Output "File downloaded successfully to $destinationPath."
         return $destinationPath
