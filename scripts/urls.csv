@@ -1,5 +1,8 @@
-ID,URL,MD5
-ubuntu2004-wsl,http://cloud-images.ubuntu.com/releases/focal/release/ubuntu-20.04-server-cloudimg-amd64.tar.gz,6021b2ff36c619a1c8eb567b16acf258
-ubuntu1810-wsl,http://cloud-images.ubuntu.com/releases/cosmic/release/ubuntu-18.10-server-cloudimg-amd64.tar.gz,c820d5583431994f176af00ad287db4d
-ubuntu1604-wsl,http://cloud-images.ubuntu.com/releases/xenial/release/ubuntu-16.04-server-cloudimg-amd64-wsl.rootfs.tar.gz,913d522e612424350b80c3c5651047af
-ubuntu1604-wsl2,http://cloud-images.ubuntu.com/releases/xenial/release/ubuntu-16.04-server-cloudimg-amd64-wsl.rootfs.tar.gz,
+ID,URL,MD5,SHA512,SHA256,TYPE
+ubuntu2004-wsl,http://cloud-images.ubuntu.com/releases/focal/release/ubuntu-20.04-server-cloudimg-amd64.tar.gz,6021b2ff36c619a1c8eb567b16acf258,,,,
+ubuntu1810-wsl,http://cloud-images.ubuntu.com/releases/cosmic/release/ubuntu-18.10-server-cloudimg-amd64.tar.gz,c820d5583431994f176af00ad287db4d,,,,
+ubuntu1604-wsl,http://cloud-images.ubuntu.com/releases/xenial/release/ubuntu-16.04-server-cloudimg-amd64-wsl.rootfs.tar.gz,913d522e612424350b80c3c5651047af,,,,
+ubuntu1604-wsl2,http://cloud-images.ubuntu.com/releases/xenial/release/ubuntu-16.04-server-cloudimg-amd64-wsl.rootfs.tar.gz,,,,,,
+alpine320-wsl,https://dl-cdn.alpinelinux.org/alpine/v3.20/releases/x86_64/alpine-minirootfs-3.20.0-x86_64.tar.gz,,,,,,
+alpine318-wsl,https://dl-cdn.alpinelinux.org/alpine/v3.18/releases/x86_64/alpine-minirootfs-3.18.0-x86_64.tar.gz,,,,,,
+fedora39-wsl,https://github.com/fedora-cloud/docker-brew-fedora/blob/39/x86_64/fedora-39-x86_64.tar.xz,,,,,,
