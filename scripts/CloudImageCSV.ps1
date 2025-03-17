@@ -38,3 +38,33 @@ function Get-CloudImageMD5 {
     } 
     return $result
 }
+function Get-CloudImageSHA256 {
+    param (
+        [string]$ID
+    )
+    if ($global:UrlDict.ContainsKey($ID)) {
+        $result =  $($global:UrlDict[$ID].SHA256) 
+    } 
+    return $result
+}
+
+function Get-CloudImageSHA512 {
+    param (
+        [string]$ID
+    )
+    if ($global:UrlDict.ContainsKey($ID)) {
+        $result =  $($global:UrlDict[$ID].SHA512) 
+    } 
+    return $result
+}
+
+function Get-CloudImageType {
+    param (
+        [string]$ID
+    )
+    if ($global:UrlDict.ContainsKey($ID)) {
+        $result =  $($global:UrlDict[$ID].TYPE) 
+
+    } 
+    return $result
+}

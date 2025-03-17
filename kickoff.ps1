@@ -1,7 +1,11 @@
+$scriptpath = $MyInvocation.MyCommand.Path
+$dir = Split-Path $scriptpath
+. $dir\scripts\CloudImageCSV.ps1
+
 $profile_name=$args[0]
 
 $sw = [Diagnostics.Stopwatch]::StartNew()
-$Profile_Path = $profile_name
+$Profile_Path = [IO.Path]::GetFullPath($profile_name) 
 Write-Host ( "#####  Install Profile {0} ##### " -f $Profile_Path)
 
 $distro_name = ""
@@ -13,11 +17,21 @@ $file | foreach {
   if ($items[0] -eq "export ps_distro_source"){$ps_distro_source = $items[1]}
   if ($items[0] -eq "export ps_install_dir"){$ps_install_dir = $items[1]}
   if ($items[0] -eq "export debug_mode"){$debug_mode = $items[1]}
+  if ($items[0] -eq "export ps_distro_id"){$distro_lookupid = $items[1]}
 }
 
 $install_name=$distro_name
 $ps_install_dir = $ps_install_dir+"\"+$distro_name
 
+if($ps_distro_source -eq ""){
+    $ps_distro_source="cloud download"
+    Init-CloudImageDb
+    $imageurl1 = Get-CloudImageURL  -ID $distro_lookupid
+    if($imageurl1 -eq ""){
+      Write-Host ( "#####  invalid cloud image name, cannot resolve ps_distro_id to a valid download url")
+
+    }
+  }
 Write-Host ( 
 "#####  Spinup params
           distro type       : {0} 

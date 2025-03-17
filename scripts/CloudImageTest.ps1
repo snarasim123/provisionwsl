@@ -26,7 +26,7 @@ Assert ($url -eq "") "test3 failed"
 
 Write-Host "Testing empty md5 for "$test2
 $mdresult = Get-CloudImageMD5  -ID  $test2
-Assert ($null -eq $mdresult) "test4 failed"
+Assert ("" -eq $mdresult) "test4 failed"
 
 Write-Host "4 tests run"
 

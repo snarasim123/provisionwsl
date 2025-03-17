@@ -5,6 +5,7 @@ export distro_name=ubu2004-test1
 #powershell specific vars
 export ps_distro_source=
 export ps_install_dir=C:\Users\snara\wsl
+export ps_distro_id=ubuntu1604-wsl
 
 # check or nocheck
 # export debug_mode=nocheck
