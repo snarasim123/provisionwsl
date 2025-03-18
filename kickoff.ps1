@@ -1,6 +1,6 @@
 $scriptpath = $MyInvocation.MyCommand.Path
 $dir = Split-Path $scriptpath
-$basedir=$dir
+$basedir=$PSScriptRoot
 . $basedir\scripts\CloudImageCSV.ps1
 . $basedir\scripts\UrlDownload.ps1
 . $basedir\scripts\GzExtract.ps1
@@ -95,14 +95,14 @@ wsl --terminate $install_name
 
 
 Write-Host( "##### Preliminary setup  {0} Step 2... " -f "$install_name")
-Write-Host "Profile_Path result type "+ $Profile_Path.GetType()  
+# Write-Host "Profile_Path result type "+ $Profile_Path.GetType()  
 $Profile_Path_unix = ($Profile_Path.replace('\','/')).replace('D:','/mnt/d')
-Write-Host "Profile_Path_unix result type "+ $Profile_Path_unix.GetType()  
-wsl -d $install_name ./prep-install.sh $Profile_Path_unix -u root
+$basedir_unixpath = ($PSScriptRoot.replace('\','/')).replace('D:','/mnt/d')
+wsl -d $install_name $basedir_unixpath/prep-install.sh $Profile_Path_unix -u root
 # wsl -d $install_name ./prep-install.sh /mnt/d/code/setup/ansible/profiles/r37-ubu2004-test1 -u root
 
 Write-Host( "##### Main setup  {0} Step 3... " -f "$install_name")
-wsl -d $install_name  ./install.sh  $Profile_Path_unix -u root
+wsl -d $install_name  $basedir_unixpath/install.sh  $Profile_Path_unix -u root
 # wsl -d $install_name  ./install.sh  "/mnt/d/code/setup/ansible/profiles/r37-ubu2004-test1"  -u root
 
 Write-Host( "##### Restarting instance  {0}... " -f "$install_name")

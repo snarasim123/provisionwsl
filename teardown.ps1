@@ -1,3 +1,4 @@
+# todo - resolve relative/absolute path differences
 $profile_name=$args[0]
 
 $Path = $profile_name
