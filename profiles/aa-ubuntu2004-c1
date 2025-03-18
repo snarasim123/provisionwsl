@@ -1,9 +1,9 @@
 #common params
-export distro_type=fedora
-export distro_name=fedora-a1
+export distro_type=ubuntu
+export distro_name=ubuntu2004-c1
 
 #powershell specific vars
-export ps_distro_source=C:\Users\srinivasa.narasimha\wsl-src\fedora_3704.tar
+export ps_distro_source=C:\Users\srinivasa.narasimha\wsl-src\ubuntu2004.tar
 export ps_install_dir=C:\Users\srinivasa.narasimha\wsl
 
 # check or nocheck
@@ -15,5 +15,7 @@ export code_src="$code_base/$code_root"
 
 export run_as_user=root
 export upgrade=true
+
+
 
 

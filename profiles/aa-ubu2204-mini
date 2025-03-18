@@ -1,10 +1,11 @@
 #common params
-export distro_type=alpine
-export distro_name=alpine-a320
+export distro_type=ubuntu
+export distro_name=ubu2204-mini
 
 #powershell specific vars
-export ps_distro_source=C:\Users\srinivasa.narasimha\wsl-src\alpine-minirootfs-3.20.0-x86_64.tar
+export ps_distro_source=
 export ps_install_dir=C:\Users\srinivasa.narasimha\wsl
+export ps_distro_id=ubuntu2204-wsl
 
 # check or nocheck
 # export debug_mode=nocheck
@@ -15,7 +16,7 @@ export code_src="$code_base/$code_root"
 
 export run_as_user=root
 export upgrade=true
-
+export skipsteps=packages,cloud,editor,git,container
 
 
 

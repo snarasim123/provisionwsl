@@ -97,7 +97,10 @@ wsl --terminate $install_name
 Write-Host( "##### Preliminary setup  {0} Step 2... " -f "$install_name")
 # Write-Host "Profile_Path result type "+ $Profile_Path.GetType()  
 $Profile_Path_unix = ($Profile_Path.replace('\','/')).replace('D:','/mnt/d')
+$Profile_Path_unix = ($Profile_Path_unix.replace('C:','/mnt/c'))
 $basedir_unixpath = ($PSScriptRoot.replace('\','/')).replace('D:','/mnt/d')
+$basedir_unixpath = ($basedir_unixpath.replace('C:','/mnt/c'))
+
 wsl -d $install_name $basedir_unixpath/prep-install.sh $Profile_Path_unix -u root
 # wsl -d $install_name ./prep-install.sh /mnt/d/code/setup/ansible/profiles/r37-ubu2004-test1 -u root
 
