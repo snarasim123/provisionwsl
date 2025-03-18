@@ -18,6 +18,15 @@ Function DeGZip-File{
     $gzipStream.Close()
     $output.Close()
     $input.Close()
+    return $outFile
+}
+
+Function GetUncompressedFileName{
+    Param(
+        $infile
+        )
+    $outFile = $infile.Substring(0, $infile.LastIndexOfAny('.'))
+    return $outFile
 }
 
 # https://stackoverflow.com/a/46876070/847953

@@ -1,12 +1,14 @@
 $scriptpath = $MyInvocation.MyCommand.Path
 $dir = Split-Path $scriptpath
-. $dir\scripts\CloudImageCSV.ps1
-. $dir\scripts\UrlDownload.ps1
+$basedir=$dir
+. $basedir\scripts\CloudImageCSV.ps1
+. $basedir\scripts\UrlDownload.ps1
+. $basedir\scripts\GzExtract.ps1
 
 $profile_name=$args[0]
 
 $sw = [Diagnostics.Stopwatch]::StartNew()
-$Profile_Path = [IO.Path]::GetFullPath($profile_name) 
+$Profile_Path = Convert-Path($profile_name) 
 
 Write-Host ( "#####  Install Profile {0} ##### " -f $Profile_Path)
 
@@ -38,9 +40,7 @@ foreach ($i in $distroslist) {
   if ($found) {
     Write-Host "Distro name already in installed distros list. cannot reinstall. exiting."
     exit
-  } else {
-    Write-Host "Substring not found."
-  }
+  } 
 }
 
 if($ps_distro_source -eq "" -And $distro_lookupid -eq ""){
@@ -55,26 +55,31 @@ if($install_method -eq "cloud"){
     Write-Host ( "#####  invalid cloud image name, cannot resolve ps_distro_id to a valid download url. exiting")
     exit
   }
-
   # parse filename from imageurl
-
+  $compressedFile = [System.IO.Path]::GetFileName($imageurl1)
   #  check if file exists under $dir\tmp, if yes, skip out of this method
-
-  # Download-URL -Url $imageurl1,-FolderLocation $dir\tmp
-    
-  # populate distro_source var and continue out of this method.
-  
+  $compressedFilePath = Join-Path -Path $basedir\tmp\ -ChildPath $compressedFile
+  $uncompressedFileName = GetUncompressedFileName  -infile $compressedFile
+  if (-not (Test-Path -Path $compressedFilePath)) {
+    Write-Host "The file does not exist. downloading..."
+    Download-URL -Url $imageurl1 -FolderLocation $basedir\tmp\
+    # extract tar file    
+  } 
+  DeGZip-File -infile $compressedFilePath
+  $ps_distro_source="$basedir\tmp\$uncompressedFileName"
+  # populate distro_source var and continue out of this method.  
   # need to have $ps_distro_source populated correctly by end of this method
 }
 
 
 Write-Host ( 
 "#####  Spinup params
-          distro type       : {0} 
-          distro_name       : {1} 
-          distro source     : {2} 
-          install location  : {3}
-#####  " -f $distro_type, $install_name, $ps_distro_source,$ps_install_dir)
+          distro type             : {0} 
+          distro_name             : {1} 
+          distro source           : {2} 
+          distro id (from cloud)  : {3}
+          install location        : {4}
+#####  " -f $distro_type, $install_name, $ps_distro_source,$distro_lookupid,$ps_install_dir)
 
 
 
@@ -86,22 +91,19 @@ wsl --import $install_name $ps_install_dir $ps_distro_source
 
 Write-Host( "##### Restarting instance  {0}... " -f "$install_name")
 wsl --terminate $install_name
-wsl -d $install_name lsb_release -d
-
-if ($debug_mode -eq "check"){
-      Write-Host ( "##### Running in check mode.  ")
-      # todo turn it on
-      # wsl -d $install_name  ./install.sh  $distro_type --check -u root
-      exit
-  }
+# wsl -d $install_name lsb_release -d
 
 
 Write-Host( "##### Preliminary setup  {0} Step 2... " -f "$install_name")
-$Profile_Path_unix = $Profile_Path.replace('\','/')
-wsl -d $install_name ./prep-install.sh $Profile_Path_unix -u root
+Write-Host "Profile_Path result type "+ $Profile_Path.GetType()  
+$Profile_Path_unix = ($Profile_Path.replace('\','/')).replace('D:','/mnt/d').replace('C:','/mnt/c')
+Write-Host "Profile_Path_unix result type "+ $Profile_Path_unix.GetType()  
+# wsl -d $install_name ./prep-install.sh $Profile_Path_unix -u root
+wsl -d $install_name ./prep-install.sh /mnt/d/code/setup/ansible/profiles/r37-ubu2004-test1 -u root
 
 Write-Host( "##### Main setup  {0} Step 3... " -f "$install_name")
-wsl -d $install_name  ./install.sh  $Profile_Path_unix -u root
+# wsl -d $install_name  ./install.sh  $Profile_Path_unix -u root
+wsl -d $install_name  ./install.sh  "/mnt/d/code/setup/ansible/profiles/r37-ubu2004-test1"  -u root
 
 Write-Host( "##### Restarting instance  {0}... " -f "$install_name")
 wsl --terminate $install_name
