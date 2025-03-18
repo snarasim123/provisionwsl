@@ -14,6 +14,8 @@ kube_gcp.sh
 gcloud auth login
 #gcloud projects list
 gcloud config set project gcp-eng-devops-test
+#to login
+gcloud auth login
 
 
 gcloud fedora install

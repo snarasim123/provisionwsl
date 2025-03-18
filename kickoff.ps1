@@ -1,14 +1,17 @@
 $scriptpath = $MyInvocation.MyCommand.Path
 $dir = Split-Path $scriptpath
 . $dir\scripts\CloudImageCSV.ps1
+. $dir\scripts\UrlDownload.ps1
 
 $profile_name=$args[0]
 
 $sw = [Diagnostics.Stopwatch]::StartNew()
 $Profile_Path = [IO.Path]::GetFullPath($profile_name) 
+
 Write-Host ( "#####  Install Profile {0} ##### " -f $Profile_Path)
 
 $distro_name = ""
+$install_method=""
 $file = get-content $Profile_Path
 $file | foreach {
   $items = $_.split("=")
@@ -22,16 +25,49 @@ $file | foreach {
 
 $install_name=$distro_name
 $ps_install_dir = $ps_install_dir+"\"+$distro_name
+if($ps_distro_source -eq "" -or $ps_distro_source -eq $null){
+  $install_method="cloud"
+} else {
+  $install_method="local"
+}
 
-if($ps_distro_source -eq ""){
-    $ps_distro_source="cloud download"
-    Init-CloudImageDb
-    $imageurl1 = Get-CloudImageURL  -ID $distro_lookupid
-    if($imageurl1 -eq ""){
-      Write-Host ( "#####  invalid cloud image name, cannot resolve ps_distro_id to a valid download url")
-
-    }
+$distroslist=(wsl -l) 
+foreach ($i in $distroslist) {
+  $finalstring=($i.ToString().Replace("`0",""))
+  $found=($finalstring  -match  $distro_name)
+  if ($found) {
+    Write-Host "Distro name already in installed distros list. cannot reinstall. exiting."
+    exit
+  } else {
+    Write-Host "Substring not found."
   }
+}
+
+if($ps_distro_source -eq "" -And $distro_lookupid -eq ""){
+    Write-Host ( "#####  No distro .tar file (export ps_distro_source) or cloud image id (export distro_lookupid) in profile file. exiting.")
+    exit
+}
+
+if($install_method -eq "cloud"){    
+  Init-CloudImageDb
+  $imageurl1 = Get-CloudImageURL  -ID $distro_lookupid
+  if($imageurl1 -eq ""){
+    Write-Host ( "#####  invalid cloud image name, cannot resolve ps_distro_id to a valid download url. exiting")
+    exit
+  }
+
+  # parse filename from imageurl
+
+  #  check if file exists under $dir\tmp, if yes, skip out of this method
+
+  # Download-URL -Url $imageurl1,-FolderLocation $dir\tmp
+    
+  # populate distro_source var and continue out of this method.
+  
+  # need to have $ps_distro_source populated correctly by end of this method
+}
+
+
 Write-Host ( 
 "#####  Spinup params
           distro type       : {0} 
@@ -40,15 +76,13 @@ Write-Host (
           install location  : {3}
 #####  " -f $distro_type, $install_name, $ps_distro_source,$ps_install_dir)
 
-$match=((wsl -l | Where {$_.Replace("`0","") -match "$install_name"}))
-if ($match -eq "$install_name") {
-    Write-Host ( "##### Instance exists. Skip creating instance with name {0}... " -f $install_name)
-}
-else {
-    Write-Host( "##### Creating new instance with name {0} Step 1... " -f "$install_name")
-    mkdir $ps_install_dir  -ea 0
-    wsl --import $install_name $ps_install_dir $ps_distro_source
-}
+
+
+
+Write-Host( "##### Creating new instance with name {0} Step 1... " -f "$install_name")
+mkdir $ps_install_dir  -ea 0
+wsl --import $install_name $ps_install_dir $ps_distro_source
+
 
 Write-Host( "##### Restarting instance  {0}... " -f "$install_name")
 wsl --terminate $install_name

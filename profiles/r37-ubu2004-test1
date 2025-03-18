@@ -1,14 +1,17 @@
-#common params
+#common (between powershell and bash) params
 export distro_type=ubuntu
+#name for the instance to be
 export distro_name=ubu2004-test1
 
 #powershell specific vars
+
+# leave this empty for download. or setup a rootfs .tar file and point to the file.
 export ps_distro_source=
+# where the wsl installation files are installed
 export ps_install_dir=C:\Users\snara\wsl
+# id to lookup from list of known cloud images from csv file
 export ps_distro_id=ubuntu1604-wsl
 
-# check or nocheck
-# export debug_mode=nocheck
 
 # cleanup this var
 export default_user=snarasim
