@@ -96,14 +96,14 @@ wsl --terminate $install_name
 
 Write-Host( "##### Preliminary setup  {0} Step 2... " -f "$install_name")
 Write-Host "Profile_Path result type "+ $Profile_Path.GetType()  
-$Profile_Path_unix = ($Profile_Path.replace('\','/')).replace('D:','/mnt/d').replace('C:','/mnt/c')
+$Profile_Path_unix = ($Profile_Path.replace('\','/')).replace('D:','/mnt/d')
 Write-Host "Profile_Path_unix result type "+ $Profile_Path_unix.GetType()  
-# wsl -d $install_name ./prep-install.sh $Profile_Path_unix -u root
-wsl -d $install_name ./prep-install.sh /mnt/d/code/setup/ansible/profiles/r37-ubu2004-test1 -u root
+wsl -d $install_name ./prep-install.sh $Profile_Path_unix -u root
+# wsl -d $install_name ./prep-install.sh /mnt/d/code/setup/ansible/profiles/r37-ubu2004-test1 -u root
 
 Write-Host( "##### Main setup  {0} Step 3... " -f "$install_name")
-# wsl -d $install_name  ./install.sh  $Profile_Path_unix -u root
-wsl -d $install_name  ./install.sh  "/mnt/d/code/setup/ansible/profiles/r37-ubu2004-test1"  -u root
+wsl -d $install_name  ./install.sh  $Profile_Path_unix -u root
+# wsl -d $install_name  ./install.sh  "/mnt/d/code/setup/ansible/profiles/r37-ubu2004-test1"  -u root
 
 Write-Host( "##### Restarting instance  {0}... " -f "$install_name")
 wsl --terminate $install_name
@@ -116,5 +116,10 @@ $ts = $sw.Elapsed;
 $elapsedTime = [string]::Format("{0:00} Hours :{1:00} Mins",$ts.Hours, $ts.Minutes);
 Write-Host( "##### RunTime  {0}... " -f "$elapsedTime")
 
- # Write-Host ( "##### Creating  {0} from source {1} to dir {2} " -f $install_name,$ps_distro_source, $ps_install_dir)
+# Write-Host ( "##### Creating  {0} from source {1} to dir {2} " -f $install_name,$ps_distro_source, $ps_install_dir)
 # Read-Host -Prompt "Press any key to continue"
+
+# test relatve path from same folder, same drive, different drive
+# test absolute path from same drive, different drive
+#     d:\code\setup\ansible\kickoff.ps1 D:\code\setup\ansible\profiles\r37-alp320-mini - fails
+# add support for few more drives
