@@ -3,6 +3,7 @@
     -autocleanup after install
     -remove github keys with teardown
     -rename github keyname to be unique
+    https://github.com/microsoft/WSL/issues/4479
     -support xh archives
     -support fedora cloud images
 . vbox support/linux support
