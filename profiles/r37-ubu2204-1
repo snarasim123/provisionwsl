@@ -1,7 +1,7 @@
 #common (between powershell and bash) params
 export distro_type=ubuntu
 #name for the instance to be
-export distro_name=ubu2004-test1
+export distro_name=ubu2204-1
 
 #powershell specific vars
 
@@ -10,7 +10,7 @@ export ps_distro_source=
 # where the wsl installation files are installed
 export ps_install_dir=C:\Users\snara\wsl
 # id to lookup from list of known cloud images from csv file
-export ps_distro_id=ubuntu1604-wsl
+export ps_distro_id=ubuntu2204-wsl
 
 
 # cleanup this var
@@ -26,7 +26,7 @@ export run_as_user=root
 
 export upgrade=true
 
-export skipsteps=cloud,editor,git,container
+# export skipsteps=cloud,editor,git,container
 # nvim,vim
 # aws,cloud
 # helm,k8s,k9s,container

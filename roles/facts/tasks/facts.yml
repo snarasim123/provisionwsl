@@ -84,15 +84,28 @@
   run_once: yes    
   check_mode: no
 
+# - name: Execute the env command and capture the output
+#   shell: env | regex_search('WSL_DISTRO_NAME=([^\\n]+)')  | cut -d : -f 1
+#   register: env_output
+
+- name: Execute the bash command with pipes
+  shell: |
+    env | grep  'WSL_DISTRO_NAME=' | cut -d = -f 2
+  register: command_output
+
+- name: Extract the WSL_DISTRO_NAME value using regex
+  set_fact:
+    wsl_distro_name: "{{ command_output.stdout }}"
+
 - name: Set user github keyname
   set_fact:
-    github_keyname: "{{ ansible_hostname }}-{{ os_name }}-{{inventory_hostname}}-{{ target_user }}-{{ random_number }}"
+    github_keyname: "{{ ansible_hostname }}-{{ target_user }}-{{ wsl_distro_name }}"
   run_once: yes
   check_mode: no    
 
 - name: Set root github keyname
   set_fact:
-    root_github_keyname: "{{ ansible_hostname }}-{{ os_name }}-{{inventory_hostname}}-{{ root_user }}-{{ random_number }}"
+    root_github_keyname: "{{ ansible_hostname }}-{{ root_user }}-{{ wsl_distro_name }}"
   run_once: yes    
   check_mode: no
 

@@ -5,6 +5,7 @@ export distro_name=ubu2004-mini1
 #powershell specific vars
 export ps_distro_source=d:\soft\wsl\ubuntu2004.tar
 export ps_install_dir=C:\Users\snara\wsl
+export ps_distro_id=ubuntu2204-wsl
 
 # check or nocheck
 # export debug_mode=nocheck

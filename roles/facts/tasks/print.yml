@@ -35,6 +35,10 @@
   when: is_wsl
   tags: print
 
+- name: Display the captured WSL_DISTRO_NAME value
+  ansible.builtin.debug:
+    msg: "Distro name is: {{ wsl_distro_name }}"
+
 # - name: Print if apt package manager is installed
 #   ansible.builtin.debug:
 #     msg: Apt installed as pkg manger 
@@ -65,10 +69,10 @@
     msg: user github keyname {{ github_keyname }}
   tags: print
 
-- name: Print github creds
-  ansible.builtin.debug:
-    msg: githubuser "{{ githubuser }}" githubpass  "{{ githubpass }}"
-  tags: print
+# - name: Print github creds
+#   ansible.builtin.debug:
+#     msg: githubuser "{{ githubuser }}" githubpass  "{{ githubpass }}"
+#   tags: print
 
 
 

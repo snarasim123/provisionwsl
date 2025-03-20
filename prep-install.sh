@@ -7,8 +7,6 @@ upgrade() {
         sudo apt install ansible aptitude -y
         ansible-galaxy collection install community.general
         ansible-galaxy collection install kubernetes.core
-    # elif [[ "$distro_type" == "fedora" ]] ; then
-        # echo "fedora upgrade"
     elif [[ "$distro_type" == "alpine" ]] ; then
         # echo "alpine upgrade"
         apk add sudo
@@ -28,15 +26,12 @@ upgrade() {
 
 profile_path=$1
 source $profile_path
-echo "###### Prepinstall.sh, reading profile  $profile_path ....."
-echo "###### Preparing instance, type  $distro_type , upgrade true/false? $upgrade....."
+
+echo "##### Preparing instance $distro_name, doing preliminary setup ....."
 
 # read -p "*** Prelim installs for $distro_type, Press to continue.. " -n 1 -r
 if [[ "$upgrade" == "true" ]] ; then
-    echo "###### Upgrade distro $distro_type ....."
     upgrade
-else 
-    echo "###### Skipping $distro_type upgrade ....."
 fi
 
 exit
