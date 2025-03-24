@@ -4,7 +4,8 @@ function Display-SpinupParams {
         [string]$install_name,
         [string]$ps_distro_source,
         [string]$distro_lookupid,
-        [string]$ps_install_dir
+        [string]$ps_install_dir,
+        [string]$ps_logfile
     )
 
     Write-Host (
@@ -14,6 +15,7 @@ function Display-SpinupParams {
           distro source           : {2} 
           distro id (from cloud)  : {3}
           install location        : {4}
-        " -f $distro_type, $install_name, $ps_distro_source, $distro_lookupid, $ps_install_dir
+          log file                : {5}
+        " -f $distro_type, $install_name, $ps_distro_source, $distro_lookupid, $ps_install_dir,$ps_logfile
     )
 }

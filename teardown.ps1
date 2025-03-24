@@ -30,13 +30,13 @@ Write-Host ( "##### Teardown  {0} from dir {1} " -f $install_name,$ps_install_di
 $match=((wsl -l | Where {$_.Replace("`0","") -match "$install_name"}))
 if ($match -eq "$install_name") {
     Write-Host ( "##### Instance exists. Tearing down {0}... " -f $install_name)
-    $i=5
-    Write-Host ( "Wait {0} Seconds"  -f $i)
-    while ($i -gt 0){
-        write-host -nonewline ("#")
-        sleep 1
-        $i--
-    }
+    # $i=5
+    # Write-Host ( "Wait {0} Seconds"  -f $i)
+    # while ($i -gt 0){
+    #     write-host -nonewline ("#")
+    #     sleep 1
+    #     $i--
+    # }
     write-host  ("")
     wsl  --unregister  $install_name
     # rmdir $ps_install_dir -ea 0

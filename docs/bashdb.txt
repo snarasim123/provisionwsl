@@ -1,0 +1,14 @@
+mkdir -p ~/code
+cd ~/code
+https://sourceforge.net/projects/bashdb/files/bashdb/5.0-1.1.2/bashdb-5.0-1.1.2.tar.gz
+
+Cchange,
+bash_version=5
+bash_major=5
+bash_minor=0
+
+./configure
+make 
+sudo make install
+
+install bashdb extension from vscode.

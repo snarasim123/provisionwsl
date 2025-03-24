@@ -4,18 +4,14 @@ $basedir=$PSScriptRoot
 . $basedir\scripts\GzExtract.ps1
 . $basedir\scripts\Print.ps1
 
-$profile_name=$args[0]
-
 $sw = [Diagnostics.Stopwatch]::StartNew()
-$formattedTime = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
-Write-Host "Start Provision/configuration at: $formattedTime"
-
-$Profile_Path = Convert-Path($profile_name) 
+$Profile_Name = Split-Path $args[0] -leaf 
+$Profile_Path = Convert-Path($args[0]) 
 
 Write-Host ( "##### Installing wsl instance using Profile {0} ##### " -f $Profile_Path)
 
-$distro_name = ""
-$install_method=""
+# $distro_name = ""
+# $install_method=""
 $file = get-content $Profile_Path
 $file | foreach {
   $items = $_.split("=")
@@ -27,14 +23,11 @@ $file | foreach {
   if ($items[0] -eq "export ps_distro_id"){$distro_lookupid = $items[1]}
 }
 
-$install_name=$distro_name
 $ps_install_dir = $ps_install_dir+"\"+$distro_name
 if($ps_distro_source -eq "" -or $ps_distro_source -eq $null){
   $install_method="cloud"
-  # Write-Host( "##### Downloading source .gz from cloud. ")
 } else {  
   $install_method="local"
-  # Write-Host( "##### Using local source .gz file from disk. ")
 }
 
 $distroslist=(wsl -l) 
@@ -42,7 +35,7 @@ foreach ($i in $distroslist) {
   $finalstring=($i.ToString().Replace("`0",""))
   $found=($finalstring  -match  $distro_name)
   if ($found) {
-    Write-Host "##### Distro name already in installed distros list. cannot reinstall. exiting."
+    Write-Host "##### Distro name present in already installed distros list. cannot reinstall. exiting."
     exit
   } 
 }
@@ -73,50 +66,42 @@ if($install_method -eq "cloud"){
 }
 $params = @{
     distro_type      = $distro_type
-    install_name     = $install_name
+    distro_name     = $distro_name
     ps_distro_source = $ps_distro_source
     distro_lookupid  = $distro_lookupid
     ps_install_dir   = $ps_install_dir
+    ps_logfile = "$basedir\$Profile_Name.log"
 }  
 Display-SpinupParams @params
 
-mkdir $ps_install_dir  -ea 0
-wsl --import $install_name $ps_install_dir $ps_distro_source
+$dummyoutput = (mkdir $ps_install_dir  -ea 0)
+$dummyoutput = (wsl --import $distro_name $ps_install_dir $ps_distro_source)
 
-Write-Host( "##### Restarting {0} instance... " -f "$install_name")
-wsl --terminate $install_name
-wsl -d $install_name lsb_release -d
+$dummyoutput = (wsl --terminate $distro_name)
 
-Write-Host( "##### Installing Prerequisites in {0} instance ... " -f "$install_name")
 $Profile_Path_unix = (($Profile_Path.replace('\','/')).replace('D:','/mnt/d')).replace('C:','/mnt/c')
 $basedir_unixpath = (($PSScriptRoot.replace('\','/')).replace('D:','/mnt/d')).replace('C:','/mnt/c')
 
-wsl -d $install_name $basedir_unixpath/prep-install.sh $Profile_Path_unix -u root
+Write-Host( "##### Installing Prerequisites for the {0} instance ... " -f "$distro_name")
+$dummyoutput = (wsl -d $distro_name $basedir_unixpath/prep-install.sh $Profile_Path_unix -u root) 
 
-Write-Host( "##### Configuring  {0} instance... " -f "$install_name")
-wsl -d $install_name  $basedir_unixpath/install.sh  $Profile_Path_unix -u root
+$dummyoutput | Out-File   "$basedir\$Profile_Name.log"
 
-Write-Host( "##### Restarting {0} instance... " -f "$install_name")
-wsl --terminate $install_name
-wsl -d $install_name lsb_release -d 
-wsl -d $install_name ls /
-Write-Host( "##### Instance  {0} ready. " -f "$install_name")
+Write-Host( "##### Configuring  {0} instance... " -f "$distro_name")
+$dummyoutput2 = (wsl -d $distro_name  $basedir_unixpath/install.sh  $Profile_Path_unix -u root) 2>&1 >  "$basedir\$Profile_Name.err"
+$dummyoutput2 | Out-File -append  ("$basedir\$Profile_Name.log")
 
+Write-Host( "##### Restarting {0} instance... " -f "$distro_name")
+wsl --terminate $distro_name
 
+$dummyoutput=(wsl -d $distro_name ls /)
+Write-Host( "##### Instance  {0} ready. " -f "$distro_name")
 
 if (Test-Path $basedir\tmp\$uncompressedFileName) {
   Remove-Item -Path $basedir\tmp\$uncompressedFileName -Force
-  Write-Host "##### Cleaned up leftover install source files : $basedir\tmp\$uncompressedFileName"
 } 
 
 $sw.Stop()
 $ts = $sw.Elapsed;
 $elapsedTime = [string]::Format("{0:00} Hours :{1:00} Mins :{2:00} Secs",$ts.Hours, $ts.Minutes, $ts.Seconds);
 Write-Host( "##### RunTime  {0}... " -f "$elapsedTime")
-$formattedTime = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
-Write-Host "Finished at: $formattedTime"
-
-# test relatve path from same folder, same drive, different drive
-# test absolute path from same drive, different drive
-#     d:\code\setup\ansible\kickoff.ps1 D:\code\setup\ansible\profiles\r37-alp320-mini - fails
-# add support for few more drives
