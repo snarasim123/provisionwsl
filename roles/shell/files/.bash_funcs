@@ -25,3 +25,95 @@ dusort() {
 du -mh  -d 1 "$1" | sort -h
 }
 
+kcget(){
+kubectl get pods | grep -i $1    
+}
+
+kcbash(){
+#bash into the first pod which matches the passed in param pattern.
+#chooses the first container which is not a traefik container.    
+PODS=$(kubectl get pods -A)
+podname=""
+containername=""
+for POD in $PODS; do
+    if ! echo "$POD" | grep -q "$1"; then
+        continue  # Skip to the next iteration
+    fi
+
+    podname=$POD
+    printf "Found pod $podname \n" 
+        
+    CONTAINERS=$(kubectl get pod "$POD" -o jsonpath="{.spec.containers[*].name}")
+    for CONTAINER in $CONTAINERS; do        
+        containername=$CONTAINER
+        if ! echo "$containername" | grep -q "traefik"; then            
+            printf "####### bash into pod '$podname' container '$containername' \n"  
+            kubectl exec -it $podname -c $containername -- /bin/bash
+            exit
+        fi
+        
+        printf "####### skipping container $containername \n"
+        continue
+    done
+done
+printf "no pod/container found to shell into. \n"
+}
+
+kclogs(){    
+cur_date="$(date +"%m-%d_%H-%M-%S%3N")"
+log_file="-$cur_date.txt"
+desc_file="-$cur_date-desc.txt"
+
+PODS=$(kubectl get pods -A)
+for POD in $PODS; do
+    if ! echo "$POD" | grep -q "$1"; then
+        continue  # Skip to the next iteration
+    fi
+
+    podname=$POD
+    printf "Found pod $podname \n"
+
+    pod_log="$POD$log_file"
+    desc_log="$POD$desc_file"
+    echo " " >  ./$pod_log
+
+    today=`date "+%Y%m%d%H%M%S"`
+    printf "\n\n\n\n####### log time $today\n"  >>  ./$pod_log
+
+    INIT_CONTAINERS=$(kubectl get pod "$POD" -o jsonpath="{.spec.initContainers[*].name}")
+    CONTAINERS=$(kubectl get pod "$POD" -o jsonpath="{.spec.containers[*].name}")
+
+    for INIT_CONTAINER in $INIT_CONTAINERS; do
+        printf "####### $INIT_CONTAINER init container logs\n\n"   >>  ./$pod_log
+        kubectl logs "$podname" -c "$INIT_CONTAINER"  >> ./$pod_log&
+        printf "\n \n"  >>  ./$pod_log
+    done
+
+    for CONTAINER in $CONTAINERS; do
+          printf "####### $CONTAINER container logs\n\n"   >>  ./$pod_log
+          kubectl logs "$podname" -c "$CONTAINER"  >> ./$pod_log&
+          printf "\n \n"  >>  ./$pod_log
+    done
+    #kubectl describe pod "$podname"   > $desc_log&
+
+done
+}
+
+kcdesc(){    
+cur_date="$(date +"%m-%d_%H-%M-%S%3N")"
+# log_file="-$cur_date.txt"
+desc_file="-$cur_date-desc.txt"
+
+PODS=$(kubectl get pods -A)
+for POD in $PODS; do
+    if ! echo "$POD" | grep -q "$1"; then
+        continue  # Skip to the next iteration
+    fi
+
+    podname=$POD
+    printf "Found pod $podname \n"
+
+    kubectl describe pod "$podname"   > "$desc_file"&
+
+done
+}
