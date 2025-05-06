@@ -26,7 +26,12 @@ du -mh  -d 1 "$1" | sort -h
 }
 
 kcget(){
-kubectl get pods | grep -i $1    
+    if [ -z "$1" ]; then
+    kubectl get pods 
+else
+    echo "Looking for pods matching : $1"
+    kubectl get pods | grep -i $1 
+fi
 }
 
 kcbash(){
@@ -35,6 +40,8 @@ kcbash(){
 PODS=$(kubectl get pods -A)
 podname=""
 containername=""
+found="false"
+
 for POD in $PODS; do
     if ! echo "$POD" | grep -q "$1"; then
         continue  # Skip to the next iteration
@@ -46,17 +53,29 @@ for POD in $PODS; do
     CONTAINERS=$(kubectl get pod "$POD" -o jsonpath="{.spec.containers[*].name}")
     for CONTAINER in $CONTAINERS; do        
         containername=$CONTAINER
-        if ! echo "$containername" | grep -q "traefik"; then            
-            printf "####### bash into pod '$podname' container '$containername' \n"  
-            kubectl exec -it $podname -c $containername -- /bin/bash
-            exit
+        if ! echo "$containername" | grep -q "traefik"; then                        
+            found="true"
+            break
         fi
-        
+
         printf "####### skipping container $containername \n"
         continue
     done
+    if [ "$found" = "true" ]; then
+        break
+    fi
 done
+    if [ "$found" = "true" ]; then
+        printf "####### bash into pod '$podname' container '$containername' \n"  
+        kubectl exec -it $podname -c $containername -- /bin/bash
+    else
+        printf "no pod/container found to shell into. \n"
+    fi
 printf "no pod/container found to shell into. \n"
+}
+
+kcshell(){
+    kcbash "$1"
 }
 
 kclogs(){    
@@ -94,7 +113,6 @@ for POD in $PODS; do
           kubectl logs "$podname" -c "$CONTAINER"  >> ./$pod_log&
           printf "\n \n"  >>  ./$pod_log
     done
-    #kubectl describe pod "$podname"   > $desc_log&
 
 done
 }
@@ -116,4 +134,9 @@ for POD in $PODS; do
     kubectl describe pod "$podname"   > "$desc_file"&
 
 done
+}
+
+kccmd(){
+    # pod name/partial unique pod name
+    # bash command without any param
 }
