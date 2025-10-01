@@ -139,4 +139,5 @@ done
 kccmd(){
     # pod name/partial unique pod name
     # bash command without any param
+    echo " "
 }
