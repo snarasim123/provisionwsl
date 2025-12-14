@@ -17,7 +17,7 @@ export code_src="$code_base/$code_root"
 
 export run_as_user=root
 export upgrade=true
-export skipsteps=cloud,container
+export skipsteps=packages,cloud,editor,git,container
 
 
 

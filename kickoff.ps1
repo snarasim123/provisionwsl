@@ -2,6 +2,8 @@ $basedir=$PSScriptRoot
 . $basedir\scripts\CloudImageCSV.ps1
 . $basedir\scripts\UrlDownload.ps1
 . $basedir\scripts\GzExtract.ps1
+. $basedir\scripts\XzExtract.ps1
+. $basedir\scripts\CompressionUtils.ps1
 . $basedir\scripts\Print.ps1
 
 $sw = [Diagnostics.Stopwatch]::StartNew()
@@ -61,7 +63,17 @@ if($install_method -eq "cloud"){
     Write-Host "The file $compressedFilePath\$compressedFile does not exist. downloading..."
     Download-URL -Url $imageurl1 -FolderLocation $basedir\tmp\
   } 
-  $resultfile = DeGZip-File -infile $compressedFilePath
+  
+  $compressionType = Get-CompressionType -FilePath $compressedFilePath
+  if ($compressionType -eq 'gz') {
+      $resultfile = DeGZip-File -infile $compressedFilePath
+  } elseif ($compressionType -eq 'xz') {
+      $resultfile = UnXz-File-WithCleanup -infile $compressedFilePath
+  } else {
+      Write-Error "Unknown or unsupported compression type for file: $compressedFilePath"
+      exit 1
+  }
+
   $ps_distro_source="$basedir\tmp\$uncompressedFileName"
 }
 $params = @{

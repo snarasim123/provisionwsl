@@ -1,4 +1,10 @@
 
+.laxygit
+.gcp
+.set gcp or aws as default
+. powershell setup
+
+
 . auto download tar files based on profile
     -autocleanup after install
     -remove github keys with teardown
@@ -11,10 +17,6 @@
 .python compile/setup
     -script to switch python version
     -install correct python version for the ansible/galaxy version    
-.Parameterize setup to 
-    done - skip tags    
-    done - check the tasks
-    step through tasks
 .setup newer version of vim
     check and upgrade vim if versions mismatch
 .xwin apps,other window mgrs - xfce4
