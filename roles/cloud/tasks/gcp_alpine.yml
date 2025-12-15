@@ -1,0 +1,104 @@
+---
+# https://github.com/ansible/role-install-gcloud/blob/master/tasks/main.yml
+# https://github.com/markosamuli/ansible-gcloud/tree/master/tasks
+
+# - name: remove existing gcp folder
+#   ansible.builtin.file:
+#     state: absent
+#     path: "/home/{{ target_user }}/tmp/gcp"
+#   tags: 
+#     - gcp
+#     - cloud
+#   become: true
+
+# - name: Download the archive
+#   get_url:
+#     url: "{{ gcloud_archive_url }}/{{ gcloud_archive_name }}"
+#     dest: ""/home/{{ target_user }}/tmp/"
+#     tags: 
+#     - gcp
+#     - cloud
+#   become: true
+  
+# - name: Unarchive the installer.
+#   unarchive: src="/home/{{ target_user }}/tmp/{{ gcloud_archive_name }}" dest="/home/{{ target_user }}/tmp/gcp" 
+#   tags: 
+#     - gcp
+#     - cloud
+
+# - name: Install gcp package.
+#   shell:  "/home/{{ target_user }}/tmp/gcp/install.sh --update"
+#   tags: 
+#     - gcp
+#     - cloud
+#   become: true
+
+# - name: Remove the archive
+#   file:
+#     path: "{{ archive_path }}"
+#     state: absent
+
+# - name: Remove the script
+#   file:
+#     path: "{{ gcloud_tmp_path }}/run_install.sh"
+#     state: absent
+#   when: not gcloud_debug 
+
+# - name: remove existing aws folder
+#   ansible.builtin.file:
+#     state: absent
+#     path: "/home/{{ target_user }}/tmp/aws"
+#   tags: 
+#     - aws
+#     - cloud
+#   become: true
+
+# - name: remove existing aws file
+#   ansible.builtin.file:
+#     state: absent
+#     path: "/home/{{ target_user }}/tmp/{{ item }}"
+#   with_items:
+#     - awscli-bundle.zip
+#   tags: 
+#     - aws
+#     - cloud
+#   become: true
+
+# - name: Download the awscli bundle.
+#   get_url: url=https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip dest="/home/{{ target_user }}/tmp/awscli-bundle.zip"
+#   tags: 
+#     - aws
+#     - cloud
+
+# - name: Unarchive the installer.
+#   unarchive: src="/home/{{ target_user }}/tmp/awscli-bundle.zip" dest="/home/{{ target_user }}/tmp" 
+#   tags: 
+#     - aws
+#     - cloud
+
+# - name: Install awscli package.
+#   shell:  "/home/{{ target_user }}/tmp/aws/install --update"
+#   tags: 
+#     - aws
+#     - cloud
+#   become: true
+
+# - name: remove existing aws folder
+#   ansible.builtin.file:
+#     state: absent
+#     path: "/home/{{ target_user }}/tmp/aws"
+#   tags: 
+#     - aws
+#     - cloud
+#   become: true
+
+# - name: remove existing aws file
+#   ansible.builtin.file:
+#     state: absent
+#     path: "/home/{{ target_user }}/tmp/{{ item }}"
+#   with_items:
+#     - awscli-bundle.zip
+#   tags: 
+#     - aws
+#     - cloud
+#   become: true

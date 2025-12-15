@@ -1,4 +1,33 @@
 ---
-- include_tasks: aws.yml
+- include_tasks: aws_common.yml
+  tags: 
+    - aws
+    - cloud
   when: is_ubuntu or is_fedora
 
+- include_tasks: aws_alpine.yml
+  tags: 
+    - aws
+    - cloud
+  when: is_alpine
+
+- name: gcp debian/ubuntu install
+  include_tasks: gcp_debian.yml
+  tags: 
+    - gcp
+    - cloud
+  when: is_ubuntu
+
+- name: gcp fedora install
+  include_tasks: gcp_fedora.yml
+  tags: 
+    - gcp
+    - cloud
+  when: is_fedora
+
+- name: gcp alpine install
+  include_tasks: gcp_alpine.yml
+  tags: 
+    - gcp
+    - cloud
+  when: is_alpine

@@ -12,8 +12,6 @@ $Profile_Path = Convert-Path($args[0])
 
 Write-Host ( "##### Installing wsl instance using Profile {0} ##### " -f $Profile_Path)
 
-# $distro_name = ""
-# $install_method=""
 $file = get-content $Profile_Path
 $file | foreach {
   $items = $_.split("=")
@@ -48,7 +46,7 @@ if($ps_distro_source -eq "" -And $distro_lookupid -eq ""){
 }
 
 if($install_method -eq "cloud"){    
-  $initresult = Init-CloudImageDb
+  $initresult = Init-CloudImageDb -PATH ".\data\urls.csv"
   $imageurl1 = Get-CloudImageURL  -ID $distro_lookupid
   if($imageurl1 -eq ""){
     Write-Host ( "##### invalid cloud image name, cannot resolve ps_distro_id to a valid download url. exiting")
@@ -60,9 +58,11 @@ if($install_method -eq "cloud"){
   $uncompressedFileName = GetUncompressedFileName  -infile $compressedFile
 
   if (-not (Test-Path -Path $compressedFilePath)) {
-    Write-Host "The file $compressedFilePath\$compressedFile does not exist. downloading..."
+    Write-Host "##### Downloading file $compressedFilePath\$compressedFile..."
     Download-URL -Url $imageurl1 -FolderLocation $basedir\tmp\
-  } 
+  } else {
+    Write-Host "##### Reusing existing file $compressedFilePath\$compressedFile for installation..."
+  }
   
   $compressionType = Get-CompressionType -FilePath $compressedFilePath
   if ($compressionType -eq 'gz') {
@@ -70,7 +70,7 @@ if($install_method -eq "cloud"){
   } elseif ($compressionType -eq 'xz') {
       $resultfile = UnXz-File-WithCleanup -infile $compressedFilePath
   } else {
-      Write-Error "Unknown or unsupported compression type for file: $compressedFilePath"
+      Write-Error "##### Unknown or unsupported compression type for file: $compressedFilePath"
       exit 1
   }
 
@@ -109,9 +109,9 @@ wsl --terminate $distro_name
 $dummyoutput=(wsl -d $distro_name ls /)
 Write-Host( "##### Instance  {0} ready. " -f "$distro_name")
 
-if (Test-Path $basedir\tmp\$uncompressedFileName) {
-  Remove-Item -Path $basedir\tmp\$uncompressedFileName -Force
-} 
+# if (Test-Path $basedir\tmp\$uncompressedFileName) {
+#   Remove-Item -Path $basedir\tmp\$uncompressedFileName 
+# } 
 
 $sw.Stop()
 $ts = $sw.Elapsed;

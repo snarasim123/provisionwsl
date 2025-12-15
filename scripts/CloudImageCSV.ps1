@@ -1,8 +1,13 @@
 $scriptpath = $MyInvocation.MyCommand.Path
 $dir = Split-Path $scriptpath
-$DictionaryFilePath = "$dir\urls.csv"
+# $DictionaryFilePath = ".\data\urls.csv"
+#$DictionaryFilePath = ".\data\urls.csv"
 $global:UrlDict = @{}
 function Init-CloudImageDb {
+    param (
+        [string]$PATH
+    )
+    $DictionaryFilePath = $Path
     $data = Import-Csv -Path $DictionaryFilePath
 
     foreach ($row in $data) {

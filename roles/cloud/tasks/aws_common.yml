@@ -1,19 +1,19 @@
 ---
-- name: remove existing aws folder
-  ansible.builtin.file:
-    state: absent
-    path: "/home/{{ target_user }}/tmp/aws"
-  tags: 
-    - aws
-    - cloud
-  become: true
-
 - name: remove existing aws file
   ansible.builtin.file:
     state: absent
     path: "/home/{{ target_user }}/tmp/{{ item }}"
   with_items:
     - awscli-bundle.zip
+  tags: 
+    - aws
+    - cloud
+  become: true
+
+- name: remove existing aws folder
+  ansible.builtin.file:
+    state: absent
+    path: "/home/{{ target_user }}/tmp/aws"
   tags: 
     - aws
     - cloud

@@ -1,39 +1,30 @@
-
-.laxygit
+.lazygit
 .gcp
 .set gcp or aws as default
-. powershell setup
+.powershell setup
 
 
-. auto download tar files based on profile
-    -autocleanup after install
-    -remove github keys with teardown
-    -rename github keyname to be unique
-    https://github.com/microsoft/WSL/issues/4479
-    -support xh archives
-    -support fedora cloud images
+
+-remove github keys with teardown
+-support fedora cloud images
 . vbox support/linux support
-    -qemu support
+-qemu support
 .python compile/setup
     -script to switch python version
     -install correct python version for the ansible/galaxy version    
 .setup newer version of vim
     check and upgrade vim if versions mismatch
 .xwin apps,other window mgrs - xfce4
-.remove github ssh key during teardown
+
 .remove sudo and use become
     review 'become' from all tasks and remove unnecessary entries
 .clone code from github instead of localcopy
-.multiple tags for tasks
-
 *add nvim path for root user - todo review
 *fix git config - todo review
 .nvim
     -nvim for alpine using release binaries
     -check and uninstall prev nvim if versions mismatch
     -change nvim install dir to variable
-.use db to track current installed instances?
-.remove empty folder during teardown
 .change ssh key name to include distro fullname
 .install .kc_funcs and source it
 .java other versions
