@@ -1,6 +1,6 @@
 #common params
 export distro_type=alpine
-export distro_name=alp230-mini
+export distro_name=r37-alp320-mini
 
 #powershell specific vars
 export ps_distro_source=

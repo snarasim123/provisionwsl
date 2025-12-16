@@ -1,7 +1,7 @@
 #common (between powershell and bash) params
 export distro_type=ubuntu
 #name for the instance to be
-export distro_name=ubu2204-1
+export distro_name=r37-ubu2204-1
 
 #powershell specific vars
 
@@ -26,7 +26,8 @@ export run_as_user=root
 
 export upgrade=true
 
-# export skipsteps=cloud,editor,git,container
+export skipsteps=packages,cloud,editor,git,container
+
 # nvim,vim
 # aws,cloud
 # helm,k8s,k9s,container

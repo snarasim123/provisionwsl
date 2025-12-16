@@ -1,6 +1,6 @@
 #common params
 export distro_type=ubuntu
-export distro_name=ubu2004-mini1
+export distro_name=r37-ubu2004-mini
 
 #powershell specific vars
 export ps_distro_source=
