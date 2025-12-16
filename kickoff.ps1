@@ -1,4 +1,11 @@
+param(
+    [Parameter(Position=0)]
+    $ProfilePath
+)
+
 $basedir=$PSScriptRoot
+. $basedir\scripts\PathUtils.ps1
+. $basedir\scripts\CloudInstallPrep.ps1
 . $basedir\scripts\CloudImageCSV.ps1
 . $basedir\scripts\UrlDownload.ps1
 . $basedir\scripts\GzExtract.ps1
@@ -6,24 +13,36 @@ $basedir=$PSScriptRoot
 . $basedir\scripts\CompressionUtils.ps1
 . $basedir\scripts\Print.ps1
 
-$sw = [Diagnostics.Stopwatch]::StartNew()
-$Profile_Name = Split-Path $args[0] -leaf 
-$Profile_Path = Convert-Path($args[0]) 
+$UrlsCsvPath = ".\data\urls.csv"
 
-Write-Host ( "##### Installing wsl instance using Profile {0} ##### " -f $Profile_Path)
 
-$file = get-content $Profile_Path
-$file | foreach {
-  $items = $_.split("=")
-  if ($items[0] -eq "export distro_type"){$distro_type = $items[1]}
-  if ($items[0] -eq "export distro_name"){$distro_name = $items[1]}
-  if ($items[0] -eq "export ps_distro_source"){$ps_distro_source = $items[1]}
-  if ($items[0] -eq "export ps_install_dir"){$ps_install_dir = $items[1]}
-  if ($items[0] -eq "export debug_mode"){$debug_mode = $items[1]}
-  if ($items[0] -eq "export ps_distro_id"){$distro_lookupid = $items[1]}
+function Run-Kickoff {
+  param($ProfilePath)
+
+  $Profile_Path = Get-ValidatedAbsolutePath -Path $ProfilePath -ScriptRoot $PSScriptRoot
+  $Profile_Name = Split-Path $Profile_Path -leaf 
+  $Urls_Csv_Path = Get-ValidatedAbsolutePath -Path $UrlsCsvPath -ScriptRoot $PSScriptRoot
+
+  Write-Host ( "##### Installing wsl instance using Profile {0} ##### " -f $Profile_Path)
+
+  $file = get-content $Profile_Path
+  $file | foreach {
+    $items = $_.split("=")
+    if ($items[0] -eq "export ps_distro_source"){$ps_distro_source = $items[1]}
+    if ($items[0] -eq "export ps_install_dir"){$ps_install_dir = $items[1]}
+    if ($items[0] -eq "export ps_distro_id"){$distro_lookupid = $items[1]}
+  }
+
+
+  $distro_name = Split-Path $Profile_Path -Leaf
+
+
+if ([string]::IsNullOrWhiteSpace($ps_install_dir) -or [string]::IsNullOrEmpty($ps_install_dir)) {
+    $ps_install_dir = $PSScriptRoot+"\install\"+$distro_name
+} else {
+  $ps_install_dir = $ps_install_dir+"\"+$distro_name
 }
 
-$ps_install_dir = $ps_install_dir+"\"+$distro_name
 if($ps_distro_source -eq "" -or $ps_distro_source -eq $null){
   $install_method="cloud"
 } else {  
@@ -46,45 +65,11 @@ if($ps_distro_source -eq "" -And $distro_lookupid -eq ""){
 }
 
 if($install_method -eq "cloud"){    
-  $initresult = Init-CloudImageDb -PATH ".\data\urls.csv"
-  $imageurl1 = Get-CloudImageURL  -ID $distro_lookupid
-  if($imageurl1 -eq ""){
-    Write-Host ( "##### invalid cloud image name, cannot resolve ps_distro_id to a valid download url. exiting")
-    exit
-  }
-
-  $compressedFile = [System.IO.Path]::GetFileName($imageurl1)
-  $compressedFilePath = Join-Path -Path $basedir\tmp\ -ChildPath $compressedFile  
-  $uncompressedFileName = GetUncompressedFileName  -infile $compressedFile
-
-  if (-not (Test-Path -Path $compressedFilePath)) {
-    Write-Host "##### Downloading file $compressedFilePath\$compressedFile..."
-    Download-URL -Url $imageurl1 -FolderLocation $basedir\tmp\
-  } else {
-    Write-Host "##### Reusing existing file $compressedFilePath\$compressedFile for installation..."
-  }
-  
-  $compressionType = Get-CompressionType -FilePath $compressedFilePath
-  if ($compressionType -eq 'gz') {
-      $resultfile = DeGZip-File -infile $compressedFilePath
-  } elseif ($compressionType -eq 'xz') {
-      $resultfile = UnXz-File-WithCleanup -infile $compressedFilePath
-  } else {
-      Write-Error "##### Unknown or unsupported compression type for file: $compressedFilePath"
-      exit 1
-  }
-
-  $ps_distro_source="$basedir\tmp\$uncompressedFileName"
+  $ps_distro_source = Prepare-CloudInstall -UrlsCsvPath $Urls_Csv_Path -DistroLookupId $distro_lookupid -BaseDir $basedir
 }
-$params = @{
-    distro_type      = $distro_type
-    distro_name     = $distro_name
-    ps_distro_source = $ps_distro_source
-    distro_lookupid  = $distro_lookupid
-    ps_install_dir   = $ps_install_dir
-    ps_logfile = "$basedir\$Profile_Name.log"
-}  
-Display-SpinupParams @params
+
+Display-SpinupParams  $distro_name $ps_distro_source $distro_lookupid $ps_install_dir "$basedir\$Profile_Name.log"
+
 
 $dummyoutput = (mkdir $ps_install_dir  -ea 0)
 $dummyoutput = (wsl --import $distro_name $ps_install_dir $ps_distro_source)
@@ -109,9 +94,11 @@ wsl --terminate $distro_name
 $dummyoutput=(wsl -d $distro_name ls /)
 Write-Host( "##### Instance  {0} ready. " -f "$distro_name")
 
-# if (Test-Path $basedir\tmp\$uncompressedFileName) {
-#   Remove-Item -Path $basedir\tmp\$uncompressedFileName 
-# } 
+}
+
+$sw = [Diagnostics.Stopwatch]::StartNew()
+
+Run-Kickoff -ProfilePath $ProfilePath 
 
 $sw.Stop()
 $ts = $sw.Elapsed;

@@ -1,12 +1,12 @@
 #common params
 export distro_type=ubuntu
-export distro_name=ubu2204-mini
+export distro_name=aa-ubu2204-mini
 
 #powershell specific vars
 #export ps_distro_source=C:\Users\SrinivasaNarasimhan\wsl-src\ubuntu2004.tar
 # export ps_distro_source=
 export ps_install_dir=C:\Users\SrinivasaNarasimhan\wsl
-export ps_distro_id=ubuntu2204-wsl
+export ps_distro_id=ubuntu2204
 
 # check or nocheck
 # export debug_mode=nocheck

@@ -1,6 +1,6 @@
 #common params
 export distro_type=ubuntu
-export distro_name=ubu2004-mini
+export distro_name=Ubu2004-mini 
 
 #powershell specific vars
 export ps_distro_source=C:\Users\srinivasa.narasimha\wsl-src\ubuntu2004.tar

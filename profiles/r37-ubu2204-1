@@ -10,7 +10,7 @@ export ps_distro_source=
 # where the wsl installation files are installed
 export ps_install_dir=C:\Users\snara\wsl
 # id to lookup from list of known cloud images from csv file
-export ps_distro_id=ubuntu2204-wsl
+export ps_distro_id=ubuntu2204
 
 
 # cleanup this var

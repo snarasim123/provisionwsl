@@ -1,7 +1,6 @@
 $scriptpath = $MyInvocation.MyCommand.Path
 $dir = Split-Path $scriptpath
-# $DictionaryFilePath = ".\data\urls.csv"
-#$DictionaryFilePath = ".\data\urls.csv"
+
 $global:UrlDict = @{}
 function Init-CloudImageDb {
     param (
