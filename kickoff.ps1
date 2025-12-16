@@ -14,32 +14,27 @@ $basedir=$PSScriptRoot
 . $basedir\scripts\CompressionUtils.ps1
 . $basedir\scripts\Print.ps1
 
-$UrlsCsvPath = ".\data\urls.csv"
+$UrlsCsvPath = $PSScriptRoot+"\data\urls.csv"
 
-
-function Run-Kickoff {
+function Kickoff {
   param($ProfilePath)
 
   $Profile_Path = Get-ValidatedAbsolutePath -Path $ProfilePath -ScriptRoot $PSScriptRoot
-  $Profile_Name = Split-Path $Profile_Path -leaf 
+  $Distro_Name = Split-Path $Profile_Path -leaf 
   $Urls_Csv_Path = Get-ValidatedAbsolutePath -Path $UrlsCsvPath -ScriptRoot $PSScriptRoot
 
   Write-Host ( "##### Installing wsl instance using Profile {0} ##### " -f $Profile_Path)
 
-  $ps_distro_source = $null; $ps_install_dir = $null; $distro_lookupid = $null
-  Get-Profile -ProfilePath $Profile_Path -DistroSource ([ref]$ps_distro_source) -InstallDir ([ref]$ps_install_dir) -LookupId ([ref]$distro_lookupid)
+  $Distro_Source = $null; $Install_Dir = $null; $distro_lookupid = $null
+  Get-Profile -ProfilePath $Profile_Path -DistroSource ([ref]$Distro_Source) -InstallDir ([ref]$Install_Dir) -LookupId ([ref]$distro_lookupid)
 
-
-  $distro_name = Split-Path $Profile_Path -Leaf
-
-
-  if ([string]::IsNullOrWhiteSpace($ps_install_dir) -or [string]::IsNullOrEmpty($ps_install_dir)) {
-      $ps_install_dir = $PSScriptRoot+"\install\"+$distro_name
+  if ([string]::IsNullOrWhiteSpace($Install_Dir) -or [string]::IsNullOrEmpty($Install_Dir)) {
+      $Install_Dir = $PSScriptRoot+"\install\"+$Distro_Name
   } else {
-    $ps_install_dir = $ps_install_dir+"\"+$distro_name
+    $Install_Dir = $Install_Dir+"\"+$Distro_Name
   }
 
-  if($ps_distro_source -eq "" -or $ps_distro_source -eq $null){
+  if($Distro_Source -eq "" -or $Distro_Source -eq $null){
     $install_method="cloud"
   } else {  
     $install_method="local"
@@ -48,55 +43,51 @@ function Run-Kickoff {
   $distroslist=(wsl -l) 
   foreach ($i in $distroslist) {
     $finalstring=($i.ToString().Replace("`0",""))
-    $found=($finalstring  -match  $distro_name)
+    $found=($finalstring  -match  $Distro_Name)
     if ($found) {
       Write-Host "##### Distro name present in already installed distros list. cannot reinstall. exiting."
       exit
     } 
-}
+  }
 
-if($ps_distro_source -eq "" -And $distro_lookupid -eq ""){
-    Write-Host ( "##### No distro .tar file (export ps_distro_source) or cloud image id (export distro_lookupid) in profile file. exiting.")
-    exit
-}
+  if($Distro_Source -eq "" -And $distro_lookupid -eq ""){
+      Write-Host ( "##### No distro .tar file (export ps_distro_source) or cloud image id (export distro_lookupid) in profile file. exiting.")
+      exit
+  }
 
-if($install_method -eq "cloud"){    
-  $ps_distro_source = Prepare-CloudInstall -UrlsCsvPath $Urls_Csv_Path -DistroLookupId $distro_lookupid -BaseDir $basedir
-}
+  if($install_method -eq "cloud"){    
+    $Distro_Source = Prepare-CloudInstall -UrlsCsvPath $Urls_Csv_Path -DistroLookupId $distro_lookupid -BaseDir $basedir
+  }
 
-Display-SpinupParams  $distro_name $ps_distro_source $distro_lookupid $ps_install_dir "$basedir\$Profile_Name.log"
+  Display-SpinupParams  $Distro_Name $Distro_Source $distro_lookupid $Install_Dir "$basedir\$Distro_Name.log"
 
+  $dummyoutput = (mkdir $Install_Dir  -ea 0)
+  $dummyoutput = (wsl --import $Distro_Name $Install_Dir $Distro_Source)
+  $dummyoutput = (wsl --terminate $Distro_Name)
 
-$dummyoutput = (mkdir $ps_install_dir  -ea 0)
-$dummyoutput = (wsl --import $distro_name $ps_install_dir $ps_distro_source)
+  $Profile_Path_unix = (($Profile_Path.replace('\','/')).replace('D:','/mnt/d')).replace('C:','/mnt/c')
+  $basedir_unixpath = (($PSScriptRoot.replace('\','/')).replace('D:','/mnt/d')).replace('C:','/mnt/c')
 
-$dummyoutput = (wsl --terminate $distro_name)
+  Write-Host( "##### Installing Prerequisites for the {0} instance ... " -f "$Distro_Name")
+  $dummyoutput = (wsl -d $Distro_Name $basedir_unixpath/prep-install.sh $Profile_Path_unix -u root) 
 
-$Profile_Path_unix = (($Profile_Path.replace('\','/')).replace('D:','/mnt/d')).replace('C:','/mnt/c')
-$basedir_unixpath = (($PSScriptRoot.replace('\','/')).replace('D:','/mnt/d')).replace('C:','/mnt/c')
+  $dummyoutput | Out-File   "$basedir\$Distro_Name.log"
 
-Write-Host( "##### Installing Prerequisites for the {0} instance ... " -f "$distro_name")
-$dummyoutput = (wsl -d $distro_name $basedir_unixpath/prep-install.sh $Profile_Path_unix -u root) 
+  Write-Host( "##### Configuring  {0} instance... " -f "$Distro_Name")
+  $dummyoutput2 = (wsl -d $Distro_Name  $basedir_unixpath/install.sh  $Profile_Path_unix -u root) 2>&1 >  "$basedir\$Distro_Name.err"
+  $dummyoutput2 | Out-File -append  ("$basedir\$Distro_Name.log")
 
-$dummyoutput | Out-File   "$basedir\$Profile_Name.log"
+  Write-Host( "##### Restarting {0} instance... " -f "$Distro_Name")
+  wsl --terminate $Distro_Name
 
-Write-Host( "##### Configuring  {0} instance... " -f "$distro_name")
-$dummyoutput2 = (wsl -d $distro_name  $basedir_unixpath/install.sh  $Profile_Path_unix -u root) 2>&1 >  "$basedir\$Profile_Name.err"
-$dummyoutput2 | Out-File -append  ("$basedir\$Profile_Name.log")
-
-Write-Host( "##### Restarting {0} instance... " -f "$distro_name")
-wsl --terminate $distro_name
-
-$dummyoutput=(wsl -d $distro_name ls /)
-Write-Host( "##### Instance  {0} ready. " -f "$distro_name")
-
+  $dummyoutput=(wsl -d $Distro_Name ls /)
+  Write-Host( "##### Instance  {0} ready. " -f "$Distro_Name")
 }
 
 $sw = [Diagnostics.Stopwatch]::StartNew()
-
-Run-Kickoff -ProfilePath $ProfilePath 
-
+Kickoff -ProfilePath $ProfilePath 
 $sw.Stop()
+
 $ts = $sw.Elapsed;
 $elapsedTime = [string]::Format("{0:00} Hours :{1:00} Mins :{2:00} Secs",$ts.Hours, $ts.Minutes, $ts.Seconds);
 Write-Host( "##### RunTime  {0}... " -f "$elapsedTime")
