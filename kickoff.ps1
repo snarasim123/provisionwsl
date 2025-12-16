@@ -5,6 +5,7 @@ param(
 
 $basedir=$PSScriptRoot
 . $basedir\scripts\PathUtils.ps1
+. $basedir\scripts\Profile.ps1
 . $basedir\scripts\CloudInstallPrep.ps1
 . $basedir\scripts\CloudImageCSV.ps1
 . $basedir\scripts\UrlDownload.ps1
@@ -25,38 +26,33 @@ function Run-Kickoff {
 
   Write-Host ( "##### Installing wsl instance using Profile {0} ##### " -f $Profile_Path)
 
-  $file = get-content $Profile_Path
-  $file | foreach {
-    $items = $_.split("=")
-    if ($items[0] -eq "export ps_distro_source"){$ps_distro_source = $items[1]}
-    if ($items[0] -eq "export ps_install_dir"){$ps_install_dir = $items[1]}
-    if ($items[0] -eq "export ps_distro_id"){$distro_lookupid = $items[1]}
-  }
+  $ps_distro_source = $null; $ps_install_dir = $null; $distro_lookupid = $null
+  Get-Profile -ProfilePath $Profile_Path -DistroSource ([ref]$ps_distro_source) -InstallDir ([ref]$ps_install_dir) -LookupId ([ref]$distro_lookupid)
 
 
   $distro_name = Split-Path $Profile_Path -Leaf
 
 
-if ([string]::IsNullOrWhiteSpace($ps_install_dir) -or [string]::IsNullOrEmpty($ps_install_dir)) {
-    $ps_install_dir = $PSScriptRoot+"\install\"+$distro_name
-} else {
-  $ps_install_dir = $ps_install_dir+"\"+$distro_name
-}
+  if ([string]::IsNullOrWhiteSpace($ps_install_dir) -or [string]::IsNullOrEmpty($ps_install_dir)) {
+      $ps_install_dir = $PSScriptRoot+"\install\"+$distro_name
+  } else {
+    $ps_install_dir = $ps_install_dir+"\"+$distro_name
+  }
 
-if($ps_distro_source -eq "" -or $ps_distro_source -eq $null){
-  $install_method="cloud"
-} else {  
-  $install_method="local"
-}
+  if($ps_distro_source -eq "" -or $ps_distro_source -eq $null){
+    $install_method="cloud"
+  } else {  
+    $install_method="local"
+  }
 
-$distroslist=(wsl -l) 
-foreach ($i in $distroslist) {
-  $finalstring=($i.ToString().Replace("`0",""))
-  $found=($finalstring  -match  $distro_name)
-  if ($found) {
-    Write-Host "##### Distro name present in already installed distros list. cannot reinstall. exiting."
-    exit
-  } 
+  $distroslist=(wsl -l) 
+  foreach ($i in $distroslist) {
+    $finalstring=($i.ToString().Replace("`0",""))
+    $found=($finalstring  -match  $distro_name)
+    if ($found) {
+      Write-Host "##### Distro name present in already installed distros list. cannot reinstall. exiting."
+      exit
+    } 
 }
 
 if($ps_distro_source -eq "" -And $distro_lookupid -eq ""){
