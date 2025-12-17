@@ -14,9 +14,21 @@ function Init-CloudImageDb {
         $global:UrlDict[$key] = @{
             URL = $row.URL
             MD5 = $row.MD5
+            PLATFORM = $row.PLATFORM
         }
     }
     return $global:UrlDict
+}
+
+function Get-CloudImagePlatform {
+    param (
+        [string]$ID
+    )
+    $result = ""
+    if ($global:UrlDict.ContainsKey($ID)) {
+        $result =  $($global:UrlDict[$ID].PLATFORM) 
+    } 
+    return $result
 }
 
 function Get-CloudImageURL {
