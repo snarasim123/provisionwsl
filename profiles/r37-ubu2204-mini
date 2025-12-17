@@ -1,7 +1,7 @@
 #common (between powershell and bash) params
 export distro_type=ubuntu
 #name for the instance to be
-export distro_name=r37-ubu2204-1
+export distro_name=r37-ubu2204-mini
 
 #powershell specific vars
 
