@@ -8,7 +8,7 @@ function Display-SpinupParams {
     )
 
     Write-Host (
-        "##### Spinup params
+        "`r`n##### Spinup params
           distro_name             : {0} 
           distro source           : {1} 
           distro id (from cloud)  : {2}

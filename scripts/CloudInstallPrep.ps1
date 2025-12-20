@@ -1,14 +1,21 @@
+
+. $basedir\scripts\Logs.ps1
 function Prepare-CloudInstall {
     param(
         [string]$UrlsCsvPath,
         [string]$DistroLookupId,
-        [string]$BaseDir
+        [string]$BaseDir,
+        [string]$LogFile
     )
+
+    if (-not [string]::IsNullOrWhiteSpace($LogFile)) {
+        $PSDefaultParameterValues['Write-Log:LogFile'] = $LogFile
+    }
 
     $initresult = Init-CloudImageDb -PATH $UrlsCsvPath
     $imageurl1 = Get-CloudImageURL  -ID $DistroLookupId
     if($imageurl1 -eq ""){
-        Write-Host ( "##### invalid cloud image name, cannot resolve ps_distro_id to a valid download url. exiting")
+        Write-Log  ( "`r`n##### invalid cloud image name, cannot resolve ps_distro_id to a valid download url. exiting")
         exit
     }
 
@@ -17,10 +24,10 @@ function Prepare-CloudInstall {
     $uncompressedFileName = GetUncompressedFileName  -infile $compressedFile
 
     if (-not (Test-Path -Path $compressedFilePath)) {
-        Write-Host "##### Downloading file $compressedFilePath\$compressedFile..."
+        Write-Log ( "`r`n##### Downloading file $compressedFilePath\$compressedFile...")
         Download-URL -Url $imageurl1 -FolderLocation $BaseDir\tmp\
     } else {
-        Write-Host "##### Reusing existing file $compressedFilePath\$compressedFile for installation..."
+        Write-Log (  "`r`n##### Reusing existing file $compressedFilePath\$compressedFile for installation...")
     }
   
     $compressionType = Get-CompressionType -FilePath $compressedFilePath
@@ -29,7 +36,7 @@ function Prepare-CloudInstall {
     } elseif ($compressionType -eq 'xz') {
         $resultfile = UnXz-File-WithCleanup -infile $compressedFilePath
     } else {
-        Write-Error "##### Unknown or unsupported compression type for file: $compressedFilePath"
+        Write-Log (  "`r`n##### Unknown or unsupported compression type for file: $compressedFilePath" )
         exit 1
     }
 
