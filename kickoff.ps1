@@ -25,6 +25,7 @@ function Kickoff {
   $Urls_Csv_Path = Get-ValidatedAbsolutePath -Path $UrlsCsvPath -ScriptRoot $PSScriptRoot
 
   $LogFile = Get-LogFilePath -BaseDir $basedir -Name $Distro_Name
+  "" | Out-File -FilePath $LogFile -Force
   $PSDefaultParameterValues['Write-Log:LogFile'] = $LogFile
 
   Write-Log ( "`r`n##### Installing wsl instance using Profile {0} ##### " -f $Profile_Path)

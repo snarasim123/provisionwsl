@@ -1,12 +1,20 @@
 ---
-- set_fact: is_apt=false
-- set_fact: is_dnf=false
-- set_fact: is_apk=false
-- set_fact: is_ubuntu=false
-- set_fact: is_fedora=false
-- set_fact: is_alpine=false
-- set_fact: is_debian=false
-- set_fact: is_wsl=false
+- set_fact:
+    is_apt: false
+- set_fact:
+    is_dnf: false
+- set_fact:
+    is_apk: false
+- set_fact:
+    is_ubuntu: false
+- set_fact:
+    is_fedora: false
+- set_fact:
+    is_alpine: false
+- set_fact:
+    is_debian: false
+- set_fact:
+    is_wsl: false
 
 - name: Check distribution
   shell: cat "/etc/os-release"  | grep ^ID=
@@ -43,28 +51,28 @@
   set_fact:
     is_ubuntu: true
     os_name: "ubuntu"
-  when: "'ubuntu' in  os_id |lower"
+  when: "'ubuntu' in (os_id | lower)"
   check_mode: no
 
 - name: Set Distribution Fedora
   set_fact:
     is_fedora: true
     os_name: "fedora"
-  when: "'fedora' in  os_id |lower"
+  when: "'fedora' in (os_id | lower)"
   check_mode: no
 
 - name: Set Distribution Alpine
   set_fact:
     is_alpine: true
     os_name: "alpine"
-  when: "'alpine' in  os_id |lower"
+  when: "'alpine' in (os_id | lower)"
   check_mode: no
   
 - name: Set Distribution Debian
   set_fact: 
     is_debian: true
     os_name: "debian"
-  when: "'debian' in  os_id |lower"
+  when: "'debian' in (os_id | lower)"
   check_mode: no
 
 - name: Run command for wsl
@@ -75,7 +83,7 @@
 - name: Set wsl variable if running under wsl
   set_fact:
     is_wsl: true
-  when: "'wsl' in uname_output.stdout|lower"
+  when: "'wsl' in (uname_output.stdout | lower)"
   check_mode: no
 
 - name: Generate a random number

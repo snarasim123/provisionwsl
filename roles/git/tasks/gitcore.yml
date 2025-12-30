@@ -1,5 +1,6 @@
 ---
-- set_fact: git_reinstall_from_source=false
+- set_fact:
+    git_reinstall_from_source: false
 
 - name: Print Task msg
   ansible.builtin.debug:

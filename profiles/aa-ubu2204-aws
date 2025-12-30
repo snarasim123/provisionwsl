@@ -1,6 +1,6 @@
 #common params
 export distro_type=ubuntu
-export distro_name=ubu2204-aws
+export distro_name=
 
 #powershell specific vars
 export ps_distro_source=
@@ -16,7 +16,7 @@ export code_src="$code_base/$code_root"
 
 export run_as_user=root
 export upgrade=true
-
+export skipsteps=editor,git,container,aws
 
 
 

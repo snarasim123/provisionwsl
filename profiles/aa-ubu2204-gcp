@@ -15,7 +15,7 @@ export code_root=setup2
 export code_src="$code_base/$code_root"
 
 export run_as_user=root
-wexport upgrade=true
+export upgrade=true
 
 
 

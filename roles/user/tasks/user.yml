@@ -61,7 +61,7 @@
 - name: User - Print if sudoers has user
   ansible.builtin.debug:
     msg: lineinefile found /etc/sudoers has {{ target_user }}
-  when: check.found
+  when: check.found > 0
   become: true
   tags: 
     - user    
@@ -69,7 +69,7 @@
 - name: User - Print if sudoers does not have user
   ansible.builtin.debug:
     msg: lineinefile did not find /etc/sudoers has {{ target_user }}
-  when: not check.found
+  when: check.found == 0
   become: true
   tags: 
     - user    
@@ -78,6 +78,6 @@
   ansible.builtin.lineinfile:
     path: /etc/sudoers
     line: '{{ target_user }} ALL=(ALL) NOPASSWD: ALL'
-  when: not check.found
+  when: check.found == 0
   tags: 
     - user  

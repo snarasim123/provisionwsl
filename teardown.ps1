@@ -1,16 +1,16 @@
 $basedir = $PSScriptRoot
 . $basedir\scripts\Logs.ps1
+. $basedir\scripts\PathUtils.ps1
 
-$Path=$args[0]
+$Profile_Path=$args[0]
 
+$Profile_Path = Get-ValidatedAbsolutePath -Path $Profile_Path -ScriptRoot $PSScriptRoot
+$distro_name = Split-Path $Profile_Path -Leaf
 
-
-$distro_name = ""
-$file = get-content $Path
+$file = get-content $Profile_Path
 $file | foreach {
   $items = $_.split("=")
   if ($items[0] -eq "export distro_type"){$distro_type = $items[1]}
-  if ($items[0] -eq "export distro_name"){$distro_name = $items[1]}
   if ($items[0] -eq "export ps_distro_source"){$ps_distro_source = $items[1]}
   if ($items[0] -eq "export ps_install_dir"){$ps_install_dir = $items[1]}
   if ($items[0] -eq "export debug_mode"){$debug_mode = $items[1]}

@@ -3,31 +3,31 @@
   tags: 
     - aws
     - cloud
-  when: is_ubuntu or is_fedora
+  when: is_ubuntu | bool or is_fedora | bool
 
 - include_tasks: aws_alpine.yml
   tags: 
     - aws
     - cloud
-  when: is_alpine
+  when: is_alpine | bool
 
 - name: gcp debian/ubuntu install
   include_tasks: gcp_debian.yml
   tags: 
     - gcp
     - cloud
-  when: is_ubuntu
+  when: is_ubuntu | bool
 
 - name: gcp fedora install
   include_tasks: gcp_fedora.yml
   tags: 
     - gcp
     - cloud
-  when: is_fedora
+  when: is_fedora | bool
 
 - name: gcp alpine install
   include_tasks: gcp_alpine.yml
   tags: 
     - gcp
     - cloud
-  when: is_alpine
+  when: is_alpine | bool
