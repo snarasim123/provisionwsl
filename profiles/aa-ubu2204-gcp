@@ -1,9 +1,9 @@
 #common params
 export distro_type=ubuntu
-export distro_name=ubu2204-gcp
+# export distro_name=
 
-#powershell specific vars
-export ps_distro_source=
+#distro source not needed for ubuntu 2204
+# export ps_distro_source=
 export ps_install_dir=C:\Users\SrinivasaNarasimhan\wsl
 export ps_distro_id=ubuntu2204
 
@@ -16,7 +16,7 @@ export code_src="$code_base/$code_root"
 
 export run_as_user=root
 export upgrade=true
-
+export skipsteps=editor,github,container,aws 
 
 
 

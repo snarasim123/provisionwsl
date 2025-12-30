@@ -12,7 +12,6 @@ $file | foreach {
   $items = $_.split("=")
   if ($items[0] -eq "export distro_type"){$distro_type = $items[1]}
   if ($items[0] -eq "export ps_distro_source"){$ps_distro_source = $items[1]}
-  if ($items[0] -eq "export ps_install_dir"){$ps_install_dir = $items[1]}
   if ($items[0] -eq "export debug_mode"){$debug_mode = $items[1]}
 }
 
@@ -32,7 +31,7 @@ Write-Log (
 # Read-Host -Prompt "Press any key to continue"
 $install_name=$distro_name
 
-Write-Log ( "`r`n##### Teardown  {0} from dir {1} " -f $install_name,$ps_install_dir)
+Write-Log ( "`r`n##### Teardown  {0}  " -f $install_name)
 
 $match=((wsl -l | Where {$_.Replace("`0","") -match "$install_name"}))
 if ($match -eq "$install_name") {
