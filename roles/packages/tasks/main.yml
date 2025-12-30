@@ -1,25 +1,22 @@
 ---
 - name: update apt cache
-  become: true  
   apt:
     update_cache: yes
-  become: yes
+  become: true
   tags: packages
   when: is_ubuntu
 
 - name: update dnf cache
-  become: true  
   dnf:
     update_cache: yes
-  become: yes
+  become: true
   tags: packages
   when: is_fedora
 
 - name: update apk cache
-  become: true  
   community.general.apk:
     update_cache: yes
-  become: yes
+  become: true
   tags: packages
   when: is_alpine
 
@@ -32,10 +29,9 @@
 #   when: is_ubuntu
 
 - name: Install ubuntu packages
-  become: true  
   apt:
     name: "{{ packages_ubuntu }}"
-  become: yes
+  become: true
   tags: packages
   when: is_ubuntu
   
@@ -47,10 +43,9 @@
 #   when: is_fedora
 
 - name: Install fedora packages
-  become: true  
   dnf:
     name: "{{ packages_fedora }}"
-  become: yes
+  become: true
   when: is_fedora
 
 # - name: Update all installed alpine packages to the latest versions
@@ -60,8 +55,7 @@
 #   when: is_alpine
 
 - name: Install alpine packages
-  become: true  
   community.general.apk:
     name: "{{ packages_alpine }}"
-  become: yes
+  become: true
   when: is_alpine
