@@ -171,6 +171,14 @@
     - gcp
     - cloud
 
+- name: Set fact that GCP CLI is installed
+  ansible.builtin.set_fact:
+    gcp_cli_installed: true
+  when: gcloud_version.rc == 0
+  tags:
+    - gcp
+    - cloud
+
 - name: Remove Google Cloud CLI tar file from tmp folder
   ansible.builtin.file:
     path: "/home/{{ target_user }}/tmp/{{ gcp_cli_archive_name_x86_64 }}"

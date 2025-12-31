@@ -25,12 +25,12 @@
     - facts
     - user
     - folders
+    - cloud
     - shell
     - packages    
     - git
     - editor  
     - gui
-    - cloud
     - container
     - bash_extra
     # - dev

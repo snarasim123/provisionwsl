@@ -24,10 +24,10 @@
     - shell
     - bash    
 
-- name: Copy files
+- name: Copy bash files from shared common files
   copy:
-    src: '{{item}}'
-    dest: "{{ root_user_home }}/bashfiles"
+    src: "{{ playbook_dir }}/files/common/{{ item }}"
+    dest: "{{ root_user_home }}/bashfiles/{{ item }}"
     owner: "{{ root_user }}"
     group: "{{ root_user }}"
     mode: 0644
@@ -44,7 +44,20 @@
   become: true
   tags: 
     - shell
-    - bash    
+    - bash
+
+- name: Add Google Cloud SDK to PATH in .bashrc_custom
+  ansible.builtin.lineinfile:
+    path: "{{ root_user_home }}/bashfiles/.bashrc_custom"
+    line: 'export PATH="/usr/local/google-cloud-sdk/bin:$PATH"'
+    insertafter: EOF
+    owner: "{{ root_user }}"
+    group: "{{ root_user }}"
+  when: gcp_cli_installed | default(false)
+  become: true
+  tags: 
+    - shell
+    - bash
 
 - name: remove existing bash files from home
   ansible.builtin.file:
