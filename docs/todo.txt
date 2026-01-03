@@ -1,8 +1,9 @@
+.gcp for alpine, fedora
+.python for fedora
+.pyenv, pipx for ubuntu, fedora, alpine
 .lazygit
-.gcp
 .set gcp or aws as default
 .powershell setup
-
 
 
 -remove github keys with teardown

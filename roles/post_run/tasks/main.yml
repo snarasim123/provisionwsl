@@ -1,0 +1,11 @@
+---
+- name: Include post_run tasks for target user
+  ansible.builtin.include_tasks: post_run_user.yml
+  tags:
+    - post_run
+
+- name: Include post_run tasks for root user
+  ansible.builtin.include_tasks: post_run_root.yml
+  tags:
+    - post_run
+

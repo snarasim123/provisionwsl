@@ -1,13 +1,23 @@
 #!/usr/bin/env bash
 
+copy_and_skip_type() {
+    local src="$1" dst="$2" skip_ext="$3"
+    mkdir -p "$dst"
+    find "$src" -mindepth 1 -type d | while read -r d; do
+        mkdir -p "$dst/${d#$src/}"
+    done
+    find "$src" -mindepth 1 -type f ! -name "*.$skip_ext" | while read -r f; do
+        cp "$f" "$dst/${f#$src/}"
+    done
+}
+
 clone-repo(){
     echo "#### clone repo."
-    mkdir "$HOME/code"  -p
+    mkdir "$HOME/code/$code_root"  -p
     cd "$HOME/code"
     rm -rf ./*
     rm -rf ./.*
-    cp -r $code_src "$HOME/code"
-    # echo "#### Done Clone repo."
+    copy_and_skip_type "$code_src" "$HOME/code/$code_root" "vhdx"
 }
 
 run-ansible(){

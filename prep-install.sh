@@ -21,6 +21,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "${SCRIPT_DIR}/csv-utils.sh"
 source "${SCRIPT_DIR}/prep-install-ubuntu.sh"
 source "${SCRIPT_DIR}/prep-install-fedora.sh"
+source "${SCRIPT_DIR}/prep-install-alpine.sh"
 ##############################################################################
 
 upgrade() {
@@ -49,13 +50,17 @@ upgrade() {
         ansible-galaxy collection install community.general
         ansible-galaxy collection install kubernetes.core
     elif [[ "$distro_type" == "alpine" ]] ; then
-        # echo "alpine upgrade"
+        # Alpine upgrade and setup
         apk add sudo
         sudo apk update
         sudo apk add bash              
         sudo apk add lsb-release     
         sudo apk add --no-cache openssh
-        sudo apk add --no-cache py3-passlib 
+        
+        remove_python_alpine
+        install_python_alpine
+        
+        # Install Ansible via apk (Alpine package manager)
         sudo apk add ansible
 
         ansible-galaxy collection install community.general
@@ -91,6 +96,8 @@ if [[ "$upgrade" == "true" ]] ; then
         verify_python_ubuntu
     elif [[ "$distro_type" == "fedora" ]] ; then
         verify_python_fedora
+    elif [[ "$distro_type" == "alpine" ]] ; then
+        verify_python_alpine
     fi
 fi
 

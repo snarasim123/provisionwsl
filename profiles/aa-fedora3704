@@ -1,13 +1,7 @@
-#common params
+#
 export distro_type=fedora
-export distro_name=aa-fedora3704-mini
-
-#powershell specific vars
 export ps_distro_source=C:\Users\SrinivasaNarasimhan\code\setup2\ansible\tmp\fedora_3704.tar
-export ps_install_dir=
 
-# check or nocheck
-# export debug_mode=nocheck
 export default_user=snarasim
 export code_base=/mnt/c/Users/SrinivasaNarasimhan/code
 export code_root=setup2
@@ -15,5 +9,5 @@ export code_src="$code_base/$code_root"
 
 export run_as_user=root
 export upgrade=true
-export skipsteps=packages,cloud,editor,git,container
+export skipsteps=editor,git,container
 

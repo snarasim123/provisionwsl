@@ -34,5 +34,6 @@
     - container
     - bash_extra
     # - dev
+    - post_run
   ### Change to your user! ###
   # user: root
