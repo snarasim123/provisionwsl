@@ -74,7 +74,12 @@ function Kickoff {
   $basedir_unixpath = (($PSScriptRoot.replace('\','/')).replace('D:','/mnt/d')).replace('C:','/mnt/c')
 
   Write-Log( "`r`n##### Installing Prerequisites for the {0} instance ... " -f "$Distro_Name")
-  (wsl -d $Distro_Name $basedir_unixpath/prep-install.sh $Profile_Path_unix -u root) | Out-File  -Append  "$basedir\$Distro_Name.log" 
+  wsl -d $Distro_Name ls /
+  
+  # Install bash first for Alpine (uses sh/ash by default)
+  wsl -d $Distro_Name -u root sh -c "command -v bash >/dev/null 2>&1 || apk add --no-cache bash"
+  
+  (wsl -d $Distro_Name -u root bash $basedir_unixpath/prep-install.sh $Profile_Path_unix) | Out-File  -Append  "$basedir\$Distro_Name.log" 
 
   
 
