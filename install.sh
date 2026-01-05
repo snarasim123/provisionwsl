@@ -45,9 +45,10 @@ run-ansible-check(){
 
 # read -p "*** Press to continue.. " -n 1 -r
 profile_path=$1
+scriptroot_path=$2
 source $profile_path
 
-# echo "###### Setting up instance, type  $distro_name....."
+echo "#### install.sh: profile_path = $profile_path scriptroot = $scriptroot_path"
 
 clone-repo
 if [[ "$debug_mode" == "check" ]] ; then

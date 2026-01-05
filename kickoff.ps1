@@ -7,6 +7,7 @@ $basedir=$PSScriptRoot
 . $basedir\scripts\PathUtils.ps1
 . $basedir\scripts\Logs.ps1
 . $basedir\scripts\Profile.ps1
+. $basedir\scripts\Wsl.ps1
 . $basedir\scripts\CloudInstallPrep.ps1
 . $basedir\scripts\CloudImageCSV.ps1
 . $basedir\scripts\UrlDownload.ps1
@@ -45,14 +46,9 @@ function Kickoff {
     $install_method="local"
   }
 
-  $distroslist=(wsl -l) 
-  foreach ($i in $distroslist) {
-    $finalstring=($i.ToString().Replace("`0",""))
-    $found=($finalstring  -match  $Distro_Name)
-    if ($found) {
-      Write-Log "`r`n##### Distro name present in already installed distros list. cannot reinstall. exiting."
-      exit
-    } 
+  if (Test-DistroExists -DistroName $Distro_Name) {
+    Write-Log "`r`n##### Distro name present in already installed distros list. cannot reinstall. exiting."
+    exit
   }
 
   if ([string]::IsNullOrWhiteSpace($Distro_Source) -and [string]::IsNullOrWhiteSpace($distro_lookupid)) {
@@ -70,8 +66,8 @@ function Kickoff {
   (wsl --import $Distro_Name $Install_Dir $Distro_Source) | Out-File  -Append  "$basedir\$Distro_Name.log"
   (wsl --terminate $Distro_Name) | Out-File  -Append  "$basedir\$Distro_Name.log"
 
-  $Profile_Path_unix = (($Profile_Path.replace('\','/')).replace('D:','/mnt/d')).replace('C:','/mnt/c')
-  $basedir_unixpath = (($PSScriptRoot.replace('\','/')).replace('D:','/mnt/d')).replace('C:','/mnt/c')
+  $Profile_Path_unix = ConvertTo-WslPath -WindowsPath $Profile_Path
+  $basedir_unixpath = ConvertTo-WslPath -WindowsPath $PSScriptRoot
 
   Write-Log( "`r`n##### Installing Prerequisites for the {0} instance ... " -f "$Distro_Name")
   wsl -d $Distro_Name ls /
@@ -79,12 +75,12 @@ function Kickoff {
   # Install bash first for Alpine (uses sh/ash by default)
   wsl -d $Distro_Name -u root sh -c "command -v bash >/dev/null 2>&1 || apk add --no-cache bash"
   
-  (wsl -d $Distro_Name -u root bash $basedir_unixpath/prep-install.sh $Profile_Path_unix) | Out-File  -Append  "$basedir\$Distro_Name.log" 
+  (wsl -d $Distro_Name -u root bash $basedir_unixpath/prep-install.sh $Profile_Path_unix $basedir_unixpath) | Out-File  -Append  "$basedir\$Distro_Name.log" 
 
   
 
   Write-Log( "`r`n##### Configuring  {0} instance... " -f "$Distro_Name")
-  wsl -d $Distro_Name $basedir_unixpath/install.sh $Profile_Path_unix -u root 2>&1 | Out-File -Append "$basedir\$Distro_Name.log"
+  wsl -d $Distro_Name $basedir_unixpath/install.sh $Profile_Path_unix $basedir_unixpath -u root 2>&1 | Out-File -Append "$basedir\$Distro_Name.log"
 
   Write-Log( "`r`n##### Restarting {0} instance... " -f "$Distro_Name")
   wsl --terminate $Distro_Name

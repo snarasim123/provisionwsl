@@ -19,9 +19,9 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # Source utility and distro-specific functions
 source "${SCRIPT_DIR}/csv-utils.sh"
-source "${SCRIPT_DIR}/prep-install-ubuntu.sh"
-source "${SCRIPT_DIR}/prep-install-fedora.sh"
-source "${SCRIPT_DIR}/prep-install-alpine.sh"
+source "${SCRIPT_DIR}/scripts/bash/prep-install-ubuntu.sh"
+source "${SCRIPT_DIR}/scripts/bash/prep-install-fedora.sh"
+source "${SCRIPT_DIR}/scripts/bash/prep-install-alpine.sh"
 ##############################################################################
 
 upgrade() {
@@ -68,16 +68,17 @@ upgrade() {
 }
 
 profile_path=$1
+scriptroot_path=$2
 distro_name=$(basename "$profile_path")
 source $profile_path
 
 echo "##### Preparing instance , doing preliminary setup ....."
-echo "##### profile_path = $profile_path distro_name = $distro_name distro_id = $ps_distro_id"
+echo "##### profile_path = $profile_path distro_name = $distro_name distro_id = $ps_distro_id scriptroot = $scriptroot_path"
 
 # Load CSV record for the distro_id from profile (if ps_distro_id is set)
 if [[ -n "$ps_distro_id" ]]; then
     
-    if get_csv_record "$ps_distro_id"; then
+    if get_csv_record "$ps_distro_id" "$scriptroot_path"; then
         echo "##### Distro id: $ps_distro_id"
         echo "##### Distro name: $distro_name"
         echo "##### Distro Type: $distro_type"

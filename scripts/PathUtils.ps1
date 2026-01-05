@@ -29,3 +29,30 @@ function Get-ValidatedAbsolutePath {
         exit 1
     }
 }
+
+function ConvertTo-WslPath {
+    param (
+        [Parameter(Mandatory=$true)]
+        [string]$WindowsPath
+    )
+    
+    # Convert backslashes to forward slashes
+    $unixPath = $WindowsPath.Replace('\', '/')
+    
+    # Normalize multiple consecutive slashes to single slash (except at start for UNC)
+    # Preserve leading // for potential UNC-like paths
+    if ($unixPath -match '^//') {
+        # UNC path - keep the leading // but normalize the rest
+        $unixPath = '//' + ($unixPath.Substring(2) -replace '/+', '/')
+    } else {
+        $unixPath = $unixPath -replace '/+', '/'
+    }
+    
+    # Convert drive letter (C: -> /mnt/c) with lowercase drive letter
+    if ($unixPath -match '^([A-Za-z]):') {
+        $driveLetter = $matches[1].ToLower()
+        $unixPath = "/mnt/$driveLetter" + $unixPath.Substring(2)
+    }
+    
+    return $unixPath
+}

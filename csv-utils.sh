@@ -1,22 +1,12 @@
 #!/usr/bin/env bash
 
-# CSV file location (relative to script directory)
-# Override PROFILE_CSV_PATH before sourcing if needed
-PROFILE_CSV_PATH="${PROFILE_CSV_PATH:-}"
-
-# Get the directory where this script is located
-_CSV_UTILS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-
-# Default CSV path if not set
-if [[ -z "$PROFILE_CSV_PATH" ]]; then
-    PROFILE_CSV_PATH="${_CSV_UTILS_DIR}/data/urls.csv"
-fi
-
 get_csv_record() {
     local distro_id="$1"
-    local csv_path="${2:-$PROFILE_CSV_PATH}"
+    local scriptroot_path="$2"
+    local csv_path="${scriptroot_path}/data/urls.csv"
     
     echo "##### DEBUG get_csv_record: distro_id='$distro_id'" >&2
+    echo "##### DEBUG get_csv_record: scriptroot_path='$scriptroot_path'" >&2
     echo "##### DEBUG get_csv_record: csv_path='$csv_path'" >&2
     
     # Validate inputs
@@ -89,7 +79,8 @@ print_csv_record() {
 
 
 list_csv_ids() {
-    local csv_path="${1:-$PROFILE_CSV_PATH}"
+    local scriptroot_path="$1"
+    local csv_path="${scriptroot_path}/data/urls.csv"
     
     if [[ ! -f "$csv_path" ]]; then
         echo "ERROR: CSV file not found: $csv_path" >&2
@@ -110,7 +101,7 @@ list_csv_ids() {
 
 load_distro_from_profile() {
     local profile_path="$1"
-    local csv_path="${2:-$PROFILE_CSV_PATH}"
+    local scriptroot_path="$2"
     
     if [[ -z "$profile_path" ]]; then
         echo "ERROR: profile_path is required" >&2
@@ -131,6 +122,6 @@ load_distro_from_profile() {
     fi
     
     # Load the CSV record
-    get_csv_record "$ps_distro_id" "$csv_path"
+    get_csv_record "$ps_distro_id" "$scriptroot_path"
     return $?
 }
