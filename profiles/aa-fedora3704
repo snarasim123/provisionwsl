@@ -1,4 +1,4 @@
-#
+#tested
 export distro_type=fedora
 export ps_distro_source=C:\Users\SrinivasaNarasimhan\code\setup2\ansible\tmp\fedora_3704.tar
 
@@ -9,5 +9,4 @@ export code_src="$code_base/$code_root"
 
 export run_as_user=root
 export upgrade=true
-export skipsteps=editor,git,container
-
+export skipsteps=github,container

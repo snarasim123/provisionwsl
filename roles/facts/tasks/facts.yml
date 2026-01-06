@@ -15,6 +15,15 @@
     is_debian: false
 - set_fact:
     is_wsl: false
+- set_fact:
+    github_skipped: false
+
+- name: Set github_skipped when github or git tag is skipped
+  set_fact:
+    github_skipped: true
+  when: "'github' in (ansible_skip_tags | default([])) or 'git' in (ansible_skip_tags | default([]))"
+  tags:
+    - always
 
 - name: Check distribution
   shell: cat "/etc/os-release"  | grep ^ID=

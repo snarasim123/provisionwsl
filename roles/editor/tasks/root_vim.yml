@@ -46,7 +46,7 @@
     - editor
   become: true
 
-- name: Copy vim files
+- name: Copy vim files (with plugins)
   copy:
     src: "{{ item }}"
     dest: "{{ root_vim_dir }}"
@@ -56,6 +56,23 @@
   loop:
     - .vimrc
     - vim_shortcuts.txt
+  when: not (github_skipped | default(false))
+  tags: 
+    - vim
+    - editor
+  become: true
+
+- name: Copy vim files (no plugins)
+  copy:
+    src: "{{ item.src }}"
+    dest: "{{ root_vim_dir }}/{{ item.dest }}"
+    owner: "{{ root_user }}"
+    group: "{{ root_user }}"
+    mode: 0644
+  loop:
+    - { src: '.vimrc_noplug', dest: '.vimrc' }
+    - { src: 'vim_shortcuts.txt', dest: 'vim_shortcuts.txt' }
+  when: github_skipped | default(false)
   tags: 
     - vim
     - editor
@@ -99,6 +116,13 @@
     - editor
   become: true
 
+- name: Print message when skipping plugin deployment
+  ansible.builtin.debug:
+    msg: "Skipping root vim plugin deployment - github tag is skipped (no SSH keys configured)"
+  when: github_skipped | default(false)
+  tags:
+    - vim
+    - editor
 
 - name: Deploy plugins
   git:
@@ -130,6 +154,8 @@
     url: git@github.com:skywind3000/vim-quickui
   - name: vim-gutentags
     url: git@github.com:ludovicchabant/vim-gutentags.git
+  when: not (github_skipped | default(false))
+  ignore_errors: yes
   tags: 
     - vim
     - editor

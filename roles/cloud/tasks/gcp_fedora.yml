@@ -1,104 +1,125 @@
 ---
-# https://github.com/ansible/role-install-gcloud/blob/master/tasks/main.yml
-# https://github.com/markosamuli/ansible-gcloud/tree/master/tasks
+# Google Cloud CLI installation for Fedora/RHEL/CentOS
+# https://docs.cloud.google.com/sdk/docs/install-sdk#red-hatfedoracentos
+# https://cloud.google.com/sdk/docs/install#rpm
 
-# - name: remove existing gcp folder
-#   ansible.builtin.file:
-#     state: absent
-#     path: "/home/{{ target_user }}/tmp/gcp"
-#   tags: 
-#     - gcp
-#     - cloud
-#   become: true
+- name: Get Python version
+  ansible.builtin.command: python3 --version
+  register: python_version_output
+  changed_when: false
+  failed_when: false
+  tags:
+    - gcp
+    - cloud
 
-# - name: Download the archive
-#   get_url:
-#     url: "{{ gcloud_archive_url }}/{{ gcloud_archive_name }}"
-#     dest: ""/home/{{ target_user }}/tmp/"
-#     tags: 
-#     - gcp
-#     - cloud
-#   become: true
-  
-# - name: Unarchive the installer.
-#   unarchive: src="/home/{{ target_user }}/tmp/{{ gcloud_archive_name }}" dest="/home/{{ target_user }}/tmp/gcp" 
-#   tags: 
-#     - gcp
-#     - cloud
+- name: Extract Python version number
+  ansible.builtin.set_fact:
+    python_version: "{{ python_version_output.stdout | regex_search('Python ([0-9]+\\.[0-9]+)', '\\1') | first | default('0.0') }}"
+  when: python_version_output.rc == 0
+  tags:
+    - gcp
+    - cloud
 
-# - name: Install gcp package.
-#   shell:  "/home/{{ target_user }}/tmp/gcp/install.sh --update"
-#   tags: 
-#     - gcp
-#     - cloud
-#   become: true
+- name: Set Python version to 0.0 if not found
+  ansible.builtin.set_fact:
+    python_version: "0.0"
+  when: python_version_output.rc != 0
+  tags:
+    - gcp
+    - cloud
 
-# - name: Remove the archive
-#   file:
-#     path: "{{ archive_path }}"
-#     state: absent
+- name: Display detected Python version
+  ansible.builtin.debug:
+    msg: "Detected Python version: {{ python_version }}"
+  tags:
+    - gcp
+    - cloud
 
-# - name: Remove the script
-#   file:
-#     path: "{{ gcloud_tmp_path }}/run_install.sh"
-#     state: absent
-#   when: not gcloud_debug 
+- name: Confirm Python version is supported for Google Cloud CLI
+  ansible.builtin.assert:
+    that:
+      - python_version is version(gcp_cli_python_min_version, '>=')
+      - python_version is version(gcp_cli_python_max_version, '<=')
+    fail_msg: >
+      Google Cloud CLI requires Python {{ gcp_cli_python_min_version }} to {{ gcp_cli_python_max_version }}.
+      Detected Python version: {{ python_version }}.
+      Note: The x86_64 Linux package includes a bundled Python interpreter that will be preferred by default.
+    success_msg: "Python version {{ python_version }} is supported for Google Cloud CLI."
+  tags:
+    - gcp
+    - cloud
 
-# - name: remove existing aws folder
-#   ansible.builtin.file:
-#     state: absent
-#     path: "/home/{{ target_user }}/tmp/aws"
-#   tags: 
-#     - aws
-#     - cloud
-#   become: true
+- name: Add Google Cloud CLI repository
+  ansible.builtin.yum_repository:
+    name: google-cloud-cli
+    description: Google Cloud CLI
+    baseurl: https://packages.cloud.google.com/yum/repos/cloud-sdk-el9-x86_64
+    enabled: yes
+    gpgcheck: yes
+    repo_gpgcheck: no
+    gpgkey:
+      - https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
+  become: true
+  tags:
+    - gcp
+    - cloud
 
-# - name: remove existing aws file
-#   ansible.builtin.file:
-#     state: absent
-#     path: "/home/{{ target_user }}/tmp/{{ item }}"
-#   with_items:
-#     - awscli-bundle.zip
-#   tags: 
-#     - aws
-#     - cloud
-#   become: true
+- name: Install libxcrypt-compat for legacy crypt library support
+  ansible.builtin.dnf:
+    name: libxcrypt-compat.x86_64
+    state: present
+  become: true
+  tags:
+    - gcp
+    - cloud
 
-# - name: Download the awscli bundle.
-#   get_url: url=https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip dest="/home/{{ target_user }}/tmp/awscli-bundle.zip"
-#   tags: 
-#     - aws
-#     - cloud
+- name: Install Google Cloud CLI via dnf
+  ansible.builtin.dnf:
+    name: google-cloud-cli
+    state: present
+  become: true
+  tags:
+    - gcp
+    - cloud
 
-# - name: Unarchive the installer.
-#   unarchive: src="/home/{{ target_user }}/tmp/awscli-bundle.zip" dest="/home/{{ target_user }}/tmp" 
-#   tags: 
-#     - aws
-#     - cloud
+- name: Verify gcloud install location
+  ansible.builtin.command:
+    cmd: which gcloud
+  register: gcloud_location
+  changed_when: false
+  failed_when: false
+  tags:
+    - gcp
+    - cloud
 
-# - name: Install awscli package.
-#   shell:  "/home/{{ target_user }}/tmp/aws/install --update"
-#   tags: 
-#     - aws
-#     - cloud
-#   become: true
+- name: Print gcloud install location
+  ansible.builtin.debug:
+    msg: "gcloud installed at: {{ gcloud_location.stdout | default('gcloud not found in PATH') }}"
+  tags:
+    - gcp
+    - cloud
 
-# - name: remove existing aws folder
-#   ansible.builtin.file:
-#     state: absent
-#     path: "/home/{{ target_user }}/tmp/aws"
-#   tags: 
-#     - aws
-#     - cloud
-#   become: true
+- name: Verify gcloud version
+  ansible.builtin.command:
+    cmd: gcloud --version
+  register: gcloud_version
+  changed_when: false
+  failed_when: false
+  tags:
+    - gcp
+    - cloud
 
-# - name: remove existing aws file
-#   ansible.builtin.file:
-#     state: absent
-#     path: "/home/{{ target_user }}/tmp/{{ item }}"
-#   with_items:
-#     - awscli-bundle.zip
-#   tags: 
-#     - aws
-#     - cloud
-#   become: true
+- name: Print gcloud version
+  ansible.builtin.debug:
+    msg: "{{ gcloud_version.stdout_lines | default(['gcloud version not available']) }}"
+  tags:
+    - gcp
+    - cloud
+
+- name: Set fact that GCP CLI is installed
+  ansible.builtin.set_fact:
+    gcp_cli_installed: true
+  when: gcloud_version.rc == 0
+  tags:
+    - gcp
+    - cloud

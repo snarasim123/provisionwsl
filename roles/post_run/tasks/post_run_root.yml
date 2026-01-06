@@ -1,4 +1,33 @@
 ---
+- name: Add gcloud to PATH in /etc/environment (Alpine)
+  ansible.builtin.lineinfile:
+    path: /etc/environment
+    regexp: '^PATH='
+    line: 'PATH="/usr/local/google-cloud-sdk/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"'
+    create: yes
+  become: true
+  when:
+    - is_alpine | bool
+    - gcp_cli_installed | default(false)
+  tags:
+    - post_run
+    - gcp
+
+- name: Add gcloud to PATH in root's .bashrc_custom (Alpine)
+  ansible.builtin.lineinfile:
+    path: "{{ root_user_home }}/.bashrc_custom"
+    line: 'export PATH="/usr/local/google-cloud-sdk/bin:$PATH"'
+    create: yes
+    owner: "{{ root_user }}"
+    group: "{{ root_user }}"
+  become: true
+  when:
+    - is_alpine | bool
+    - gcp_cli_installed | default(false)
+  tags:
+    - post_run
+    - gcp
+
 - name: Add GCP installed marker to .bashrc_custom
   ansible.builtin.lineinfile:
     path: "{{ root_user_home }}/.bashrc_custom"

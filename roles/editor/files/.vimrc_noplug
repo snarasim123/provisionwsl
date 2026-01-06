@@ -1,0 +1,23 @@
+set nocompatible              " be iMproved, required
+filetype off                  " required
+
+filetype plugin indent on
+syntax on
+set number
+set ic
+set wrap
+"to disable mouse completely
+"set mouse=
+set mouse=a
+set guifont=Source\ Code\ Pro:h14 
+set showmatch
+set tabstop=4
+set listchars=eol:$,tab:>-,trail:~,extends:>,precedes:<
+set list
+
+colorscheme desert
+
+
+
+
+

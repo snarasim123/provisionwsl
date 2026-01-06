@@ -22,6 +22,11 @@ install_python_alpine() {
     # Update package index
     sudo apk update
     
+    # Install GNU tar and unzip (required for Ansible unarchive module)
+    # Alpine's default BusyBox tar is not compatible with Ansible
+    echo "Installing GNU tar and unzip for Ansible compatibility..."
+    sudo apk add --no-cache tar gzip unzip zip
+    
     # Install Python 3 and related packages
     # Alpine package naming: python3, py3-pip, python3-dev
     echo "Installing Python on Alpine..."
