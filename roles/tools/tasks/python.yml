@@ -1,0 +1,232 @@
+# Pyenv and Python installation tasks
+# Installs pyenv - Python version manager
+# Installs Python 3.11 and 3.12, sets 3.11 as default
+# Works on Ubuntu, Fedora, and Alpine
+# To enable: uncomment in tools/tasks/main.yml
+---
+
+- name: Check if pyenv is already installed
+  stat:
+    path: "{{ user_home }}/.pyenv/bin/pyenv"
+  register: pyenv_installed
+  tags:
+    - python
+    - pyenv
+    - tools
+
+- name: Install pyenv dependencies on Ubuntu/Debian
+  apt:
+    name:
+      - make
+      - build-essential
+      - libssl-dev
+      - zlib1g-dev
+      - libbz2-dev
+      - libreadline-dev
+      - libsqlite3-dev
+      - wget
+      - curl
+      - llvm
+      - libncursesw5-dev
+      - xz-utils
+      - tk-dev
+      - libxml2-dev
+      - libxmlsec1-dev
+      - libffi-dev
+      - liblzma-dev
+      - git
+    state: present
+  become: true
+  when: is_ubuntu | bool or is_debian | bool
+  tags:
+    - python
+    - pyenv
+    - tools
+
+- name: Install pyenv dependencies on Fedora
+  dnf:
+    name:
+      - make
+      - gcc
+      - zlib-devel
+      - bzip2
+      - bzip2-devel
+      - readline-devel
+      - sqlite
+      - sqlite-devel
+      - openssl-devel
+      - tk-devel
+      - libffi-devel
+      - xz-devel
+      - libuuid-devel
+      - gdbm-devel
+      - libnsl2-devel
+      - git
+    state: present
+  become: true
+  when: is_fedora | bool
+  tags:
+    - python
+    - pyenv
+    - tools
+
+- name: Install pyenv dependencies on Alpine
+  community.general.apk:
+    name:
+      - git
+      - bash
+      - build-base
+      - libffi-dev
+      - openssl-dev
+      - bzip2-dev
+      - zlib-dev
+      - xz-dev
+      - readline-dev
+      - sqlite-dev
+      - tk-dev
+      - linux-headers
+    state: present
+  become: true
+  when: is_alpine | bool
+  tags:
+    - python
+    - pyenv
+    - tools
+
+- name: Download and install pyenv
+  shell: |
+    curl https://pyenv.run | bash
+  args:
+    creates: "{{ user_home }}/.pyenv/bin/pyenv"
+  become: false
+  become_user: "{{ target_user }}"
+  when: not pyenv_installed.stat.exists
+  tags:
+    - python
+    - pyenv
+    - tools
+
+- name: Set pyenv_installed flag for post_run
+  set_fact:
+    pyenv_installed_flag: true
+  tags:
+    - python
+    - pyenv
+    - tools
+
+- name: Check installed Python versions
+  shell: |
+    export PYENV_ROOT="{{ user_home }}/.pyenv"
+    export PATH="$PYENV_ROOT/bin:$PATH"
+    eval "$(pyenv init -)"
+    pyenv versions --bare
+  args:
+    executable: /bin/bash
+  become: false
+  become_user: "{{ target_user }}"
+  register: pyenv_versions
+  changed_when: false
+  failed_when: false
+  tags:
+    - python
+    - pyenv
+    - tools
+
+- name: Install Python 3.11 via pyenv
+  shell: |
+    export PYENV_ROOT="{{ user_home }}/.pyenv"
+    export PATH="$PYENV_ROOT/bin:$PATH"
+    eval "$(pyenv init -)"
+    pyenv install -s {{ python311_version }}
+  args:
+    executable: /bin/bash
+  become: false
+  become_user: "{{ target_user }}"
+  when: python311_version not in pyenv_versions.stdout
+  register: python311_install
+  tags:
+    - python
+    - pyenv
+    - tools
+
+- name: Install Python 3.12 via pyenv
+  shell: |
+    export PYENV_ROOT="{{ user_home }}/.pyenv"
+    export PATH="$PYENV_ROOT/bin:$PATH"
+    eval "$(pyenv init -)"
+    pyenv install -s {{ python312_version }}
+  args:
+    executable: /bin/bash
+  become: false
+  become_user: "{{ target_user }}"
+  when: python312_version not in pyenv_versions.stdout
+  register: python312_install
+  tags:
+    - python
+    - pyenv
+    - tools
+
+- name: Set Python 3.11 as global default
+  shell: |
+    export PYENV_ROOT="{{ user_home }}/.pyenv"
+    export PATH="$PYENV_ROOT/bin:$PATH"
+    eval "$(pyenv init -)"
+    pyenv global {{ python311_version }}
+  args:
+    executable: /bin/bash
+  become: false
+  become_user: "{{ target_user }}"
+  tags:
+    - python
+    - pyenv
+    - tools
+
+- name: Verify pyenv installation
+  shell: |
+    export PYENV_ROOT="{{ user_home }}/.pyenv"
+    export PATH="$PYENV_ROOT/bin:$PATH"
+    eval "$(pyenv init -)"
+    pyenv versions
+  args:
+    executable: /bin/bash
+  become: false
+  become_user: "{{ target_user }}"
+  register: pyenv_verify
+  changed_when: false
+  tags:
+    - python
+    - pyenv
+    - tools
+
+- name: Display installed Python versions
+  debug:
+    msg: "{{ pyenv_verify.stdout_lines }}"
+  tags:
+    - python
+    - pyenv
+    - tools
+
+- name: Verify active Python version
+  shell: |
+    export PYENV_ROOT="{{ user_home }}/.pyenv"
+    export PATH="$PYENV_ROOT/bin:$PATH"
+    eval "$(pyenv init -)"
+    python --version
+  args:
+    executable: /bin/bash
+  become: false
+  become_user: "{{ target_user }}"
+  register: python_version
+  changed_when: false
+  tags:
+    - python
+    - pyenv
+    - tools
+
+- name: Display active Python version
+  debug:
+    msg: "Active Python: {{ python_version.stdout }}"
+  tags:
+    - python
+    - pyenv
+    - tools

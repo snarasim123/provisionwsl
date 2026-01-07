@@ -1,0 +1,200 @@
+# Lazygit installation tasks
+# Installs lazygit - a simple terminal UI for git commands
+# Works on Ubuntu, Fedora, and Alpine
+# Version is defined in vars/language_versions.yml as lazygit_version
+---
+
+- name: Check if lazygit is already installed
+  command: which lazygit
+  register: lazygit_installed
+  changed_when: false
+  failed_when: false
+  tags:
+    - lazygit
+    - git
+    - tools
+
+- name: Get installed lazygit version
+  shell: lazygit --version | grep -oP 'version=\K[0-9]+\.[0-9]+\.[0-9]+'
+  register: lazygit_current_version
+  changed_when: false
+  failed_when: false
+  when: lazygit_installed.rc == 0
+  tags:
+    - lazygit
+    - git
+    - tools
+
+- name: Set lazygit_needs_install fact
+  set_fact:
+    lazygit_needs_install: "{{ lazygit_installed.rc != 0 or (lazygit_current_version.stdout is defined and lazygit_current_version.stdout is version(lazygit_version, '<')) }}"
+  tags:
+    - lazygit
+    - git
+    - tools
+
+- name: Display current lazygit version
+  debug:
+    msg: "Current lazygit version: {{ lazygit_current_version.stdout | default('not installed') }}, Target version: {{ lazygit_version }}, Needs install: {{ lazygit_needs_install }}"
+  tags:
+    - lazygit
+    - git
+    - tools
+
+- name: Install lazygit on Ubuntu/Debian
+  block:
+    - name: Create tmp directory for lazygit
+      file:
+        path: "/home/{{ target_user }}/tmp"
+        state: directory
+        mode: '0755'
+        owner: "{{ target_user }}"
+        group: "{{ target_user }}"
+
+    - name: Download lazygit for Ubuntu/Debian
+      get_url:
+        url: "https://github.com/jesseduffield/lazygit/releases/download/v{{ lazygit_version }}/lazygit_{{ lazygit_version }}_Linux_x86_64.tar.gz"
+        dest: "/home/{{ target_user }}/tmp/lazygit.tar.gz"
+        mode: '0644'
+
+    - name: Extract lazygit
+      unarchive:
+        src: "/home/{{ target_user }}/tmp/lazygit.tar.gz"
+        dest: "/home/{{ target_user }}/tmp"
+        remote_src: yes
+
+    - name: Install lazygit to /usr/local/bin
+      copy:
+        src: "/home/{{ target_user }}/tmp/lazygit"
+        dest: /usr/local/bin/lazygit
+        mode: '0755'
+        remote_src: yes
+      become: true
+
+    - name: Cleanup lazygit tmp files
+      file:
+        path: "/home/{{ target_user }}/tmp/{{ item }}"
+        state: absent
+      loop:
+        - lazygit.tar.gz
+        - lazygit
+        - LICENSE
+        - README.md
+  when:
+    - is_ubuntu | bool or is_debian | bool
+    - lazygit_needs_install | bool
+  tags:
+    - lazygit
+    - git
+    - tools
+
+- name: Install lazygit on Fedora
+  block:
+    - name: Create tmp directory for lazygit
+      file:
+        path: "/home/{{ target_user }}/tmp"
+        state: directory
+        mode: '0755'
+        owner: "{{ target_user }}"
+        group: "{{ target_user }}"
+
+    - name: Download lazygit for Fedora
+      get_url:
+        url: "https://github.com/jesseduffield/lazygit/releases/download/v{{ lazygit_version }}/lazygit_{{ lazygit_version }}_Linux_x86_64.tar.gz"
+        dest: "/home/{{ target_user }}/tmp/lazygit.tar.gz"
+        mode: '0644'
+
+    - name: Extract lazygit
+      unarchive:
+        src: "/home/{{ target_user }}/tmp/lazygit.tar.gz"
+        dest: "/home/{{ target_user }}/tmp"
+        remote_src: yes
+
+    - name: Install lazygit to /usr/local/bin
+      copy:
+        src: "/home/{{ target_user }}/tmp/lazygit"
+        dest: /usr/local/bin/lazygit
+        mode: '0755'
+        remote_src: yes
+      become: true
+
+    - name: Cleanup lazygit tmp files
+      file:
+        path: "/home/{{ target_user }}/tmp/{{ item }}"
+        state: absent
+      loop:
+        - lazygit.tar.gz
+        - lazygit
+        - LICENSE
+        - README.md
+  when:
+    - is_fedora | bool
+    - lazygit_needs_install | bool
+  tags:
+    - lazygit
+    - git
+    - tools
+
+- name: Install lazygit on Alpine
+  block:
+    - name: Create tmp directory for lazygit
+      file:
+        path: "/home/{{ target_user }}/tmp"
+        state: directory
+        mode: '0755'
+        owner: "{{ target_user }}"
+        group: "{{ target_user }}"
+
+    - name: Download lazygit for Alpine
+      get_url:
+        url: "https://github.com/jesseduffield/lazygit/releases/download/v{{ lazygit_version }}/lazygit_{{ lazygit_version }}_Linux_x86_64.tar.gz"
+        dest: "/home/{{ target_user }}/tmp/lazygit.tar.gz"
+        mode: '0644'
+
+    - name: Extract lazygit
+      unarchive:
+        src: "/home/{{ target_user }}/tmp/lazygit.tar.gz"
+        dest: "/home/{{ target_user }}/tmp"
+        remote_src: yes
+
+    - name: Install lazygit to /usr/local/bin
+      copy:
+        src: "/home/{{ target_user }}/tmp/lazygit"
+        dest: /usr/local/bin/lazygit
+        mode: '0755'
+        remote_src: yes
+      become: true
+
+    - name: Cleanup lazygit tmp files
+      file:
+        path: "/home/{{ target_user }}/tmp/{{ item }}"
+        state: absent
+      loop:
+        - lazygit.tar.gz
+        - lazygit
+        - LICENSE
+        - README.md
+  when:
+    - is_alpine | bool
+    - lazygit_needs_install | bool
+  tags:
+    - lazygit
+    - git
+    - tools
+
+- name: Verify lazygit installation
+  command: lazygit --version
+  register: lazygit_verify
+  changed_when: false
+  tags:
+    - lazygit
+    - git
+    - tools
+
+- name: Display lazygit version
+  debug:
+    msg: "{{ lazygit_verify.stdout }}"
+  tags:
+    - lazygit
+    - git
+    - tools

@@ -1,0 +1,12 @@
+---
+# Tools role - main tasks file
+# Uncomment tasks to enable them
+
+# JDK/SDKMAN installation (Java 11, 17, 21)
+# - import_tasks: jdk.yml
+
+# Lazygit - terminal UI for git
+# - import_tasks: lazygit.yml
+
+# Pyenv - Python version manager with Python 3.11 and 3.12
+# - import_tasks: python.yml
