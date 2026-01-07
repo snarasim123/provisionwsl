@@ -14,6 +14,7 @@ There are prebuilt alternatives like devcontainers , but i found scripting and a
 
 - [Overview](#overview)
 - [Prerequisites](#prerequisites)
+- [GitHub Integration & Secrets Setup](#github-integration--secrets-setup)
 - [Project Structure](#project-structure)
 - [Quick Start](#quick-start)
 - [Profile Configuration](#profile-configuration)
@@ -37,6 +38,73 @@ The project provides:
 - Windows 10/11 with WSL2 enabled
 - PowerShell 5.1 or later
 
+## GitHub Integration & Secrets Setup
+
+Some roles (such as Vim plugin installation) require GitHub SSH access for passwordless authentication from your WSL instance. You can either skip GitHub integration or set up secrets for secure access.
+
+### Option 1: Skip GitHub Integration
+
+If you do not want to set up GitHub SSH keys or secrets, you can skip all GitHub-dependent steps by adding `github` to the `skipsteps` variable in your profile:
+
+```bash
+export skipsteps=github
+```
+
+When this tag is skipped, the playbook will:
+- Avoid tasks that require GitHub SSH access (e.g., installing Vim plugins that clone from private repos)
+- Use a minimal `.vimrc_noplug` configuration for Vim without plugins
+- Skip SSH key setup for no automatic login to GitHub from wsl instance. any task which requires github integration will not work.
+ 
+### Option 2: Set Up GitHub Secrets (Recommended)
+
+To enable full GitHub integration (Vim plugins, passwordless SSH authentication to GitHub from wsl instance, etc.), follow these steps:
+
+> **Note:** `ansible-vault` does not run natively on Windows. You must run these commands in a Linux environment, then copy the encrypted `secrets.yaml` file to your project root.
+> 
+> **Options for running ansible-vault:**
+> - **Google Cloud Shell** (free, easiest): https://shell.cloud.google.com - Install ansible with `pip install ansible`, encrypt the password file  then Download to copy files to Windows
+> - **GitHub Codespaces** (free tier: 120 core-hours/month)
+> - **Azure Cloud Shell** (free with Azure account)
+> - **Existing WSL instance** on your machine
+> - Any Linux VM or machine
+
+1. **Copy the secrets template to the right filename:**
+   ```bash
+   cp secrets-template.yaml secrets.yaml
+   # Edit secrets.yaml and fill in your GitHub credentials/keys
+   ```
+   Only fill in the values; the keys are already set.
+
+2. **Encrypt the secrets file (run in Linux environment):**
+   ```bash
+   ansible-vault encrypt secrets.yaml
+   ```
+   Enter a password when prompted. This will encrypt your secrets.
+
+3. **Copy the encrypted file to Windows:**
+   - If you created `secrets.yaml` in WSL or Linux, copy it to the Windows project root directory (e.g., `C:\Users\...\code\setup2\ansible\`)
+
+4. **Save the vault password:**
+   - Save the password you used above in a plain text file named `secrets.pass` in the project root.
+   - **Do not commit `secrets.yaml` or `secrets.pass` to version control.**
+
+5. **Run the playbook as usual:**
+   ```powershell
+   .\kickoff.ps1 .\profiles\<profile-name>
+   ```
+   The playbook will automatically use the secrets if present.
+
+6. **To view encrypted secrets:**
+   ```bash
+   ansible-vault view secrets.yaml
+   ```
+   Enter the password from `secrets.pass` when prompted. (Must run in Linux environment)
+
+**References:**
+- [How to use Vault to protect sensitive Ansible data (DigitalOcean)](https://www.digitalocean.com/community/tutorials/how-to-use-vault-to-protect-sensitive-ansible-data)
+- [Managing secrets in Ansible playbooks (Red Hat)](https://www.redhat.com/sysadmin/ansible-playbooks-secrets)
+
+---
 
 ## Project Structure
 
