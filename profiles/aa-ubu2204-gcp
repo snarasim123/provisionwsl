@@ -9,7 +9,7 @@ export code_src="$code_base/$code_root"
 
 export run_as_user=root
 export upgrade=true
-export skipsteps=github,container,aws 
+export skipsteps=aws 
 
 
 

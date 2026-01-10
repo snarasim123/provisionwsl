@@ -172,6 +172,20 @@
     - gcp
     - cloud
 
+- name: Install gke-gcloud-auth-plugin for GKE authentication (Alpine)
+  ansible.builtin.command:
+    cmd: /usr/local/google-cloud-sdk/bin/gcloud components install gke-gcloud-auth-plugin --quiet
+  environment:
+    PATH: "/usr/local/google-cloud-sdk/bin:{{ ansible_env.PATH }}"
+  become: true
+  when: gcloud_version.rc == 0
+  register: gke_plugin_install
+  changed_when: "'All components are up to date' not in gke_plugin_install.stderr"
+  tags:
+    - gcp
+    - cloud
+    - gke
+
 - name: Remove Google Cloud CLI tar file from tmp folder
   ansible.builtin.file:
     path: "/home/{{ target_user }}/tmp/{{ gcp_cli_archive_name_x86_64 }}"

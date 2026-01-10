@@ -123,3 +123,14 @@
   tags:
     - gcp
     - cloud
+
+- name: Install gke-gcloud-auth-plugin for GKE authentication (Fedora)
+  ansible.builtin.dnf:
+    name: google-cloud-cli-gke-gcloud-auth-plugin
+    state: present
+  become: true
+  when: gcloud_version.rc == 0
+  tags:
+    - gcp
+    - cloud
+    - gke

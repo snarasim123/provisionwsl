@@ -1,12 +1,8 @@
 # WSL Distro Provisioning with Ansible
 
-This project automates the creation and proconfiguration visioning of WSL (Windows Subsystem for Linux) instances  using Ansible. It supports **Ubuntu**, **Fedora**, and **Alpine** Linux distributions.
+This project automates the creation and provisioning of WSL (Windows Subsystem for Linux) instances using Ansible. It supports **Ubuntu**, **Fedora**, and **Alpine** Linux distributions.
 
-The project was created by my need to provision  wsl instances for different needs over several years of my career.  
-For example, i wanted a wsl instance to test redis related tasks and later on i needed a specific version of java to   
-for my tasks. And then it was python...  
-There is docker option to do this, but i found writing and maintaining docker files was tedious.   
-There are prebuilt alternatives like devcontainers , but i found scripting and ansible easier for some reason.  
+The project was created to address my need to provision WSL instances for different tasks over several years. For example, I needed a WSL instance to test Redis-related tasks, later a specific Java version, and then Python environments. While Docker is an option, I found writing and maintaining Dockerfiles tedious. There are prebuilt alternatives like devcontainers, but I found scripting and Ansible easier to work with.  
 
 
 
@@ -22,16 +18,17 @@ There are prebuilt alternatives like devcontainers , but i found scripting and a
 - [Examples](#examples)
 - [Teardown](#teardown)
 - [Customization](#customization)
+- [Troubleshooting](#troubleshooting)
 
 ---
 
 ## Overview
 
 The project provides:
-- Automated WSL instance provisioning (import from cloud images or preexisting wsl compatible local images)
+- Automated WSL instance provisioning (using cloud images or preexisting WSL-compatible local images)
 - Ansible-based configuration
-- file driven configuration for different types of instances
-- Support for Ubuntu , Fedora , and Alpine 
+- File-driven configuration management for different types of instances
+- Support for Ubuntu, Fedora, and Alpine distributions
 
 ## Prerequisites
 
@@ -40,11 +37,11 @@ The project provides:
 
 ## GitHub Integration & Secrets Setup
 
-Some roles (such as Vim plugin installation) require GitHub SSH access for passwordless authentication from your WSL instance. You can either skip GitHub integration or set up secrets for secure access.
+Some roles (such as Vim plugin installation) require GitHub SSH access for passwordless authentication from your WSL instance. You can either skip GitHub integration or set up secrets for secure access. Without GitHub integration, GitHub access requires manual generation/upload of SSH keys or password authentication.
 
 ### Option 1: Skip GitHub Integration
 
-If you do not want to set up GitHub SSH keys or secrets, you can skip all GitHub-dependent steps by adding `github` to the `skipsteps` variable in your profile:
+If you do not want to set up GitHub SSH keys or secrets, you can skip all GitHub-dependent steps by adding `github` to the `skipsteps` variable in your profile file:
 
 ```bash
 export skipsteps=github
@@ -53,20 +50,11 @@ export skipsteps=github
 When this tag is skipped, the playbook will:
 - Avoid tasks that require GitHub SSH access (e.g., installing Vim plugins that clone from private repos)
 - Use a minimal `.vimrc_noplug` configuration for Vim without plugins
-- Skip SSH key setup for no automatic login to GitHub from wsl instance. any task which requires github integration will not work.
+- Skip SSH key setup (no automatic login to GitHub from WSL instance; any task requiring GitHub integration will not work)
  
 ### Option 2: Set Up GitHub Secrets (Recommended)
 
 To enable full GitHub integration (Vim plugins, passwordless SSH authentication to GitHub from wsl instance, etc.), follow these steps:
-
-> **Note:** `ansible-vault` does not run natively on Windows. You must run these commands in a Linux environment, then copy the encrypted `secrets.yaml` file to your project root.
-> 
-> **Options for running ansible-vault:**
-> - **Google Cloud Shell** (free, easiest): https://shell.cloud.google.com - Install ansible with `pip install ansible`, encrypt the password file  then Download to copy files to Windows
-> - **GitHub Codespaces** (free tier: 120 core-hours/month)
-> - **Azure Cloud Shell** (free with Azure account)
-> - **Existing WSL instance** on your machine
-> - Any Linux VM or machine
 
 1. **Copy the secrets template to the right filename:**
    ```bash
@@ -99,6 +87,16 @@ To enable full GitHub integration (Vim plugins, passwordless SSH authentication 
    ansible-vault view secrets.yaml
    ```
    Enter the password from `secrets.pass` when prompted. (Must run in Linux environment)
+
+> **Note:** `ansible-vault` does not run natively on Windows. You must run these commands in a Linux environment, then copy the encrypted `secrets.yaml` file to your project root.
+> 
+> **Options for running ansible-vault:**
+> - **Google Cloud Shell** (free, easiest): https://shell.cloud.google.com - Install ansible with `pip install ansible`, encrypt the file, then use Download button to copy files to Windows
+> - **GitHub Codespaces** (free tier: 120 core-hours/month)
+> - **Azure Cloud Shell** (free with Azure account)
+> - **Existing WSL instance** on your machine
+> - Any Linux VM or machine
+
 
 **References:**
 - [How to use Vault to protect sensitive Ansible data (DigitalOcean)](https://www.digitalocean.com/community/tutorials/how-to-use-vault-to-protect-sensitive-ansible-data)
@@ -145,7 +143,7 @@ ansible/
 
 ## Profile Configuration
 
-Profiles are stored in the `profiles/` directory. Each profile defines how a WSL instance should be downloaded/accessed   and configured.
+Profiles are stored in the `profiles/` directory. Each profile defines how a WSL instance should be downloaded and configured. 
 
 ### Profile Variables
 
@@ -185,13 +183,26 @@ Running,
     .\Kickoff.ps1 .\profiles\aa-ubu2204-test 
 ```
 
-will provision a wsl distro identified by ubuntu2204, specified in the .\data\urls.csv  
-The csv file provides the type of this distro (ubuntu), cloud image url.
-The cloud image is downloaded to .\tmp folder, unpacked and used for provisioning.  
-Then the ubuntu2204 instanced is updated , ansible and python are installed in it.  
-The project code is copied to it and ansible is run to do the configuration.  
-All ansible roles except listed in the skipsteps above will be installed.  
-To install all roles, comment out, export skipsteps , line  
+The above profile will provision a WSL distro identified by `ubuntu2204`.
+
+The identifier definition is specified in the `./data/urls.csv` file. The CSV file provides the distro type (ubuntu), cloud image URL, and other information. The cloud image is downloaded to the `./tmp` folder, unpacked, and used for provisioning.
+
+The WSL instance name is inherited from the profile name itself, unless overridden by the `distro_name` profile variable.
+
+The provisioning process:
+1. The ubuntu2204 instance is updated
+2. Ansible and Python are installed
+3. Project code is copied to the instance
+4. Ansible runs to perform further configuration
+
+All Ansible roles except those listed in `skipsteps` will be run. To install all roles, clear the `skipsteps` variable: `export skipsteps=`
+
+The above example skips:
+- `packages` - Ubuntu packages specified by the role
+- `cloud` - AWS and Google Cloud CLI
+- `editor` - Vim, Neovim, vim plugins
+- `git` - Git and SSH key upload to your GitHub account
+- `container` - Kubernetes, Helm
 
 ---
 
@@ -207,7 +218,7 @@ The playbook includes these roles (defined in `playbook.yaml`):
 | `cloud` | Installs cloud CLIs (AWS, GCP) |
 | `shell` | Configures bash, aliases, and shell environment |
 | `packages` | Installs system packages per distribution |
-| `git` | Installs and configures git, creates ssh keys and uploads it to specified github account. This enabled github ops from the wsl instance. |
+| `git` | Installs and configures git, creates SSH keys and uploads them to specified GitHub account. This enables GitHub operations from the WSL instance. |
 | `editor` | Installs vim/neovim with plugins |
 | `gui` | GUI application support |
 | `container` | Docker, Podman, Kubernetes tools |
@@ -285,6 +296,8 @@ To remove a WSL instance:
 .\teardown.ps1 .\profiles\<profile-name>
 ```
 
+You can also run the `wsl --unregister <distro-name>` command to remove the instance. The teardown script does not do any extra processing other than unregistering the instance.
+
 ---
 
 ## Customization
@@ -304,36 +317,194 @@ fedora37,wsl,fedora,https://github.com/fedora-cloud/docker-brew-fedora/blob/37/x
 
 Roles are located in `roles/<role-name>/tasks/`. Edit the YAML files to customize behavior.
 
-### Adding Variables
+### Changing Variables
 
 - `vars/language_versions.yml` - Version numbers for languages/tools
-- `vars/packages_ubuntu.yml` - Ubuntu-specific packages to install  
-- `vars/packages_fedora.yml` - Fedora-specific packages to install  
-- `vars/packages_alpine.yml` - Alpine-specific packages to install  
+- `vars/packages_ubuntu.yml` - Ubuntu-specific packages to install
+- `vars/packages_fedora.yml` - Fedora-specific packages to install
+- `vars/packages_alpine.yml` - Alpine-specific packages to install
 - `vars/tool_versions.yml` - Tool version configurations
 - `vars/user_environment.yml` - User environment settings
-
 
 ---
 
 ## Troubleshooting
 
-### Distro already exists
+### Log Files
+
+Log files are created in the ansible directory and contain detailed information about the provisioning process:
+
+- **`<distro-name>.log`** - Main kickoff/provisioning log
+  - Contains output from WSL import, prep-install scripts, and Ansible playbook execution
+  - Check this file if provisioning fails or hangs
+  
+- **`<distro-name>-teardown.log`** - Teardown/removal log
+  - Contains output from the WSL unregister operation
+
+**Viewing logs:**
+```powershell
+# View latest log in real-time
+Get-Content .\<distro-name>.log -Wait -Tail 50
+
+# Search for errors
+Select-String -Path ".\<distro-name>.log" -Pattern "error|failed|fatal"
+```
+
+### Common Issues
+
+#### 1. Distro already exists
 ```
 ##### Distro name present in already installed distros list. cannot reinstall. exiting.
 ```
-Solution: Run teardown first, then kickoff again.
+**Cause:** A WSL instance with the same name is already installed.
 
-### Missing SSH keys (github tag skipped)
-If you skip the `github` tag, vim plugins requiring git clone over SSH won't work. The project automatically uses `.vimrc_noplug` in this case.
+**Solution:** 
+```powershell
+# Option 1: Run teardown first
+.\teardown.ps1 .\profiles\<profile-name>
 
-### Alpine-specific issues
-Alpine uses `ash` shell by default. The project installs `bash` automatically during prep-install.
+# Option 2: Manually unregister
+wsl --unregister <distro-name>
+
+# Then run kickoff again
+.\kickoff.ps1 .\profiles\<profile-name>
+```
+
+#### 2. Missing SSH keys (github tag skipped)
+If you skip the `github` tag, vim plugins requiring git clone over SSH won't work.
+
+**Solution:** The project automatically uses `.vimrc_noplug` (minimal Vim config without plugins) in this case. To enable full Vim with plugins, set up GitHub secrets as described in the [GitHub Integration section](#github-integration--secrets-setup).
+
+#### 3. Ansible playbook fails with "Permission denied"
+**Cause:** Insufficient permissions or user not created properly.
+
+**Solution:**
+- Check that `default_user` is set in your profile
+- Verify the user was created: `wsl -d <distro-name> -u root id <username>`
+- Check log file for user creation errors
+
+#### 4. Cloud CLI (AWS/GCP) not found after installation
+**Cause:** PATH not updated in current shell session.
+
+**Solution:**
+```bash
+# Restart the WSL instance
+exit
+wsl -d <distro-name>
+
+# Or manually source bashrc
+source ~/.bashrc_custom
+```
+
+#### 5. Kubernetes authentication errors
+```
+Unable to connect to the server: getting credentials: exec: executable aws not found
+```
+**Cause:** kubectl is using the wrong cloud provider credentials.
+
+**Solution:**
+```bash
+# Switch to AWS
+~/bin/kube_aws.sh
+
+# Or switch to GCP
+~/bin/kube_gcp.sh
+
+# Verify
+kubectl config current-context
+```
+
+#### 6. Alpine-specific issues
+**Issue:** Commands not found, or shell behaves unexpectedly.
+
+**Cause:** Alpine uses `ash` shell by default instead of `bash`.
+
+**Solution:** The project installs `bash` automatically during prep-install. If issues persist:
+```bash
+# Verify bash is installed
+wsl -d <distro-name> -u root which bash
+
+# Manually switch to bash
+wsl -d <distro-name> -u root bash
+```
+
+#### 7. Package installation fails on Alpine
+**Cause:** Alpine uses `apk` package manager, package names may differ from Ubuntu/Fedora.
+
+**Solution:** Check `vars/packages_alpine.yml` for correct package names. Alpine packages often have different names (e.g., `python3-dev` vs `python3-devel`).
+
+#### 8. Ansible vault errors when setting up secrets
+```
+ERROR! Attempting to decrypt but no vault secrets found
+```
+**Cause:** `secrets.pass` file not found or not in the correct location.
+
+**Solution:**
+- Ensure `secrets.pass` is in the project root directory
+- Verify the file contains only the vault password (no extra whitespace or newlines)
+- Check file is not empty: `Get-Content .\secrets.pass`
+
+#### 9. WSL instance hangs or becomes unresponsive
+**Solution:**
+```powershell
+# Terminate the instance
+wsl --terminate <distro-name>
+
+# Restart WSL service
+wsl --shutdown
+wsl -d <distro-name>
+
+# If still unresponsive, teardown and recreate
+.\teardown.ps1 .\profiles\<profile-name>
+.\kickoff.ps1 .\profiles\<profile-name>
+```
+
+#### 10. Python version issues with GCP CLI
+```
+Google Cloud CLI requires Python 3.9 to 3.14
+```
+**Cause:** System Python version incompatible with GCP CLI.
+
+**Solution:** The GCP CLI tarball includes a bundled Python interpreter. Ensure you're using the tarball installation method (which is default for Ubuntu/Debian and Alpine). For Fedora, the DNF package handles dependencies automatically.
+
+### Debugging Tips
+
+1. **Enable verbose Ansible output:**
+   Edit `prep-install.sh` and add `-vvv` to the ansible-playbook command:
+   ```bash
+   ansible-playbook -vvv playbook.yaml ...
+   ```
+
+2. **Test individual roles:**
+   ```bash
+   # From inside WSL instance
+   cd /mnt/c/Users/<username>/code/setup2/ansible
+   ansible-playbook playbook.yaml --tags "git" -vv
+   ```
+
+3. **Check Ansible facts:**
+   ```bash
+   ansible -m setup localhost
+   ```
+
+4. **Verify WSL version:**
+   ```powershell
+   wsl -l -v
+   # Ensure VERSION shows "2" not "1"
+   ```
+
+5. **Check Windows build for WSLg support:**
+   ```powershell
+   winver
+   # Need 10.0.19044+ for WSLg (GUI apps)
+   ```
+
+### Getting Help
+
+If issues persist:
+1. Check the log files in the ansible directory
+2. Review the profile configuration for typos or missing variables
+3. Verify all prerequisites are met (WSL2 enabled, PowerShell 5.1+)
+4. Check the [GitHub Issues](https://github.com/your-repo/issues) for similar problems
 
 ---
-
-## Log Files
-
-Log files are created in the ansible directory:
-- `<distro-name>.log` - Kickoff log
-- `<distro-name>-teardown.log` - Teardown log

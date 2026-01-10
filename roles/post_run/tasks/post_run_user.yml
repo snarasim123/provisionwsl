@@ -65,3 +65,122 @@
   tags:
     - post_run
     - pyenv
+
+- name: Create AWS + Kubernetes integration script
+  copy:
+    content: |
+      #!/bin/bash
+      # AWS + Kubernetes integration helper
+      # This script is sourced when both AWS CLI and Kubernetes are installed
+      
+      # Add any AWS + K8s specific aliases or functions here
+      alias k8s-aws='kubectl config use-context aws'
+      
+      # Example: Helper to list EKS clusters
+      function eks-list() {
+          aws eks list-clusters --output table
+      }
+    dest: "{{ user_home }}/.aws_k8s_integration.sh"
+    owner: "{{ target_user }}"
+    group: "{{ target_user }}"
+    mode: '0644'
+  when:
+    - aws_cli_installed | default(false)
+    - kubernetes_installed | default(false)
+  tags:
+    - post_run
+    - aws
+    - k8s
+
+- name: Source AWS + Kubernetes integration script in .bashrc_custom
+  ansible.builtin.lineinfile:
+    path: "{{ user_home }}/.bashrc_custom"
+    line: '[ -f "$HOME/.aws_k8s_integration.sh" ] && source "$HOME/.aws_k8s_integration.sh"'
+    insertafter: EOF
+    owner: "{{ target_user }}"
+    group: "{{ target_user }}"
+  when:
+    - aws_cli_installed | default(false)
+    - kubernetes_installed | default(false)
+  tags:
+    - post_run
+    - aws
+    - k8s
+
+- name: Create GCP + Kubernetes integration script
+  copy:
+    content: |
+      #!/bin/bash
+      # GCP + Kubernetes integration helper
+      # This script is sourced when both GCP CLI and Kubernetes are installed
+      
+      # Add any GCP + K8s specific aliases or functions here
+      alias k8s-gcp='kubectl config use-context gcp'
+      
+      # Example: Helper to list GKE clusters
+      function gke-list() {
+          gcloud container clusters list
+      }
+    dest: "{{ user_home }}/.gcp_k8s_integration.sh"
+    owner: "{{ target_user }}"
+    group: "{{ target_user }}"
+    mode: '0644'
+  when:
+    - gcp_cli_installed | default(false)
+    - kubernetes_installed | default(false)
+  tags:
+    - post_run
+    - gcp
+    - k8s
+
+- name: Source GCP + Kubernetes integration script in .bashrc_custom
+  ansible.builtin.lineinfile:
+    path: "{{ user_home }}/.bashrc_custom"
+    line: '[ -f "$HOME/.gcp_k8s_integration.sh" ] && source "$HOME/.gcp_k8s_integration.sh"'
+    insertafter: EOF
+    owner: "{{ target_user }}"
+    group: "{{ target_user }}"
+  when:
+    - gcp_cli_installed | default(false)
+    - kubernetes_installed | default(false)
+  tags:
+    - post_run
+    - gcp
+    - k8s
+
+- name: Set AWS as default k8s config (when both AWS and Kubernetes are installed)
+  ansible.builtin.file:
+    src: "{{ user_home }}/.kube_aws"
+    dest: "{{ user_home }}/.kube"
+    owner: "{{ target_user }}"
+    group: "{{ target_user }}"
+    state: link
+    follow: False
+    force: yes
+  become: true
+  when:
+    - aws_cli_installed | default(false)
+    - kubernetes_installed | default(false)
+  tags:
+    - post_run
+    - aws
+    - k8s
+
+- name: Set GCP as default k8s config (when both GCP and Kubernetes are installed, but AWS is not)
+  ansible.builtin.file:
+    src: "{{ user_home }}/.kube_gcp"
+    dest: "{{ user_home }}/.kube"
+    owner: "{{ target_user }}"
+    group: "{{ target_user }}"
+    state: link
+    follow: False
+    force: yes
+  become: true
+  when:
+    - gcp_cli_installed | default(false)
+    - kubernetes_installed | default(false)
+    - not (aws_cli_installed | default(false))
+  tags:
+    - post_run
+    - gcp
+    - k8s

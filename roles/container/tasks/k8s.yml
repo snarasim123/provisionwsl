@@ -64,7 +64,7 @@
 
 - name: Copy .kube_aws.zip file
   copy:
-    src: .kube_aws.zip    
+    src: "{{ playbook_dir }}/files/common/.kube_aws.zip"
     dest: "{{ user_home }}"
     owner: "{{ target_user }}"
     group: "{{ target_user }}"
@@ -76,7 +76,7 @@
 
 - name: Copy .kube_gcp.zip file
   copy:
-    src: .kube_gcp.zip    
+    src: "{{ playbook_dir }}/files/common/.kube_gcp.zip"
     dest: "{{ user_home }}"
     owner: "{{ target_user }}"
     group: "{{ target_user }}"
@@ -128,19 +128,6 @@
     - container
   become: true
 
-- name: Set aws as default k8s config
-  ansible.builtin.file:
-    src: "{{ user_home }}/.kube_aws"
-    dest: "{{ user_home }}/.kube"
-    owner: "{{ target_user }}" 
-    group: "{{ target_user }}" 
-    state: link
-    follow: False
-  tags: 
-    - k8s
-    - container
-  become: true
-
 - name: remove existing .kube_aws.zip
   ansible.builtin.file:
     state: absent
@@ -161,7 +148,7 @@
   
 - name: Copy gcp config switcher script
   copy:
-    src: kube_gcp.sh    
+    src: "{{ playbook_dir }}/files/common/kube_gcp.sh"
     dest: "{{ user_home }}/bin"
     owner: "{{ target_user }}"
     group: "{{ target_user }}"
@@ -173,7 +160,7 @@
 
 - name: Copy aws config switcher script
   copy:
-    src: kube_aws.sh    
+    src: "{{ playbook_dir }}/files/common/kube_aws.sh"
     dest: "{{ user_home }}/bin"
     owner: "{{ target_user }}"
     group: "{{ target_user }}"
@@ -182,3 +169,10 @@
     - k8s
     - container
   become: true
+
+- name: Set kubernetes_installed flag for post_run
+  set_fact:
+    kubernetes_installed: true
+  tags:
+    - k8s
+    - container
