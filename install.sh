@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 get_script_info() {
+    echo "#### get_script_info."
     # Get the directory where this script is located
     local script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
     
@@ -16,9 +17,11 @@ get_script_info() {
     
     echo "Script folder name: $SCRIPT_FOLDER_NAME"
     echo "Script folder path: $SCRIPT_FOLDER_PATH"
+    echo "#### done get_script_info."
 }
 
 copy_and_skip_type() {
+    echo "#### copy_and_skip_type."
     local src="$1" dst="$2" skip_ext="$3"
     mkdir -p "$dst"
     find "$src" -mindepth 1 -type d | while read -r d; do
@@ -27,20 +30,26 @@ copy_and_skip_type() {
     find "$src" -mindepth 1 -type f ! -name "*.$skip_ext" | while read -r f; do
         cp "$f" "$dst/${f#$src/}"
     done
+    echo "#### done copy_and_skip_type."
 }
 
 clone-repo(){
     echo "#### clone repo."
     mkdir "$HOME/code/$SCRIPT_FOLDER_NAME"  -p
     cd "$HOME/code"
-    rm -rf ./*
-    rm -rf ./.*
+    # rm -rf ./*
+    # rm -rf ./.*
     copy_and_skip_type "$SCRIPT_FOLDER_PATH" "$HOME/code/$SCRIPT_FOLDER_NAME" "vhdx"
+    echo "#### done clone repo."
 }
 
 run-ansible(){
     echo "#### Ansible setup."
     cd "$HOME/code/$SCRIPT_FOLDER_NAME"
+    local cur_dir="$(pwd)"
+    echo "#### current dir $cur_dir"
+    local ls_list="$(ls -al)"
+    echo "#### list of files  $ls_list"    
     chmod -x secrets.*
     if [ -z ${skipsteps+x} ]; 
     then 

@@ -3,19 +3,22 @@
 .pyenv, pipx for ubuntu, fedora, alpine
 .lazygit
 .set gcp or aws as default
+.install .kc_funcs and source it, add other aliases
+.xwin apps,other window mgrs - xfce4
+.java other versions
+.ability to run a single role after setup
+.https://github.com/geerlingguy/ansible-role-redis
+.cleanup coderoot and codebasetest invoking with different path styles and locations
+
 .powershell setup
-
-
 -remove github keys with teardown
 -support fedora cloud images
 . vbox support/linux support
 -qemu support
-.python compile/setup
-    -script to switch python version
-    -install correct python version for the ansible/galaxy version    
+
 .setup newer version of vim
     check and upgrade vim if versions mismatch
-.xwin apps,other window mgrs - xfce4
+
 
 .remove sudo and use become
     review 'become' from all tasks and remove unnecessary entries
@@ -27,11 +30,11 @@
     -check and uninstall prev nvim if versions mismatch
     -change nvim install dir to variable
 .change ssh key name to include distro fullname
-.install .kc_funcs and source it
-.java other versions
+
+
     -script to switch java versions
 .add ~/tmp dir to both root and user
-https://github.com/geerlingguy/ansible-role-redis
+
 https://github.com/geerlingguy/ansible-role-java
 
 

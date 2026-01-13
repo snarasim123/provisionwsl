@@ -1,20 +1,9 @@
-#common params
-export distro_type=alpine
-export distro_name=alp230-a2
 
-#powershell specific vars
-export ps_distro_source=d:\soft\wsl\alpine-minirootfs-3.20.0-x86_64.tar
+#tested
+export ps_distro_id=alpine320
 export ps_install_dir=C:\Users\snara\wsl
-
-# check or nocheck
-# export debug_mode=nocheck
 export default_user=snarasim
-export code_base=/mnt/d/code
-export code_root=setup
-export code_src="$code_base/$code_root"
-
-export run_as_user=root
-export upgrade=true
+export skipsteps=github
 
 
 
