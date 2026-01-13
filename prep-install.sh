@@ -91,16 +91,16 @@ else
 fi
 
 # read -p "*** Prelim installs for $distro_type, Press to continue.. " -n 1 -r
-if [[ "$upgrade" == "true" ]] ; then
-    upgrade
-    if [[ "$distro_type" == "ubuntu" ]] ; then
-        verify_python_ubuntu
-    elif [[ "$distro_type" == "fedora" ]] ; then
-        verify_python_fedora
-    elif [[ "$distro_type" == "alpine" ]] ; then
-        verify_python_alpine
-    fi
+# if [[ "$upgrade" == "true" ]] ; then
+upgrade
+if [[ "$distro_type" == "ubuntu" ]] ; then
+    verify_python_ubuntu
+elif [[ "$distro_type" == "fedora" ]] ; then
+    verify_python_fedora
+elif [[ "$distro_type" == "alpine" ]] ; then
+    verify_python_alpine
 fi
+# fi
 
 exit
 

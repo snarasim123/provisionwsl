@@ -1,0 +1,8 @@
+
+#tested
+export ps_distro_id=alpine320
+export default_user=snarasim
+export skipsteps=aws,github,gui
+
+
+
