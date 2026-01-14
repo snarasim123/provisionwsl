@@ -8,6 +8,45 @@
 # PYTHON_VERSION, PYTHON_CMD, PYTHON_BIN, PYTHON_DEV_PKG, PYTHON_VENV_PKG,
 # PYTHON_DISTUTILS_PKG, PIP_CMD, PIP_LOCAL_BIN
 
+# Flag to track if we're using system Python (set by check_deadsnakes_availability)
+USE_SYSTEM_PYTHON=false
+
+check_deadsnakes_availability() {
+    # Check if the configured Python version is available in deadsnakes PPA
+    # for the current Ubuntu version
+    # Returns 0 if available, 1 if not available
+    
+    local ubuntu_codename
+    ubuntu_codename=$(lsb_release -cs 2>/dev/null || grep VERSION_CODENAME /etc/os-release | cut -d= -f2)
+    
+    if [ -z "$ubuntu_codename" ]; then
+        echo "WARNING: Could not determine Ubuntu codename, falling back to system Python"
+        return 1
+    fi
+    
+    echo "Checking deadsnakes PPA for python${PYTHON_VERSION} on Ubuntu ${ubuntu_codename}..."
+    
+    # Query the deadsnakes PPA package list
+    local ppa_url="https://ppa.launchpadcontent.net/deadsnakes/ppa/ubuntu/dists/${ubuntu_codename}/main/binary-amd64/Packages.gz"
+    
+    # Check if the package exists in the PPA
+    if curl -sf "${ppa_url}" 2>/dev/null | gunzip 2>/dev/null | grep -q "^Package: python${PYTHON_VERSION}$"; then
+        echo "SUCCESS: python${PYTHON_VERSION} is available in deadsnakes PPA for Ubuntu ${ubuntu_codename}"
+        return 0
+    else
+        echo ""
+        echo "=========================================================================="
+        echo "WARNING: python${PYTHON_VERSION} is NOT available in deadsnakes PPA"
+        echo "         for Ubuntu ${ubuntu_codename}"
+        echo ""
+        echo "         Falling back to system Python interpreter."
+        echo "         Ansible will use /usr/bin/python3 (system Python)"
+        echo "=========================================================================="
+        echo ""
+        return 1
+    fi
+}
+
 remove_python_ubuntu() {
     # Remove pre-installed Python versions
     sudo apt remove -y python3 python3-pip python3-venv 2>/dev/null || true
@@ -49,6 +88,43 @@ build_python3_apt() {
 }
 
 install_python_ubuntu() {
+    # First check if the requested Python version is available in deadsnakes
+    if ! check_deadsnakes_availability; then
+        # Python version not available - use system Python
+        USE_SYSTEM_PYTHON=true
+        install_python_ubuntu_system
+        return
+    fi
+    
+    # Python version is available in deadsnakes - proceed with installation
+    install_python_ubuntu_deadsnakes
+}
+
+install_python_ubuntu_system() {
+    # Use system Python - don't install from deadsnakes
+    echo "Using system Python interpreter..."
+    
+    # Ensure system Python has pip
+    sudo apt install -y python3-pip python3-venv python3-dev
+    
+    # Install dependencies for cryptography
+    sudo apt install -y libssl-dev libffi-dev rustc cargo
+    
+    # Upgrade pip and install required packages using system Python
+    sudo python3 -m pip install --upgrade pip
+    sudo python3 -m pip install --upgrade cryptography
+    sudo python3 -m pip install passlib
+    
+    echo ""
+    echo "=========================================================================="
+    echo "INFO: System Python will be used for Ansible"
+    echo "      Python version: $(python3 --version 2>&1)"
+    echo "=========================================================================="
+    echo ""
+}
+
+install_python_ubuntu_deadsnakes() {
+    # Install Python from deadsnakes PPA
     # Install dependencies for Python
     sudo apt install -y software-properties-common
     
@@ -91,35 +167,65 @@ install_python_ubuntu() {
 
 verify_python_ubuntu() {
     echo "=== Python Installation Verification ==="
-    echo "Configured Python Version: ${PYTHON_VERSION}"
-    echo ""
     
-    echo "--- Python Versions ---"
-    echo -n "${PYTHON_CMD}: "; ${PYTHON_CMD} --version 2>&1 || echo "NOT INSTALLED"
-    echo -n "python3:    "; python3 --version 2>&1 || echo "NOT INSTALLED"
-    echo -n "python:     "; python --version 2>&1 || echo "NOT INSTALLED"
-    echo ""
-    
-    echo "--- Pip Versions ---"
-    echo -n "${PIP_CMD}: "; ${PYTHON_CMD} -m pip --version 2>&1 || echo "NOT INSTALLED"
-    echo -n "pip3:    "; pip3 --version 2>&1 || echo "NOT INSTALLED"
-    echo -n "pip:     "; pip --version 2>&1 || echo "NOT INSTALLED"
-    echo ""
-    
-    echo "--- Python Module Tests ---"
-    ${PYTHON_CMD} -c "import apt; print('apt:          OK')" 2>&1 || echo "apt:          FAILED"
-    ${PYTHON_CMD} -c "import apt_pkg; print('apt_pkg:      OK')" 2>&1 || echo "apt_pkg:      FAILED"
-    ${PYTHON_CMD} -c "import cryptography; print('cryptography: OK (' + cryptography.__version__ + ')')" 2>&1 || echo "cryptography: FAILED"
-    echo ""
-    
-    echo "--- Ansible ---"
-    ansible --version 2>&1 | head -4 || echo "Ansible: NOT INSTALLED"
-    echo ""
-    
-    echo "--- Python Paths ---"
-    echo -n "${PYTHON_CMD} path: "; which ${PYTHON_CMD} 2>&1 || echo "NOT FOUND"
-    echo -n "python3 path:    "; which python3 2>&1 || echo "NOT FOUND"
-    echo -n "python path:     "; which python 2>&1 || echo "NOT FOUND"
+    if [ "$USE_SYSTEM_PYTHON" = true ]; then
+        echo "Mode: SYSTEM PYTHON (deadsnakes not available for Python ${PYTHON_VERSION})"
+        echo ""
+        
+        echo "--- Python Versions ---"
+        echo -n "python3:    "; python3 --version 2>&1 || echo "NOT INSTALLED"
+        echo -n "python:     "; python --version 2>&1 || echo "NOT INSTALLED"
+        echo ""
+        
+        echo "--- Pip Versions ---"
+        echo -n "pip3:    "; pip3 --version 2>&1 || echo "NOT INSTALLED"
+        echo -n "pip:     "; pip --version 2>&1 || echo "NOT INSTALLED"
+        echo ""
+        
+        echo "--- Python Module Tests ---"
+        python3 -c "import apt; print('apt:          OK')" 2>&1 || echo "apt:          FAILED"
+        python3 -c "import apt_pkg; print('apt_pkg:      OK')" 2>&1 || echo "apt_pkg:      FAILED"
+        python3 -c "import cryptography; print('cryptography: OK (' + cryptography.__version__ + ')')" 2>&1 || echo "cryptography: FAILED"
+        echo ""
+        
+        echo "--- Ansible ---"
+        ansible --version 2>&1 | head -4 || echo "Ansible: NOT INSTALLED"
+        echo ""
+        
+        echo "--- Python Paths ---"
+        echo -n "python3 path:    "; which python3 2>&1 || echo "NOT FOUND"
+        echo -n "python path:     "; which python 2>&1 || echo "NOT FOUND"
+    else
+        echo "Mode: DEADSNAKES (Python ${PYTHON_VERSION})"
+        echo ""
+        
+        echo "--- Python Versions ---"
+        echo -n "${PYTHON_CMD}: "; ${PYTHON_CMD} --version 2>&1 || echo "NOT INSTALLED"
+        echo -n "python3:    "; python3 --version 2>&1 || echo "NOT INSTALLED"
+        echo -n "python:     "; python --version 2>&1 || echo "NOT INSTALLED"
+        echo ""
+        
+        echo "--- Pip Versions ---"
+        echo -n "${PIP_CMD}: "; ${PYTHON_CMD} -m pip --version 2>&1 || echo "NOT INSTALLED"
+        echo -n "pip3:    "; pip3 --version 2>&1 || echo "NOT INSTALLED"
+        echo -n "pip:     "; pip --version 2>&1 || echo "NOT INSTALLED"
+        echo ""
+        
+        echo "--- Python Module Tests ---"
+        ${PYTHON_CMD} -c "import apt; print('apt:          OK')" 2>&1 || echo "apt:          FAILED"
+        ${PYTHON_CMD} -c "import apt_pkg; print('apt_pkg:      OK')" 2>&1 || echo "apt_pkg:      FAILED"
+        ${PYTHON_CMD} -c "import cryptography; print('cryptography: OK (' + cryptography.__version__ + ')')" 2>&1 || echo "cryptography: FAILED"
+        echo ""
+        
+        echo "--- Ansible ---"
+        ansible --version 2>&1 | head -4 || echo "Ansible: NOT INSTALLED"
+        echo ""
+        
+        echo "--- Python Paths ---"
+        echo -n "${PYTHON_CMD} path: "; which ${PYTHON_CMD} 2>&1 || echo "NOT FOUND"
+        echo -n "python3 path:    "; which python3 2>&1 || echo "NOT FOUND"
+        echo -n "python path:     "; which python 2>&1 || echo "NOT FOUND"
+    fi
     echo ""
     
     echo "=== Verification Complete ==="

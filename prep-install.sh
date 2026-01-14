@@ -33,8 +33,12 @@ upgrade() {
         remove_python_ubuntu
         install_python_ubuntu
         
-        # Install Ansible via pip (ensures it uses configured Python version)
-        sudo ${PYTHON_CMD} -m pip install ansible
+        # Install Ansible via pip (use system Python if deadsnakes not available)
+        if [ "$USE_SYSTEM_PYTHON" = true ]; then
+            sudo python3 -m pip install ansible
+        else
+            sudo ${PYTHON_CMD} -m pip install ansible
+        fi
         sudo apt install aptitude -y
         ansible-galaxy collection install community.general
         ansible-galaxy collection install kubernetes.core
