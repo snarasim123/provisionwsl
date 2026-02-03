@@ -141,3 +141,82 @@ kccmd(){
     # bash command without any param
     echo " "
 }
+
+kctimedlogs(){    
+    if [ -z "$1" ] || [ -z "$2" ]; then
+        printf "Usage: kctimedlogs <pod_pattern> <iterations> [sleep_seconds]\n"
+        printf "Example: kctimedlogs kernel 5        (write logs from pods matching pattern kernel, 5 times, wait 60 seconds between each)\n"
+        printf "Example: kctimedlogs kernel 5 30     (write logs from pods matching pattern kernel, 5 times, wait 30 seconds between each)\n"
+        return 1
+    fi
+    
+    pod_pattern="$1"
+    total_iterations="$2"
+    sleep_time="${3:-60}"
+    
+    for ((i=1; i<=total_iterations; i++)); do
+        printf "========================================\n"
+        printf "Collecting logs - iteration $i of $total_iterations\n"
+        printf "Time: $(date)\n"
+        printf "========================================\n"
+        
+        kclogs "$pod_pattern"
+        
+        if [ $i -lt $total_iterations ]; then
+            printf "Waiting $sleep_time seconds before next collection...\n"
+            sleep $sleep_time
+        fi
+    done
+    
+    printf "========================================\n"
+    printf "Completed $total_iterations log collections\n"
+    printf "========================================\n"
+}
+
+kcrestart(){
+    # Restarts a deployment matching the given pattern
+    # Usage: kcrestart <deployment_pattern>
+    # Example: kcrestart kernel
+    
+    if [ -z "$1" ]; then
+        printf "Usage: kcrestart <deployment_pattern>\n"
+        printf "Example: kcrestart kernel\n"
+        return 1
+    fi
+    
+    pattern="$1"
+    matched_deployments=()
+    
+    DEPLOYMENTS=$(kubectl get deployments -o jsonpath="{.items[*].metadata.name}")
+    for DEPLOYMENT in $DEPLOYMENTS; do
+        if ! echo "$DEPLOYMENT" | grep -q "$pattern"; then
+            continue
+        fi
+        matched_deployments+=("$DEPLOYMENT")
+    done
+    
+    if [ ${#matched_deployments[@]} -eq 0 ]; then
+        printf "No deployment found matching pattern: $pattern\n"
+        return 1
+    fi
+    
+    printf "Found the following deployments matching '$pattern':\n"
+    printf "========================================\n"
+    for dep in "${matched_deployments[@]}"; do
+        printf "  - $dep\n"
+    done
+    printf "========================================\n"
+    
+    read -p "Do you want to restart these deployments? (y/n): " confirm
+    if [ "$confirm" != "y" ] && [ "$confirm" != "Y" ]; then
+        printf "Restart cancelled.\n"
+        return 0
+    fi
+    
+    for dep in "${matched_deployments[@]}"; do
+        printf "Restarting deployment: $dep\n"
+        kubectl rollout restart deployment/"$dep"
+    done
+    
+    printf "Restart initiated for ${#matched_deployments[@]} deployment(s).\n"
+}

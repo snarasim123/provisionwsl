@@ -73,6 +73,8 @@ alias mvnrun='mvn spring-boot:run -e -X'
 #aws
 
 #k8s
+alias kc='kubectl'
+
 
 #vagrant aliases
 # alias vssh1='ssh vagrant@127.0.0.1 -p 2222 -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no'
