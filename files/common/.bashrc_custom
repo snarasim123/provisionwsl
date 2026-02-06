@@ -4,6 +4,9 @@ source ~/variables.sh
 # Flag to control display detection method: true = new method, false = legacy method
 USE_NEW_DISPLAY_DETECTION=true
 
+# Flag to use Wayland instead of X11: true = Wayland, false = X11
+USE_WAYLAND=false
+
 # Detect the Linux environment type
 # Returns: "wsl", "local_x", "ssh_x", or "headless"
 detect_display_env() {
@@ -58,6 +61,28 @@ set_display_old() {
     export LIBGL_ALWAYS_INDIRECT=0
 }
 
+# Set Wayland variables and unset X11 DISPLAY
+set_wayland() {
+    # Unset X11 display variables
+    unset DISPLAY
+    unset LIBGL_ALWAYS_INDIRECT
+    
+    # Set Wayland variables
+    export WAYLAND_DISPLAY=wayland-0
+    export XDG_SESSION_TYPE=wayland
+    export GDK_BACKEND=wayland
+    export QT_QPA_PLATFORM=wayland
+    export MOZ_ENABLE_WAYLAND=1
+    
+    # Set XDG_RUNTIME_DIR if not set
+    if [ -z "$XDG_RUNTIME_DIR" ]; then
+        export XDG_RUNTIME_DIR=/run/user/$(id -u)
+        if [ ! -d "$XDG_RUNTIME_DIR" ]; then
+            export XDG_RUNTIME_DIR=/tmp
+        fi
+    fi
+}
+
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then
         current_env=Linux;
 elif [[ "$OSTYPE" == "darwin"* ]]; then
@@ -90,8 +115,10 @@ then
     export USER=$user_name
     export CODE_FOLDER=$code_folder
     
-    # Set display based on flag
-    if [ "$USE_NEW_DISPLAY_DETECTION" = true ]; then
+    # Set display based on flags
+    if [ "$USE_WAYLAND" = true ]; then
+        set_wayland
+    elif [ "$USE_NEW_DISPLAY_DETECTION" = true ]; then
         set_display
     else
         set_display_old
