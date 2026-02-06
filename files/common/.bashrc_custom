@@ -1,6 +1,9 @@
 #!/bin/sh
 source ~/variables.sh
 
+# Flag to control display detection method: true = new method, false = legacy method
+USE_NEW_DISPLAY_DETECTION=true
+
 # Detect the Linux environment type
 # Returns: "wsl", "local_x", "ssh_x", or "headless"
 detect_display_env() {
@@ -49,6 +52,12 @@ set_display() {
     esac
 }
 
+# Legacy method using resolv.conf nameserver
+set_display_old() {
+    export DISPLAY="`grep nameserver /etc/resolv.conf | sed 's/nameserver //'`:0.0"
+    export LIBGL_ALWAYS_INDIRECT=0
+}
+
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then
         current_env=Linux;
 elif [[ "$OSTYPE" == "darwin"* ]]; then
@@ -81,10 +90,12 @@ then
     export USER=$user_name
     export CODE_FOLDER=$code_folder
     
-#     export DISPLAY="`grep nameserver /etc/resolv.conf | sed 's/nameserver //'`:0.0"
-#     #Wsl specific variable
-#     export LIBGL_ALWAYS_INDIRECT=0
-    set_display
+    # Set display based on flag
+    if [ "$USE_NEW_DISPLAY_DETECTION" = true ]; then
+        set_display
+    else
+        set_display_old
+    fi
     
     #export LS_COLORS="di=34;40:ln=35;40:so=32;40:pi=33;40:ex=31;40:bd=34;46:cd=34;43:su=0;41:sg=0;46:tw=0;42:ow=0;43:"
     #export KUBECONFIG=${HOME}/.kube_aws/config
