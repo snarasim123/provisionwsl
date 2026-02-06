@@ -1,6 +1,54 @@
 #!/bin/sh
 source ~/variables.sh
 
+# Detect the Linux environment type
+# Returns: "wsl", "local_x", "ssh_x", or "headless"
+detect_display_env() {
+    # Already set (e.g., by SSH X11 forwarding)
+    if [ -n "$DISPLAY" ]; then
+        echo "ssh_x"
+        return
+    fi
+    
+    # WSL detection
+    if grep -qi microsoft /proc/version 2>/dev/null; then
+        echo "wsl"
+        return
+    fi
+    
+    # Local VM with GUI - check if X server is running locally
+    if [ -S /tmp/.X11-unix/X0 ]; then
+        echo "local_x"
+        return
+    fi
+    
+    # Fallback for headless/no display
+    echo "headless"
+}
+
+# Set DISPLAY and related variables based on detected environment
+set_display() {
+    local env_type=$(detect_display_env)
+    
+    case "$env_type" in
+        "ssh_x")
+            # DISPLAY already set by SSH - do nothing
+            ;;
+        "wsl")
+            export HOST_IP="$(ip route | awk '/^default/{print $3}')"
+            export DISPLAY="${HOST_IP}:0.0"
+            export LIBGL_ALWAYS_INDIRECT=0
+            export PULSE_SERVER="tcp:$HOST_IP"
+            ;;
+        "local_x")
+            export DISPLAY=:0
+            ;;
+        "headless")
+            # No X server - leave DISPLAY unset
+            ;;
+    esac
+}
+
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then
         current_env=Linux;
 elif [[ "$OSTYPE" == "darwin"* ]]; then
@@ -32,12 +80,13 @@ then
     export TERM=screen-256color
     export USER=$user_name
     export CODE_FOLDER=$code_folder
-    export DISPLAY="`grep nameserver /etc/resolv.conf | sed 's/nameserver //'`:0.0"
-#   #Wsl specific variable
-    export LIBGL_ALWAYS_INDIRECT=0
+    
+#     export DISPLAY="`grep nameserver /etc/resolv.conf | sed 's/nameserver //'`:0.0"
+#     #Wsl specific variable
+#     export LIBGL_ALWAYS_INDIRECT=0
+    set_display
+    
     #export LS_COLORS="di=34;40:ln=35;40:so=32;40:pi=33;40:ex=31;40:bd=34;46:cd=34;43:su=0;41:sg=0;46:tw=0;42:ow=0;43:"
-    export HOST_IP="$(ip route |awk '/^default/{print $3}')"
-    export PULSE_SERVER="tcp:$HOST_IP"
     #export KUBECONFIG=${HOME}/.kube_aws/config
     ##export KUBECONFIG=${HOME}/.kube_gcp/config
     export KUBECONFIG=${HOME}/.kube/config

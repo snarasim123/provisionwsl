@@ -34,3 +34,4 @@ packages_ubuntu:
   - xclip
   # - openjdk-8-jdk
   - openjdk-11-jdk
+  - xfce4
