@@ -42,3 +42,14 @@ packages_alpine:
   - aws-cli
   - xfce4
   - windowmaker
+  # Pyenv build dependencies
+  - bash
+  - bzip2-dev
+  - readline-dev
+  - sqlite-dev
+  - libffi-dev
+  - xz-dev
+  - ncurses-dev
+  - tk-dev
+  - openssl-dev
+  - linux-headers

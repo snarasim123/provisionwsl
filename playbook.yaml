@@ -33,7 +33,7 @@
     - gui
     - container
     - bash_extra
-    # - dev
+    - dev
     - post_run
   ### Change to your user! ###
   # user: root

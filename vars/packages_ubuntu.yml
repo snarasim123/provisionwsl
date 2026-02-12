@@ -16,9 +16,7 @@ packages_ubuntu:
   - mc
   - dos2unix
   - zip
-  - rxvt-unicode
   - fzf
-  - wmaker
   - tree
   - libncurses5-dev
   - libcurl4-gnutls-dev
@@ -28,10 +26,22 @@ packages_ubuntu:
   - build-essential
   - gettext
   - zlib1g-dev
-  - build-essential
   - gcc
   - ripgrep
   - xclip
   # - openjdk-8-jdk
   - openjdk-11-jdk
+  # Pyenv build dependencies
+  - libbz2-dev
+  - libreadline-dev
+  - libsqlite3-dev
+  - libffi-dev
+  - liblzma-dev
+  - libncursesw5-dev
+  - xz-utils
+  - tk-dev
+
+packages_ubuntu_gui:
+  - rxvt-unicode
+  - wmaker
   - xfce4

@@ -17,11 +17,20 @@
     is_wsl: false
 - set_fact:
     github_skipped: false
+- set_fact:
+    gui_skipped: false
 
 - name: Set github_skipped when github or git tag is skipped
   set_fact:
     github_skipped: true
   when: "'github' in (ansible_skip_tags | default([])) or 'git' in (ansible_skip_tags | default([]))"
+  tags:
+    - always
+
+- name: Set gui_skipped when gui tag is skipped
+  set_fact:
+    gui_skipped: true
+  when: "'gui' in (ansible_skip_tags | default([]))"
   tags:
     - always
 

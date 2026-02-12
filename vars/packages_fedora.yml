@@ -40,4 +40,13 @@ packages_fedora:
   - subversion-perl
   - make
   - gcc
+  # Pyenv build dependencies
+  - bzip2-devel
+  - readline-devel
+  - sqlite-devel
+  - libffi-devel
+  - xz-devel
+  - ncurses-devel
+  - tk-devel
+  - zlib-devel
 # - '@development-libraries'

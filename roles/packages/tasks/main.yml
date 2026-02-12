@@ -2,6 +2,7 @@
 - name: update apt cache
   apt:
     update_cache: yes
+    cache_valid_time: 3600
   become: true
   tags: packages
   when: is_ubuntu
@@ -34,7 +35,16 @@
   become: true
   tags: packages
   when: is_ubuntu
-  
+
+- name: Install ubuntu GUI packages
+  apt:
+    name: "{{ packages_ubuntu_gui }}"
+  become: true
+  tags:
+    - packages
+    - gui
+  when: is_ubuntu and not (gui_skipped | default(false))
+
 # - name: Upgrade all fedora packages
 #   ansible.builtin.dnf:
 #     name: "*"

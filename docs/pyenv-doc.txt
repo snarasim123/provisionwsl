@@ -1,0 +1,37 @@
+# List all available versions you can install
+pyenv install --list
+
+# Filter to just CPython 3.x releases
+pyenv install --list | grep -E '^\s+3\.'
+
+# Filter to a specific minor version (e.g. 3.12.x)
+pyenv install --list | grep -E '^\s+3\.12\.'
+
+# List all virtualenvs
+pyenv virtualenvs
+
+# List versions already installed on your system
+pyenv versions
+
+# Create with specific Python version
+pyenv virtualenv 3.12.4 test-env
+
+# Create with current global Python version
+pyenv virtualenv myproject-env
+
+# Manual activate
+pyenv activate test-env
+
+#to exit from virtualenv
+pyenv deactivate
+
+# Set a virtualenv for a project directory (creates .python-version file)
+cd ~/code/myproject
+pyenv local myproject-env
+
+
+# List all virtualenvs
+pyenv virtualenvs
+
+# Delete a virtualenv
+pyenv virtualenv-delete myproject-env

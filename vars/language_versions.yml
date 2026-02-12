@@ -6,3 +6,12 @@ gcp_cli_archive_name_x86_64: "google-cloud-cli-linux-x86_64.tar.gz"
 lazygit_version: "0.44.1"
 python311_version: "3.11.9"
 python312_version: "3.12.4"
+
+# Pyenv configuration
+pyenv_version: "v2.6.22"
+pyenv_virtualenv_version: "v1.2.4"
+pyenv_root: "{{ user_home }}/.pyenv"
+pyenv_python_versions:
+  - "3.11.9"
+  - "3.12.4"
+pyenv_global_version: "3.12.4"

@@ -1,0 +1,163 @@
+---
+# Pyenv installation and Python version management
+# Installs pyenv from git and configures Python versions
+# Idempotent: skips clone if already installed, updates if present
+
+- name: Check if pyenv is already installed
+  stat:
+    path: "{{ pyenv_root }}/bin/pyenv"
+  register: pyenv_binary
+  tags:
+    - python
+    - pyenv
+    - dev
+
+- name: Clone pyenv repository (fresh install only)
+  ansible.builtin.shell: |
+    git clone --depth 1 --branch {{ pyenv_version }} https://github.com/pyenv/pyenv.git {{ pyenv_root }}
+  args:
+    creates: "{{ pyenv_root }}/bin/pyenv"
+  become: true
+  become_user: "{{ target_user }}"
+  when: not pyenv_binary.stat.exists
+  tags:
+    - python
+    - pyenv
+    - dev
+
+- name: Set ownership of pyenv directory
+  ansible.builtin.file:
+    path: "{{ pyenv_root }}"
+    owner: "{{ target_user }}"
+    group: "{{ target_user }}"
+    recurse: yes
+  become: true
+  tags:
+    - python
+    - pyenv
+    - dev
+
+- name: Ensure pyenv shims directory exists
+  ansible.builtin.file:
+    path: "{{ pyenv_root }}/shims"
+    state: directory
+    owner: "{{ target_user }}"
+    group: "{{ target_user }}"
+    mode: '0755'
+  become: true
+  tags:
+    - python
+    - pyenv
+    - dev
+
+- name: Ensure pyenv versions directory exists
+  ansible.builtin.file:
+    path: "{{ pyenv_root }}/versions"
+    state: directory
+    owner: "{{ target_user }}"
+    group: "{{ target_user }}"
+    mode: '0755'
+  become: true
+  tags:
+    - python
+    - pyenv
+    - dev
+
+- name: Ensure pyenv plugins directory exists
+  ansible.builtin.file:
+    path: "{{ pyenv_root }}/plugins"
+    state: directory
+    owner: "{{ target_user }}"
+    group: "{{ target_user }}"
+    mode: '0755'
+  become: true
+  tags:
+    - python
+    - pyenv
+    - pyenv-virtualenv
+    - dev
+
+- name: Check if pyenv-virtualenv plugin is installed
+  stat:
+    path: "{{ pyenv_root }}/plugins/pyenv-virtualenv/bin/pyenv-virtualenv"
+  register: pyenv_virtualenv_binary
+  tags:
+    - python
+    - pyenv
+    - pyenv-virtualenv
+    - dev
+
+- name: Clone pyenv-virtualenv plugin (fresh install only)
+  ansible.builtin.shell: |
+    git clone --depth 1 --branch {{ pyenv_virtualenv_version | default('v1.2.1') }} https://github.com/pyenv/pyenv-virtualenv.git {{ pyenv_root }}/plugins/pyenv-virtualenv
+  args:
+    creates: "{{ pyenv_root }}/plugins/pyenv-virtualenv/bin/pyenv-virtualenv"
+  become: true
+  become_user: "{{ target_user }}"
+  when: not pyenv_virtualenv_binary.stat.exists
+  tags:
+    - python
+    - pyenv
+    - pyenv-virtualenv
+    - dev
+
+- name: Set ownership of pyenv-virtualenv plugin
+  ansible.builtin.file:
+    path: "{{ pyenv_root }}/plugins/pyenv-virtualenv"
+    owner: "{{ target_user }}"
+    group: "{{ target_user }}"
+    recurse: yes
+  become: true
+  tags:
+    - python
+    - pyenv
+    - pyenv-virtualenv
+    - dev
+
+# Install Python versions using pyenv
+- name: Install Python versions via pyenv
+  ansible.builtin.shell: |
+    {{ pyenv_root }}/bin/pyenv install -s {{ item }}
+  args:
+    creates: "{{ pyenv_root }}/versions/{{ item }}"
+  become: true
+  become_user: "{{ target_user }}"
+  loop: "{{ pyenv_python_versions }}"
+  tags:
+    - python
+    - pyenv
+    - dev
+  environment:
+    PYENV_ROOT: "{{ pyenv_root }}"
+
+- name: Set global Python version
+  ansible.builtin.shell: |
+    {{ pyenv_root }}/bin/pyenv global {{ pyenv_global_version }}
+  become: true
+  become_user: "{{ target_user }}"
+  tags:
+    - python
+    - pyenv
+    - dev
+  environment:
+    PYENV_ROOT: "{{ pyenv_root }}"
+
+- name: Verify pyenv installation
+  ansible.builtin.shell: |
+    {{ pyenv_root }}/bin/pyenv --version
+  register: pyenv_version_check
+  become: true
+  become_user: "{{ target_user }}"
+  tags:
+    - python
+    - pyenv
+    - dev
+  changed_when: false
+
+- name: Display pyenv version
+  debug:
+    msg: "Installed {{ pyenv_version_check.stdout }}"
+  tags:
+    - python
+    - pyenv
+    - dev
