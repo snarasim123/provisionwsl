@@ -49,69 +49,75 @@
     - gcp
     - cloud
 
-- name: Check if Google Cloud CLI tar file exists
+- name: Check if gcloud is already installed
   ansible.builtin.stat:
-    path: "/home/{{ target_user }}/tmp/{{ gcp_cli_archive_name_x86_64 }}"
-  register: gcp_cli_tar_file
+    path: /usr/local/google-cloud-sdk/bin/gcloud
+  register: gcloud_binary
   tags:
     - gcp
     - cloud
 
-- name: Remove existing Google Cloud CLI tar file if present
-  ansible.builtin.file:
-    path: "/home/{{ target_user }}/tmp/{{ gcp_cli_archive_name_x86_64 }}"
-    state: absent
-  when: gcp_cli_tar_file.stat.exists
-  tags:
-    - gcp
-    - cloud
-
-- name: Download Google Cloud CLI tar file
-  ansible.builtin.get_url:
-    url: https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/{{ gcp_cli_archive_name_x86_64 }}
-    dest: "/home/{{ target_user }}/tmp/{{ gcp_cli_archive_name_x86_64 }}"
-    mode: '0644'
-  tags:
-    - gcp
-    - cloud
-
-- name: Extract Google Cloud CLI tar file to /usr/local
-  ansible.builtin.unarchive:
-    src: "/home/{{ target_user }}/tmp/{{ gcp_cli_archive_name_x86_64 }}"
-    dest: "/usr/local"
-    remote_src: true
-  become: true
-  tags:
-    - gcp
-    - cloud
-
-- name: Ensure install.sh has executable permissions
-  ansible.builtin.file:
-    path: "/usr/local/google-cloud-sdk/install.sh"
-    mode: '0755'
-  become: true
-  tags:
-    - gcp
-    - cloud
-
-- name: Run Google Cloud CLI install script
-  ansible.builtin.shell:
-    cmd: /usr/local/google-cloud-sdk/install.sh --quiet --path-update true --command-completion true 2>&1
-  register: gcp_install_output
-  failed_when: false
-  become: true
-  tags:
-    - gcp
-    - cloud
-
-- name: Print Google Cloud CLI install script output
+- name: Display gcloud install status
   ansible.builtin.debug:
-    msg: 
-      - "Return code: {{ gcp_install_output.rc }}"
-      - "Output: {{ gcp_install_output.stdout_lines | default([]) }}"
+    msg: "gcloud already installed, skipping download/extract/install"
+  when: gcloud_binary.stat.exists
   tags:
     - gcp
     - cloud
+
+- name: Install Google Cloud CLI
+  when: not gcloud_binary.stat.exists
+  tags:
+    - gcp
+    - cloud
+  block:
+    - name: Check if Google Cloud CLI tar file exists
+      ansible.builtin.stat:
+        path: "/home/{{ target_user }}/tmp/{{ gcp_cli_archive_name_x86_64 }}"
+      register: gcp_cli_tar_file
+
+    - name: Remove existing Google Cloud CLI tar file if present
+      ansible.builtin.file:
+        path: "/home/{{ target_user }}/tmp/{{ gcp_cli_archive_name_x86_64 }}"
+        state: absent
+      when: gcp_cli_tar_file.stat.exists
+
+    - name: Download Google Cloud CLI tar file
+      ansible.builtin.get_url:
+        url: https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/{{ gcp_cli_archive_name_x86_64 }}
+        dest: "/home/{{ target_user }}/tmp/{{ gcp_cli_archive_name_x86_64 }}"
+        mode: '0644'
+
+    - name: Extract Google Cloud CLI tar file to /usr/local
+      ansible.builtin.unarchive:
+        src: "/home/{{ target_user }}/tmp/{{ gcp_cli_archive_name_x86_64 }}"
+        dest: "/usr/local"
+        remote_src: true
+      become: true
+
+    - name: Ensure install.sh has executable permissions
+      ansible.builtin.file:
+        path: "/usr/local/google-cloud-sdk/install.sh"
+        mode: '0755'
+      become: true
+
+    - name: Run Google Cloud CLI install script
+      ansible.builtin.shell:
+        cmd: /usr/local/google-cloud-sdk/install.sh --quiet --path-update true --command-completion true 2>&1
+      register: gcp_install_output
+      failed_when: false
+      become: true
+
+    - name: Print Google Cloud CLI install script output
+      ansible.builtin.debug:
+        msg: 
+          - "Return code: {{ gcp_install_output.rc }}"
+          - "Output: {{ gcp_install_output.stdout_lines | default([]) }}"
+
+    - name: Remove Google Cloud CLI tar file from tmp folder
+      ansible.builtin.file:
+        path: "/home/{{ target_user }}/tmp/{{ gcp_cli_archive_name_x86_64 }}"
+        state: absent
 
 - name: Add gcloud to PATH in /etc/environment
   ansible.builtin.lineinfile:
@@ -179,21 +185,30 @@
     - gcp
     - cloud
 
+- name: Check if gke-gcloud-auth-plugin is already installed
+  ansible.builtin.stat:
+    path: /usr/local/google-cloud-sdk/bin/gke-gcloud-auth-plugin
+  register: gke_plugin_binary
+  tags:
+    - gcp
+    - cloud
+    - gke
+
 - name: Install gke-gcloud-auth-plugin for GKE authentication
   ansible.builtin.command:
     cmd: /usr/local/google-cloud-sdk/bin/gcloud components install gke-gcloud-auth-plugin --quiet
   environment:
     PATH: "/usr/local/google-cloud-sdk/bin:{{ ansible_env.PATH }}"
   become: true
-  when: gcloud_version.rc == 0
+  when: gcloud_version.rc == 0 and not gke_plugin_binary.stat.exists
   register: gke_plugin_install
-  changed_when: "'All components are up to date' not in gke_plugin_install.stderr"
+  changed_when: "'All components are up to date' not in (gke_plugin_install.stderr | default(''))"
   tags:
     - gcp
     - cloud
     - gke
 
-- name: Remove Google Cloud CLI tar file from tmp folder
+- name: Remove Google Cloud CLI tar file from tmp folder (cleanup)
   ansible.builtin.file:
     path: "/home/{{ target_user }}/tmp/{{ gcp_cli_archive_name_x86_64 }}"
     state: absent

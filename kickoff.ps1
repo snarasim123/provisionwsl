@@ -80,7 +80,7 @@ function Kickoff {
   
 
   Write-Log( "`r`n##### Configuring  {0} instance... " -f "$Distro_Name")
-  wsl -d $Distro_Name $basedir_unixpath/install.sh $Profile_Path_unix $basedir_unixpath -u root 2>&1 | Out-File -Append "$basedir\$Distro_Name.log"
+  wsl -d $Distro_Name $basedir_unixpath/install.sh $Profile_Path_unix $basedir_unixpath -u root 2>&1 | Tee-Object -Append -FilePath "$basedir\$Distro_Name.log"
 
   Write-Log( "`r`n##### Restarting {0} instance... " -f "$Distro_Name")
   wsl --terminate $Distro_Name

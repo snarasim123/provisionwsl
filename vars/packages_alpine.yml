@@ -15,9 +15,7 @@ packages_alpine:
   - dos2unix
   - zip
   - tar
-  - rxvt-unicode
   - fzf
-  - konsole  
   - coreutils
   - tree
   - autoconf
@@ -40,8 +38,6 @@ packages_alpine:
   - openjdk11
   - neovim
   - aws-cli
-  - xfce4
-  - windowmaker
   # Pyenv build dependencies
   - bash
   - bzip2-dev
@@ -53,3 +49,9 @@ packages_alpine:
   - tk-dev
   - openssl-dev
   - linux-headers
+
+packages_alpine_gui:
+  - rxvt-unicode
+  - konsole
+  - xfce4
+  - windowmaker

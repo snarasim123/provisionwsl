@@ -47,6 +47,7 @@
     marker: "## {mark} ANSIBLE MANAGED BLOCK"
     create: true
   become: true
+  when: is_wsl
   tags: 
     - user    
 

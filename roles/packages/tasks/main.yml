@@ -56,6 +56,7 @@
   dnf:
     name: "{{ packages_fedora }}"
   become: true
+  tags: packages
   when: is_fedora
 
 # - name: Update all installed alpine packages to the latest versions
@@ -68,4 +69,14 @@
   community.general.apk:
     name: "{{ packages_alpine }}"
   become: true
+  tags: packages
   when: is_alpine
+
+- name: Install alpine GUI packages
+  community.general.apk:
+    name: "{{ packages_alpine_gui }}"
+  become: true
+  tags:
+    - packages
+    - gui
+  when: is_alpine and not (gui_skipped | default(false))
