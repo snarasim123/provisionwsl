@@ -95,3 +95,4 @@ alias mc='mc -u -X'
 #alias fgrep='fgrep --color=auto'
 #alias xt='xterm -j -rw -aw -sb -sl 1000 -geometry 93x31+100+350 -fa 'Monospace' -fs 14&'
 #alias python='/Library/Frameworks/Python.framework/Versions/3.4/python'
+ 

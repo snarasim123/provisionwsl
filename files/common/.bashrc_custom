@@ -21,7 +21,7 @@ detect_display_env() {
         echo "wsl"
         return
     fi
-    
+     
     # Local VM with GUI - check if X server is running locally
     if [ -S /tmp/.X11-unix/X0 ]; then
         echo "local_x"
@@ -159,7 +159,7 @@ export HISTFILESIZE=20000
 shopt -s histappend
 
 cd $STARTUP_FOLDER
-export PATH=$HOME/bin:$HOME/.local/bin:/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin:/sbin:/usr/lib/jvm/java-11-openjdk-amd64/bin:$PATH
+export PATH=$HOME/bin:$HOME/.local/bin:/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin:/sbin:/usr/lib/jvm/java-11-openjdk-amd64/bin
 
 # Pyenv initialization
 export PYENV_ROOT="$HOME/.pyenv"
