@@ -220,3 +220,4 @@ kcrestart(){
     
     printf "Restart initiated for ${#matched_deployments[@]} deployment(s).\n"
 }
+ 
