@@ -1,7 +1,8 @@
 #untested
 export ps_distro_id=ubuntu2204
-export default_user=snarasim
-export skipsteps=github
+# default_user now sourced from vars/user_environment.yml via kickoff.ps1
+#export default_user=snarasim
+export skipsteps=github,gui
 
 
 

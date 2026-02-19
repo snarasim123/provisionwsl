@@ -1,14 +1,15 @@
 #tested
 #export ps_install_dir=C:\Users\SrinivasaNarasimhan\wsl
 export ps_distro_id=ubuntu2204
-export default_user=snarasim
+# default_user now sourced from vars/user_environment.yml via kickoff.ps1
+#export default_user=snarasim
 export code_base=/mnt/c/Users/SrinivasaNarasimhan/code
 export code_root=setup2
 export code_src="$code_base/$code_root"
 
 export run_as_user=root
 export upgrade=true
-export skipsteps=gcp
+export skipsteps=gcp,github,gui
 
 
 

@@ -14,3 +14,20 @@ function Get-Profile {
         if ($items[0] -eq "export ps_distro_id"){$LookupId.Value = $items[1]}
     }
 }
+
+function Get-TargetUser {
+    param(
+        [Parameter(Mandatory=$true)]
+        [string]$BaseDir
+    )
+    $varsFile = Join-Path $BaseDir "vars\user_environment.yml"
+    if (-not (Test-Path $varsFile)) {
+        Write-Error "Ansible vars file not found: $varsFile"
+        return $null
+    }
+    $target_user = $null
+    Get-Content $varsFile | ForEach-Object {
+        if ($_ -match '^\s*target_user:\s*(.+)$') { $target_user = $Matches[1].Trim() }
+    }
+    return $target_user
+}

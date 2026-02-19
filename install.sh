@@ -75,10 +75,15 @@ profile_path=$1
 scriptroot_path=$2
 source $profile_path
 
+# Accept default_user from 3rd arg (passed from kickoff.ps1, sourced from Ansible vars)
+if [[ -n "$3" ]]; then
+    export default_user="$3"
+fi
+
 # Get script location information
 get_script_info
 
-echo "#### install.sh: profile_path = $profile_path scriptroot = $scriptroot_path"
+echo "#### install.sh: profile_path = $profile_path scriptroot = $scriptroot_path default_user = $default_user"
 
 clone-repo
 if [[ "$debug_mode" == "check" ]] ; then

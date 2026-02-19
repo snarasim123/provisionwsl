@@ -76,8 +76,13 @@ scriptroot_path=$2
 distro_name=$(basename "$profile_path")
 source $profile_path
 
+# Accept default_user from 3rd arg (passed from kickoff.ps1, sourced from Ansible vars)
+if [[ -n "$3" ]]; then
+    export default_user="$3"
+fi
+
 echo "##### Preparing instance , doing preliminary setup ....."
-echo "##### profile_path = $profile_path distro_name = $distro_name distro_id = $ps_distro_id scriptroot = $scriptroot_path"
+echo "##### profile_path = $profile_path distro_name = $distro_name distro_id = $ps_distro_id scriptroot = $scriptroot_path default_user = $default_user"
 
 # Load CSV record for the distro_id from profile (if ps_distro_id is set)
 if [[ -n "$ps_distro_id" ]]; then

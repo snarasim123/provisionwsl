@@ -1,5 +1,6 @@
 #untested
 export ps_install_dir=C:\Users\snara\wsl
 export ps_distro_id=ubuntu2204
-export default_user=snarasim
-export skipsteps=packages,cloud,editor,git,container
+# default_user now sourced from vars/user_environment.yml via kickoff.ps1
+#export default_user=snarasim
+export skipsteps=packages,cloud,editor,git,github,gui,container

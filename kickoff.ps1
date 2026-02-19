@@ -30,7 +30,13 @@ function Kickoff {
   $PSDefaultParameterValues['Write-Log:LogFile'] = $LogFile
 
   Write-Log ( "`r`n##### Installing wsl instance using Profile {0} ##### " -f $Profile_Path)
-
+  # Read target_user from Ansible vars (single source of truth)
+  $Target_User = Get-TargetUser -BaseDir $basedir
+  if ([string]::IsNullOrWhiteSpace($Target_User)) {
+      Write-Log "\`r\`n##### Could not read target_user from vars/user_environment.yml. exiting."
+      exit
+  }
+  Write-Log ( "\`r\`n##### Target user: {0}" -f $Target_User)
   $Distro_Source = $null; $Install_Dir = $null; $distro_lookupid = $null
   Get-Profile -ProfilePath $Profile_Path -DistroSource ([ref]$Distro_Source) -InstallDir ([ref]$Install_Dir) -LookupId ([ref]$distro_lookupid)
 
@@ -75,12 +81,12 @@ function Kickoff {
   # Install bash first for Alpine (uses sh/ash by default)
   wsl -d $Distro_Name -u root sh -c "command -v bash >/dev/null 2>&1 || apk add --no-cache bash"
   
-  (wsl -d $Distro_Name -u root bash $basedir_unixpath/prep-install.sh $Profile_Path_unix $basedir_unixpath) | Out-File  -Append  "$basedir\$Distro_Name.log" 
+  (wsl -d $Distro_Name -u root bash $basedir_unixpath/prep-install.sh $Profile_Path_unix $basedir_unixpath $Target_User) | Out-File  -Append  "$basedir\$Distro_Name.log" 
 
   
 
-  Write-Log( "`r`n##### Configuring  {0} instance... " -f "$Distro_Name")
-  wsl -d $Distro_Name $basedir_unixpath/install.sh $Profile_Path_unix $basedir_unixpath -u root 2>&1 | Tee-Object -Append -FilePath "$basedir\$Distro_Name.log"
+  Write-Log( "\`r\`n##### Configuring  {0} instance... " -f "$Distro_Name")
+  wsl -d $Distro_Name $basedir_unixpath/install.sh $Profile_Path_unix $basedir_unixpath $Target_User -u root 2>&1 | Tee-Object -Append -FilePath "$basedir\$Distro_Name.log"
 
   Write-Log( "`r`n##### Restarting {0} instance... " -f "$Distro_Name")
   wsl --terminate $Distro_Name

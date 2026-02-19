@@ -3,7 +3,8 @@ export distro_type=fedora
 # export distro_name=fedora-a2
 export ps_distro_source=d:\soft\wsl\fedora_3704.tar
 export ps_install_dir=C:\Users\snara\wsl
-export default_user=snarasim
-export skipsteps=github
+# default_user now sourced from vars/user_environment.yml via kickoff.ps1
+#export default_user=snarasim
+export skipsteps=github,gui
 
 

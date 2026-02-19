@@ -1,8 +1,9 @@
 #tested
 export distro_type=ubuntu
 export ps_distro_source=C:\Users\SrinivasaNarasimhan\wsl-src\ubuntu2004.tar
-export default_user=snarasim
-export skipsteps=git,gui,editor,container,cloud
+# default_user now sourced from vars/user_environment.yml via kickoff.ps1
+#export default_user=snarasim
+export skipsteps=git,github,gui,editor,container,cloud
 
 
 

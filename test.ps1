@@ -21,6 +21,7 @@ $basedir = $PSScriptRoot
 . $basedir\scripts\PathUtils.ps1
 . $basedir\scripts\Logs.ps1
 . $basedir\scripts\Wsl.ps1
+. $basedir\scripts\Profile.ps1
 
 $pass_count = 0
 $fail_count = 0
@@ -54,7 +55,9 @@ function Run-Test {
     try {
         $tmpFile = [System.IO.Path]::GetTempFileName()
         $utf8NoBom = New-Object System.Text.UTF8Encoding $false
-        $lfCommand = $Command -replace "`r`n", "`n"
+        # Ensure standard PATH is set (Alpine's login shell may not include /usr/bin, /bin etc.)
+        $pathPrefix = 'export PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:$PATH"'
+        $lfCommand = ($pathPrefix + "`n" + $Command) -replace "`r`n", "`n"
         [System.IO.File]::WriteAllText($tmpFile, $lfCommand, $utf8NoBom)
         $tmpWslPath = (wsl -d $DistroName wslpath -u $tmpFile.Replace('\','\\')) -replace '\s',''
         $output = wsl -d $DistroName -u $User -- bash -l $tmpWslPath 2>&1 | Out-String
@@ -474,19 +477,20 @@ function Run-AllTests {
     # Parse Profile
     $script:Profile_Path = Get-ValidatedAbsolutePath -Path $ProfilePath -ScriptRoot $PSScriptRoot
     $distro_name = Split-Path $Profile_Path -Leaf
-    $default_user = $null
 
+    # Read target_user from Ansible vars (single source of truth)
+    $default_user = Get-TargetUser -BaseDir $BaseDir
+    if ([string]::IsNullOrWhiteSpace($default_user)) {
+        Write-Error "Could not read target_user from vars/user_environment.yml"
+        exit 1
+    }
+
+    # Read skipsteps from profile
     $skipsteps = @()
     $file = Get-Content $Profile_Path
     $file | ForEach-Object {
         $items = $_.split("=")
-        if ($items[0] -eq "export default_user") { $default_user = $items[1] }
         if ($items[0] -eq "export skipsteps") { $skipsteps = $items[1].Split(",") | ForEach-Object { $_.Trim() } }
-    }
-
-    if ([string]::IsNullOrWhiteSpace($default_user)) {
-        Write-Error "Could not find 'default_user' in profile $Profile_Path"
-        exit 1
     }
 
     # Check distro exists
