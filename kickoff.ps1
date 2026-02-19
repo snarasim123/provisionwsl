@@ -66,11 +66,11 @@ function Kickoff {
     $Distro_Source = Prepare-CloudInstall -UrlsCsvPath $Urls_Csv_Path -DistroLookupId $distro_lookupid -BaseDir $basedir -LogFile $LogFile
   }
 
-  Display-SpinupParams  $Distro_Name $Distro_Source $distro_lookupid $Install_Dir "$basedir\$Distro_Name.log"
+  Display-SpinupParams  $Distro_Name $Distro_Source $distro_lookupid $Install_Dir $LogFile
 
-  (mkdir $Install_Dir  -ea 0) | Out-File  "$basedir\$Distro_Name.log"
-  (wsl --import $Distro_Name $Install_Dir $Distro_Source) | Out-File  -Append  "$basedir\$Distro_Name.log"
-  (wsl --terminate $Distro_Name) | Out-File  -Append  "$basedir\$Distro_Name.log"
+  (mkdir $Install_Dir  -ea 0) | Out-File  $LogFile
+  (wsl --import $Distro_Name $Install_Dir $Distro_Source) | Out-File  -Append  $LogFile
+  (wsl --terminate $Distro_Name) | Out-File  -Append  $LogFile
 
   $Profile_Path_unix = ConvertTo-WslPath -WindowsPath $Profile_Path
   $basedir_unixpath = ConvertTo-WslPath -WindowsPath $PSScriptRoot
@@ -81,12 +81,12 @@ function Kickoff {
   # Install bash first for Alpine (uses sh/ash by default)
   wsl -d $Distro_Name -u root sh -c "command -v bash >/dev/null 2>&1 || apk add --no-cache bash"
   
-  (wsl -d $Distro_Name -u root bash $basedir_unixpath/prep-install.sh $Profile_Path_unix $basedir_unixpath $Target_User) | Out-File  -Append  "$basedir\$Distro_Name.log" 
+  (wsl -d $Distro_Name -u root bash $basedir_unixpath/prep-install.sh $Profile_Path_unix $basedir_unixpath $Target_User) | Out-File  -Append  $LogFile
 
   
 
   Write-Log( "\`r\`n##### Configuring  {0} instance... " -f "$Distro_Name")
-  wsl -d $Distro_Name $basedir_unixpath/install.sh $Profile_Path_unix $basedir_unixpath $Target_User -u root 2>&1 | Tee-Object -Append -FilePath "$basedir\$Distro_Name.log"
+  wsl -d $Distro_Name $basedir_unixpath/install.sh $Profile_Path_unix $basedir_unixpath $Target_User -u root 2>&1 | Tee-Object -Append -FilePath $LogFile
 
   Write-Log( "`r`n##### Restarting {0} instance... " -f "$Distro_Name")
   wsl --terminate $Distro_Name
@@ -105,4 +105,5 @@ $RunTimeMsg = "##### RunTime  {0}... " -f "$elapsedTime"
 Write-Host $RunTimeMsg
 $Profile_Path_Global = Get-ValidatedAbsolutePath -Path $ProfilePath -ScriptRoot $PSScriptRoot
 $Distro_Name_Global = Split-Path $Profile_Path_Global -leaf 
-$RunTimeMsg | Out-File -Append "$basedir\$Distro_Name_Global.log"
+$GlobalLogFile = Get-LogFilePath -BaseDir $basedir -Name $Distro_Name_Global
+$RunTimeMsg | Out-File -Append $GlobalLogFile

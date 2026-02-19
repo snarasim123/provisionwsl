@@ -518,11 +518,14 @@ function Run-AllTests {
     Write-Log ("  Profile: {0}" -f $Profile_Path)
     Write-Log ("  User: {0}" -f $default_user)
     Write-Log ("  Log: {0}" -f $LogFile)
-    Write-Log ("  Date: {0}" -f (Get-Date -Format "yyyy-MM-dd HH:mm:ss"))
+    Write-Log ("  Start: {0}" -f (Get-Date -Format "yyyy-MM-dd HH:mm:ss"))
     if ($skipsteps.Count -gt 0) {
         Write-Log ("  Skip: {0}" -f ($skipsteps -join ', '))
     }
     Write-Log ("=" * 60)
+
+    # Start timer
+    $sw = [Diagnostics.Stopwatch]::StartNew()
 
     # Common params for all tests
     $tp = @{ DistroName = $distro_name; User = $default_user }
@@ -563,6 +566,10 @@ function Run-AllTests {
     Test-SudoAccess             @tp
 
     # Summary
+    $sw.Stop()
+    $ts = $sw.Elapsed
+    $elapsed = [string]::Format("{0:00}m {1:00}s", [int]$ts.TotalMinutes, $ts.Seconds)
+
     Write-Log ("`r`n" + "=" * 60)
     Write-Log "  TEST SUMMARY"
     Write-Log ("=" * 60)
@@ -574,6 +581,7 @@ function Run-AllTests {
 
     Write-Log ""
     Write-Log ("  Total: {0}  |  Passed: {1}  |  Failed: {2}" -f ($pass_count + $fail_count), $pass_count, $fail_count)
+    Write-Log ("  End: {0}  |  Duration: {1}" -f (Get-Date -Format "yyyy-MM-dd HH:mm:ss"), $elapsed)
     Write-Log ("=" * 60)
     Write-Log ("`r`nResults saved to: {0}" -f $LogFile)
 }

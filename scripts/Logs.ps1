@@ -7,10 +7,15 @@ function Get-LogFilePath {
         [string]$Suffix = ""
     )
     
+    $logsDir = Join-Path $BaseDir "logs"
+    if (-not (Test-Path $logsDir)) {
+        $null = New-Item -Path $logsDir -ItemType Directory -Force
+    }
+
     if ([string]::IsNullOrWhiteSpace($Suffix)) {
-        return Join-Path $BaseDir "$Name.log"
+        return Join-Path $logsDir "$Name.log"
     } else {
-        return Join-Path $BaseDir "$Name-$Suffix.log"
+        return Join-Path $logsDir "$Name-$Suffix.log"
     }
 }
 
