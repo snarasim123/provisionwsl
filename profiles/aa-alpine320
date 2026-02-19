@@ -1,8 +1,5 @@
 
-#untested
 export ps_distro_id=alpine320
-# default_user now sourced from vars/user_environment.yml via kickoff.ps1
-#export default_user=snarasim
 export skipsteps=github,gui
 
 

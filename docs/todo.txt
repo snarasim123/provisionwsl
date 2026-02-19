@@ -1,27 +1,26 @@
+.lazygit
+.remove github keys with teardown
+.install vim plugins without github
+.support fedora cloud images
+.support new wsl filetype 
+.java other versions
+
+.vbox support/linux support
+.qemu support
+
 .gcp for alpine, fedora
 .python for fedora
 .pyenv, pipx for ubuntu, fedora, alpine
-.lazygit
 .set gcp or aws as default
 .install .kc_funcs and source it, add other aliases
 .xwin apps,other window mgrs - xfce4
-.java other versions
 .ability to run a single role after setup
 .https://github.com/geerlingguy/ansible-role-redis
-.cleanup coderoot and codebasetest invoking with different path styles and locations
-
 .powershell setup
--remove github keys with teardown
--support fedora cloud images
-. vbox support/linux support
--qemu support
-
 .setup newer version of vim
     check and upgrade vim if versions mismatch
-
-
 .remove sudo and use become
-    review 'become' from all tasks and remove unnecessary entries
+review 'become' from all tasks and remove unnecessary entries
 .clone code from github instead of localcopy
 *add nvim path for root user - todo review
 *fix git config - todo review
@@ -30,56 +29,5 @@
     -check and uninstall prev nvim if versions mismatch
     -change nvim install dir to variable
 .change ssh key name to include distro fullname
-
-
-    -script to switch java versions
 .add ~/tmp dir to both root and user
-
 https://github.com/geerlingguy/ansible-role-java
-
-
-
-
-- name: Write lines of text to a file, including a variable value
-  copy:
-    dest: "{{ ansible_user_dir }}/example.txt"
-    content: |
-      This is the first line of text.
-      This is the second line of text.
-      The value of the variable is: {{ custom_variable }}
-      This is the third line of text.
-    owner: "{{ ansible_user_id }}"
-    group: "{{ ansible_user_gid }}"
-    mode: '0644'
-
-    curl -L \
-  -X DELETE \
-  -H "Accept: application/vnd.github+json" \
-  -H "Authorization: Bearer <YOUR-TOKEN>" \
-  -H "X-GitHub-Api-Version: 2022-11-28" \
-  https://api.github.com/user/keys/KEY_ID
-
-
-  curl -L \
-  -X POST \
-  -H "Accept: application/vnd.github+json" \
-  -H "Authorization: Bearer <YOUR-TOKEN>" \
-  -H "X-GitHub-Api-Version: 2022-11-28" \
-  https://api.github.com/user/keys \
-  -d '{"title":"ssh-rsa AAAAB3NzaC1yc2EAAA","key":"2Sg8iYjAxxmI2LvUXpJjkYrMxURPc8r+dB7TJyvv1234"}'
-
-- name: Setup root github ssh keys
-uri:
-  url: https://api.github.com/user/keys
-  method: POST
-  body: "{ \"title\":\"{{ root_github_keyname }}\",\"key\":\"{{ root_ssh_publickey.stdout }}\" }"
-  body_format: json
-  headers:
-    Content-Type: application/json
-  user: "{{ githubuser }}"
-  password: "{{ githubpass }}"
-  status_code: [200, 201, 422, 304]
-  force_basic_auth: true
-tags: 
-  - github
-  - git

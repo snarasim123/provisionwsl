@@ -24,21 +24,22 @@ function Prepare-CloudInstall {
     $uncompressedFileName = GetUncompressedFileName  -infile $compressedFile
 
     if (-not (Test-Path -Path $compressedFilePath)) {
-        Write-Log ( "`r`n##### Downloading file $compressedFilePath\$compressedFile...")
-        Download-URL -Url $imageurl1 -FolderLocation $BaseDir\tmp\
+        Write-Log ( "`r`n##### Downloading file $compressedFilePath...")
+        Download-URL -Url $imageurl1 -FolderLocation $BaseDir\tmp\ | Out-Null
     } else {
-        Write-Log (  "`r`n##### Reusing existing file $compressedFilePath\$compressedFile for installation...")
+        Write-Log (  "`r`n##### Reusing existing file $compressedFilePath for installation...")
     }
   
     $compressionType = Get-CompressionType -FilePath $compressedFilePath
+     Write-Host (  "`r`n---- compression type: {0}" -f  "$compressionType" )
     if ($compressionType -eq 'gz') {
         $resultfile = DeGZip-File -infile $compressedFilePath
     } elseif ($compressionType -eq 'xz') {
         $resultfile = UnXz-File-WithCleanup -infile $compressedFilePath
     } else {
-        Write-Log (  "`r`n##### Unknown or unsupported compression type for file: $compressedFilePath" )
+        Write-Log (  "`r`n##### Unknown or unsupported compression type for file: $compressionType" )
         exit 1
     }
-
+     Write-Log (  "`r`n---- Extracted file: $BaseDir\tmp\$uncompressedFileName" )
     return "$BaseDir\tmp\$uncompressedFileName"
 }
