@@ -1,3 +1,6 @@
 secret.sh
 unused/secret.sh
 secrets.*
+*.tar
+*.tar.gz
+*.vhdx

@@ -1,0 +1,35 @@
+Move ansible/ folder to a new repo (provisionwsl) using git subtree split
+=========================================================================
+
+This preserves commit history for the ansible/ folder.
+The source repo (setup2) is NOT modified — only a temporary branch is created.
+
+Step 1: Create a branch with only ansible/ history
+---------------------------------------------------
+cd C:\Users\SrinivasaNarasimhan\code\setup2
+git subtree split -P ansible -b split-branch
+
+Step 2: Create the new repo and pull the branch into it
+-------------------------------------------------------
+cd C:\Users\SrinivasaNarasimhan\code
+mkdir provisionwsl
+cd provisionwsl
+#git init
+git pull ..\setup2 split-branch
+
+Step 3: Add remote and push
+----------------------------
+#git remote add origin https://github.com/snarasim123/provisionwsl.git
+git branch -M main
+git push -u origin main
+
+Step 4: Clean up the temp branch in the source repo
+----------------------------------------------------
+cd C:\Users\SrinivasaNarasimhan\code\setup2
+git branch -D provisionwsl-branch
+
+Reverting
+---------
+If something goes wrong after Step 1, just delete the branch:
+    git branch -D provisionwsl-branch
+The source repo is back to exactly how it was — no commits altered, no files changed.
