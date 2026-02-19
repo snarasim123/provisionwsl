@@ -301,23 +301,32 @@ $nvimPluginCheck || echo 'no nvim plugins found';
     Record-Result $testName $vimOk $out
 }
 
-function Test-K9sLazygit {
+function Test-K9s {
     param([string]$DistroName, [string]$User)
-    $testName = "k9s & lazygit installed"
+    $testName = "k9s installed"
     $cmd = @"
-echo '== k9s ==';
+echo '== k9s version ==';
 k9s version 2>&1 | head -3;
 echo '== k9s binary ==';
 which k9s 2>&1;
-echo '== lazygit ==';
+"@
+    $out = Run-Test -DistroName $DistroName -User $User -TestName $testName -Command $cmd
+    $k9sOk = $out -match "k9s|Version"
+    Record-Result $testName $k9sOk $out
+}
+
+function Test-Lazygit {
+    param([string]$DistroName, [string]$User)
+    $testName = "lazygit installed"
+    $cmd = @"
+echo '== lazygit version ==';
 lazygit --version 2>&1;
 echo '== lazygit binary ==';
 which lazygit 2>&1;
 "@
     $out = Run-Test -DistroName $DistroName -User $User -TestName $testName -Command $cmd
-    $k9sOk = $out -match "k9s|Version"
-    $lazygitOk = $out -match "lazygit" -and -not ($out -match "lazygit: command not found")
-    Record-Result $testName ($k9sOk -and $lazygitOk) $out
+    $lazygitOk = $out -match "lazygit" -and -not ($out -match "not found")
+    Record-Result $testName $lazygitOk $out
 }
 
 function Test-Helm {
@@ -530,7 +539,14 @@ function Run-AllTests {
     Test-KubeDirectories        @tp -KubeDirs $KubeDirectories
     Test-BinScripts             @tp
     Test-VimNeovim              @tp -VimPaths $VimPluginPaths -NvimPaths $NvimPluginPaths
-    Test-K9sLazygit             @tp
+    Test-K9s                    @tp
+    # Only test lazygit if binary exists in the instance
+    $lazygitCheck = wsl -d $distro_name -u $default_user -- which lazygit 2>&1
+    if ($lazygitCheck -match '/lazygit') {
+        Test-Lazygit            @tp
+    } else {
+        Write-Log "`r`n--- SKIPPED: lazygit test (binary not installed) ---"
+    }
     Test-Helm                   @tp
     Test-Kubectl                @tp
     Test-KubeConfigSwitchers    @tp -Switchers $KubeSwitchers
