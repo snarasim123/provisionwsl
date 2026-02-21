@@ -1,0 +1,4 @@
+export distro_type=fedora
+export ps_distro_source=C:\Users\{}\code\setup2\ansible\tmp\fedora_3704.tar
+export ps_install_dir=C:\Users\{}\wsl
+export skipsteps=github,gui

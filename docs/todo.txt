@@ -4,6 +4,7 @@
 .support fedora cloud images
 .support new wsl filetype 
 .java other versions
+.test without secrets
 
 .vbox support/linux support
 .qemu support
