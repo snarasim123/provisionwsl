@@ -145,3 +145,19 @@
     - post_run
     - gcp
     - k8s
+
+- name: Create empty .kube directory (when Kubernetes is installed, but neither AWS nor GCP is)
+  ansible.builtin.file:
+    path: "{{ user_home }}/.kube"
+    state: directory
+    owner: "{{ target_user }}"
+    group: "{{ target_user }}"
+    mode: '0755'
+  become: true
+  when:
+    - kubernetes_installed | default(false)
+    - not (aws_cli_installed | default(false))
+    - not (gcp_cli_installed | default(false))
+  tags:
+    - post_run
+    - k8s

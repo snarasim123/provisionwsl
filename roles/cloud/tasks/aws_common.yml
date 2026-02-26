@@ -57,3 +57,10 @@
     - aws
     - cloud
   become: true
+
+- name: Set aws_cli_installed flag for post_run
+  ansible.builtin.set_fact:
+    aws_cli_installed: true
+  tags:
+    - aws
+    - cloud

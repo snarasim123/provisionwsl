@@ -28,6 +28,7 @@ copy_and_skip_type() {
         mkdir -p "$dst/${d#$src/}"
     done
     find "$src" -mindepth 1 -type f ! -name "*.$skip_ext" | while read -r f; do
+        # echo "Copying $f to $dst/${f#$src/}"
         cp "$f" "$dst/${f#$src/}"
     done
     echo "#### done copy_and_skip_type."
@@ -48,8 +49,8 @@ run-ansible(){
     cd "$HOME/code/$SCRIPT_FOLDER_NAME"
     local cur_dir="$(pwd)"
     echo "#### current dir $cur_dir"
-    local ls_list="$(ls -al)"
-    echo "#### list of files  $ls_list"    
+    local ls_list="$(ls -alR $HOME/code)"
+    # echo "#### list of files  $ls_list"    
     chmod -x secrets.*
     if [ -z ${skipsteps+x} ]; 
     then 

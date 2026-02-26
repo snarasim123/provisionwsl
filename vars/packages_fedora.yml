@@ -30,7 +30,8 @@ packages_fedora:
   - '@Development tools'
   - ripgrep
   - xclip
-  - java-11-openjdk.x86_64 
+  - java-11-openjdk.x86_64
+  - java-11-openjdk-devel.x86_64
   - gettext-devel
   - expat-devel
   - curl-devel

@@ -19,7 +19,7 @@
   dnf:
     name:
       - python3-qt5
-      - python3-qtpy
+      - python3-QtPy
       - python3-send2trash
     state: present
   become: true

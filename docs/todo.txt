@@ -3,10 +3,16 @@
 .lazygit
 .fix pyenv or setup virtualenv correctly
     -turn off pyenv at startup
+-fedora install failure
+    -javac failure
+    -pyenv failure
+    -.kube folder not setup
 .debug why new kc methods are not getting deployed.    
 .set display env by default
 .move display methods to bash_funcs
-
+.alpine does not work, add /bin to path
+.document lf requirement as opposed to crlf for profile files
+.capture error conditions and jump to role/task?
  
 .remove github keys with teardown
 .install vim plugins without github
