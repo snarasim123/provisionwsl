@@ -24,6 +24,24 @@
     - shell
     - bash    
 
+- name: remove existing bash files from home
+  ansible.builtin.file:
+    state: absent
+    path: "{{ root_user_home }}/{{ item }}"
+  with_items:
+    - .alias
+    - .bash_funcs
+    - .bash_profile
+    - .bashrc
+    - .bashrc_custom
+    - prompt.sh
+    - variables.sh
+    - .dircolors
+  become: true
+  tags: 
+    - shell
+    - bash    
+    
 - name: Copy bash files from shared common files
   copy:
     src: "{{ playbook_dir }}/files/common/{{ item }}"
@@ -59,23 +77,7 @@
     - shell
     - bash
 
-- name: remove existing bash files from home
-  ansible.builtin.file:
-    state: absent
-    path: "{{ root_user_home }}/{{ item }}"
-  with_items:
-    - .alias
-    - .bash_funcs
-    - .bash_profile
-    - .bashrc
-    - .bashrc_custom
-    - prompt.sh
-    - variables.sh
-    - .dircolors
-  become: true
-  tags: 
-    - shell
-    - bash    
+
 
 - name: Create symbolic link 
   file:

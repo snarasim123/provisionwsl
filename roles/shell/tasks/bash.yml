@@ -13,6 +13,23 @@
     - shell
     - bash  
     
+- name: remove existing bash files from home
+  ansible.builtin.file:
+    state: absent
+    path: "{{ user_home }}/{{ item }}"
+  with_items:
+    - .alias
+    - .bash_funcs
+    - .bash_profile
+    - .bashrc
+    - .bashrc_custom
+    - prompt.sh
+    - variables.sh
+    - .dircolors
+  tags: 
+    - shell
+    - bash  
+
 - name: Create a directory if it does not exist
   ansible.builtin.file:
     path: "{{ user_home }}/bashfiles"
@@ -42,35 +59,6 @@
   tags: 
     - shell
     - bash
-
-- name: Add Google Cloud SDK to PATH in .bashrc_custom
-  ansible.builtin.lineinfile:
-    path: "{{ user_home }}/bashfiles/.bashrc_custom"
-    line: 'export PATH="/usr/local/google-cloud-sdk/bin:$PATH"'
-    insertafter: EOF
-    owner: "{{ target_user }}"
-    group: "{{ target_user }}"
-  when: gcp_cli_installed | default(false)
-  tags: 
-    - shell
-    - bash
-
-- name: remove existing bash files from home
-  ansible.builtin.file:
-    state: absent
-    path: "{{ user_home }}/{{ item }}"
-  with_items:
-    - .alias
-    - .bash_funcs
-    - .bash_profile
-    - .bashrc
-    - .bashrc_custom
-    - prompt.sh
-    - variables.sh
-    - .dircolors
-  tags: 
-    - shell
-    - bash  
 
 - name: Create symbolic link 
   file:
@@ -104,22 +92,14 @@
     - shell
     - bash
 
-# - name: Create bin directory if it does not exist
-#   ansible.builtin.file:
-#     path: "{{ user_home }}/bin"
-#     state: directory
-#     owner: "{{ target_user }}"
-#     group: "{{ target_user }}"
-#     mode: '0755'
-#   tags: upgrade
-#   become: true
-
-# - name: Create temp directory if it does not exist
-#   ansible.builtin.file:
-#     path: "{{ user_home }}/tmp"
-#     state: directory
-#     owner: "{{ target_user }}"
-#     group: "{{ target_user }}"
-#     mode: '0755'
-#   tags: upgrade
-#   become: true
+- name: Add Google Cloud SDK to PATH in .bashrc_custom
+  ansible.builtin.lineinfile:
+    path: "{{ user_home }}/bashfiles/.bashrc_custom"
+    line: 'export PATH="/usr/local/google-cloud-sdk/bin:$PATH"'
+    insertafter: EOF
+    owner: "{{ target_user }}"
+    group: "{{ target_user }}"
+  when: gcp_cli_installed | default(false)
+  tags: 
+    - shell
+    - bash

@@ -161,3 +161,11 @@
     - python
     - pyenv
     - dev
+
+- name: Set pyenv_installed flag for post_run
+  set_fact:
+    pyenv_installed_flag: true
+  tags:
+    - python
+    - pyenv
+    - dev

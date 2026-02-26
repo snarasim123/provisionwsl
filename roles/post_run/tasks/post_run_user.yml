@@ -49,22 +49,20 @@
   tags:
     - post_run
 
-- name: Add pyenv to .bashrc_custom
-  blockinfile:
-    path: "{{ user_home }}/.bashrc_custom"
-    marker: "# {mark} PYENV CONFIGURATION"
-    block: |
-      export PYENV_ROOT="$HOME/.pyenv"
-      [[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
-      eval "$(pyenv init -)"
-      eval "$(pyenv virtualenv-init -)"
-    create: yes
-    owner: "{{ target_user }}"
-    group: "{{ target_user }}"
-  when: pyenv_installed_flag | default(false)
-  tags:
-    - post_run
-    - pyenv
+# - name: Add pyenv to .bash_funcs
+#   blockinfile:
+#     path: "{{ user_home }}/.bash_funcs"
+#     marker: "# {mark} PYENV CONFIGURATION"
+#     block: |
+#       export PYENV_ROOT="$HOME/.pyenv"
+#       [[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
+#     create: yes
+#     owner: "{{ target_user }}"
+#     group: "{{ target_user }}"
+#   when: pyenv_installed_flag | default(false)
+#   tags:
+#     - post_run
+#     - pyenv
 
 - name: Create AWS + Kubernetes integration script
   copy:

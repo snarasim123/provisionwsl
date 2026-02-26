@@ -45,3 +45,9 @@ packages_ubuntu_gui:
   - rxvt-unicode
   - wmaker
   - xfce4
+  - pcmanfm
+  - meld
+  - firefox
+  - chromium-browser
+  - git-cola
+  - gitg

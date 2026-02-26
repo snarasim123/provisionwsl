@@ -1,7 +1,7 @@
 ---
 # Dev role - Development tools and language version managers
+- include_tasks: python.yml
 - include_tasks: pyenv.yml
 # - include_tasks: nodejs.yml
 # - include_tasks: golang.yml
 # - include_tasks: java.yml
-# - include_tasks: python.yml

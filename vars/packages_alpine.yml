@@ -55,3 +55,9 @@ packages_alpine_gui:
   - konsole
   - xfce4
   - windowmaker
+  - pcmanfm
+  - meld
+  - firefox
+  - chromium
+  - git-cola
+  - gitg

@@ -1,0 +1,50 @@
+---
+# Python packages for git-cola and GUI development tools
+# Installs distro-specific PyQt5 and related packages
+
+- name: Install Python packages for git-cola (Ubuntu)
+  apt:
+    name:
+      - python3-pyqt5
+      - python3-qtpy
+      - python3-send2trash
+    state: present
+  become: true
+  when: is_ubuntu | default(false)
+  tags:
+    - python
+    - dev
+
+- name: Install Python packages for git-cola (Fedora)
+  dnf:
+    name:
+      - python3-qt5
+      - python3-qtpy
+      - python3-send2trash
+    state: present
+  become: true
+  when: is_fedora | default(false)
+  tags:
+    - python
+    - dev
+
+- name: Install Python packages for git-cola (Alpine)
+  apk:
+    name:
+      - py3-pyqt5
+    state: present
+  become: true
+  when: is_alpine | default(false)
+  tags:
+    - python
+    - dev
+
+- name: Install git-cola pip dependencies (all distros)
+  pip:
+    name:
+      - polib
+    executable: /usr/bin/pip3
+  become: true
+  tags:
+    - python
+    - dev

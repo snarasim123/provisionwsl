@@ -1,10 +1,22 @@
+.fix aws sso login by configuring profile
+
 .lazygit
+.fix pyenv or setup virtualenv correctly
+    -turn off pyenv at startup
+.debug why new kc methods are not getting deployed.    
+.set display env by default
+.move display methods to bash_funcs
+
+ 
 .remove github keys with teardown
 .install vim plugins without github
 .support fedora cloud images
 .support new wsl filetype 
 .java other versions
-.test without secrets
+.tests 
+    -test without secrets
+    -test failure sourcing . files
+.fix kcdesc function to populate with proper filename
 
 .vbox support/linux support
 .qemu support

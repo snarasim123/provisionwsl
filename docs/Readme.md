@@ -266,7 +266,7 @@ export skipsteps=gui
 ---
 
 ## Available Cloud Images
-
+   
 Cloud images are defined in `data/urls.csv`. When a profile sets `ps_distro_id`, the image is downloaded from the URL, extracted, and used to create the WSL instance.
 
 | ID | Type | Description |
@@ -577,7 +577,7 @@ Google Cloud CLI requires Python 3.9 to 3.14
 ### Debugging Tips
 
 1. **Enable verbose Ansible output:**
-   Edit `prep-install.sh` and add `-vvv` to the ansible-playbook command:
+   Edit `install.sh` and add `-vvv` to the ansible-playbook command:
    ```bash
    ansible-playbook -vvv playbook.yaml ...
    ```

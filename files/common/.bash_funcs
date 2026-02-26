@@ -30,110 +30,141 @@ kcget(){
     kubectl get pods 
 else
     echo "Looking for pods matching : $1"
-    kubectl get pods | grep -i $1 
+    kubectl get pods -A --no-headers -o custom-columns="NAMESPACE:.metadata.namespace,NAME:.metadata.name" | grep -i $1 
 fi
 }
 
 kcbash(){
 #bash into the first pod which matches the passed in param pattern.
 #chooses the first container which is not a traefik container.    
-PODS=$(kubectl get pods -A)
-podname=""
-containername=""
-found="false"
 
-for POD in $PODS; do
-    if ! echo "$POD" | grep -q "$1"; then
-        continue  # Skip to the next iteration
+    if [ -z "$1" ]; then
+        printf "Usage: kcbash <pod_pattern>\n"
+        printf "Example: kcbash kernel\n"
+        return 1
     fi
 
-    podname=$POD
-    printf "Found pod $podname \n" 
-        
-    CONTAINERS=$(kubectl get pod "$POD" -o jsonpath="{.spec.containers[*].name}")
-    for CONTAINER in $CONTAINERS; do        
-        containername=$CONTAINER
-        if ! echo "$containername" | grep -q "traefik"; then                        
-            found="true"
-            break
+    local podname=""
+    local namespace=""
+    local containername=""
+
+    # Read line-by-line with proper field parsing; match only against pod name
+    while read -r ns name ready status restarts age; do
+        if ! echo "$name" | grep -qi "$1"; then
+            continue
         fi
 
-        printf "####### skipping container $containername \n"
-        continue
-    done
-    if [ "$found" = "true" ]; then
-        break
-    fi
-done
-    if [ "$found" = "true" ]; then
-        printf "####### bash into pod '$podname' container '$containername' \n"  
-        kubectl exec -it $podname -c $containername -- /bin/bash
+        podname="$name"
+        namespace="$ns"
+        printf "Found pod $podname in namespace $namespace\n"
+
+        CONTAINERS=$(kubectl get pod "$podname" -n "$namespace" -o jsonpath="{.spec.containers[*].name}")
+        for CONTAINER in $CONTAINERS; do
+            if ! echo "$CONTAINER" | grep -q "traefik"; then
+                containername="$CONTAINER"
+                break
+            fi
+            printf "####### skipping container $CONTAINER\n"
+        done
+
+        # Found a valid container, stop searching pods
+        if [ -n "$containername" ]; then
+            break
+        fi
+    done < <(kubectl get pods -A --no-headers)
+
+    if [ -n "$containername" ]; then
+        printf "####### bash into pod '$podname' container '$containername' (namespace: $namespace)\n"
+        kubectl exec -it "$podname" -n "$namespace" -c "$containername" -- /bin/bash
     else
-        printf "no pod/container found to shell into. \n"
+        printf "no pod/container found to shell into.\n"
     fi
-printf "no pod/container found to shell into. \n"
 }
 
 kcshell(){
+    if [ -z "$1" ]; then
+        printf "Usage: kcshell <pod_pattern>\n"
+        printf "Example: kcshell kernel\n"
+        printf "Alias for kcbash - shells into the first matching pod's non-traefik container.\n"
+        return 1
+    fi
     kcbash "$1"
 }
 
 kclogs(){    
 cur_date="$(date +"%m-%d_%H-%M-%S%3N")"
 log_file="-$cur_date.txt"
-desc_file="-$cur_date-desc.txt"
 
-PODS=$(kubectl get pods -A)
-for POD in $PODS; do
-    if ! echo "$POD" | grep -q "$1"; then
-        continue  # Skip to the next iteration
-    fi
+if [ -z "$1" ]; then
+    printf "Usage: kclogs <pod_pattern>\n"
+    printf "Example: kclogs kernel\n"
+    return 1
+fi
 
-    podname=$POD
-    printf "Found pod $podname \n"
+overall_start=$SECONDS
 
-    pod_log="$POD$log_file"
-    desc_log="$POD$desc_file"
+search_start=$SECONDS
+matching_pods=$(kubectl get pods -A --no-headers | grep -i "$1")
+search_elapsed=$(( SECONDS - search_start ))
+match_count=$(echo "$matching_pods" | grep -c .)
+printf "[timing] pod search took ${search_elapsed}s, found $match_count pod(s)\n"
+
+echo "$matching_pods" | while read -r namespace podname ready status restarts age; do
+    [ -z "$podname" ] && continue
+
+    pod_start=$SECONDS
+    printf "Found pod $podname in namespace $namespace\n"
+
+    pod_log="$podname$log_file"
     echo " " >  ./$pod_log
 
-    today=`date "+%Y%m%d%H%M%S"`
+    today=$(date "+%Y%m%d%H%M%S")
     printf "\n\n\n\n####### log time $today\n"  >>  ./$pod_log
 
-    INIT_CONTAINERS=$(kubectl get pod "$POD" -o jsonpath="{.spec.initContainers[*].name}")
-    CONTAINERS=$(kubectl get pod "$POD" -o jsonpath="{.spec.containers[*].name}")
+    INIT_CONTAINERS=$(kubectl get pod "$podname" -n "$namespace" -o jsonpath="{.spec.initContainers[*].name}")
+    CONTAINERS=$(kubectl get pod "$podname" -n "$namespace" -o jsonpath="{.spec.containers[*].name}")
 
     for INIT_CONTAINER in $INIT_CONTAINERS; do
-        printf "####### $INIT_CONTAINER init container logs\n\n"   >>  ./$pod_log
-        kubectl logs "$podname" -c "$INIT_CONTAINER"  >> ./$pod_log&
-        printf "\n \n"  >>  ./$pod_log
+        printf "####### $INIT_CONTAINER init container logs\n\n" | tee -a ./$pod_log
+        container_start=$SECONDS
+        kubectl logs "$podname" -n "$namespace" -c "$INIT_CONTAINER" >> ./$pod_log
+        printf "[timing] init container '$INIT_CONTAINER' logs took $(( SECONDS - container_start ))s\n"
+        printf "\n \n" | tee -a ./$pod_log
     done
 
     for CONTAINER in $CONTAINERS; do
-          printf "####### $CONTAINER container logs\n\n"   >>  ./$pod_log
-          kubectl logs "$podname" -c "$CONTAINER"  >> ./$pod_log&
-          printf "\n \n"  >>  ./$pod_log
+          printf "####### $CONTAINER container logs\n\n" | tee -a ./$pod_log
+          container_start=$SECONDS
+          kubectl logs "$podname" -n "$namespace" -c "$CONTAINER" >> ./$pod_log
+          printf "[timing] container '$CONTAINER' logs took $(( SECONDS - container_start ))s\n"
+          printf "\n \n" | tee -a ./$pod_log
     done
 
+    printf "[timing] pod '$podname' total: $(( SECONDS - pod_start ))s, log file: $pod_log\n"
+
 done
+
+printf "[timing] kclogs total: $(( SECONDS - overall_start ))s\n"
 }
 
 kcdesc(){    
-cur_date="$(date +"%m-%d_%H-%M-%S%3N")"
-# log_file="-$cur_date.txt"
-desc_file="-$cur_date-desc.txt"
-
-PODS=$(kubectl get pods -A)
-for POD in $PODS; do
-    if ! echo "$POD" | grep -q "$1"; then
-        continue  # Skip to the next iteration
+    if [ -z "$1" ]; then
+        printf "Usage: kcdesc <pod_pattern>\n"
+        printf "Example: kcdesc kernel\n"
+        return 1
     fi
 
-    podname=$POD
-    printf "Found pod $podname \n"
+    cur_date="$(date +"%m-%d_%H-%M-%S%3N")"
+    desc_file="-$cur_date-desc.txt"
 
-    kubectl describe pod "$podname"   > "$desc_file"&
+    kubectl get pods -A --no-headers | grep -i "$1" | while read -r namespace podname ready status restarts age; do
+        [ -z "$podname" ] && continue
+        printf "Found pod $podname in namespace $namespace\n"
+        kubectl describe pod "$podname" -n "$namespace" > "$podname$desc_file" &
+    done
 
-done
+    wait
+    printf "Done. Describe files written with suffix $desc_file\n"
 }
 
 kccmd(){
@@ -163,7 +194,7 @@ kctimedlogs(){
         kclogs "$pod_pattern"
         
         if [ $i -lt $total_iterations ]; then
-            printf "Waiting $sleep_time seconds before next collection...\n"
+            printf "Waiting $sleep_time seconds before next collection...Time: $(date)\n"
             sleep $sleep_time
         fi
     done
@@ -221,3 +252,15 @@ kcrestart(){
     printf "Restart initiated for ${#matched_deployments[@]} deployment(s).\n"
 }
  
+pyenvact() {
+    eval "$(pyenv init -)"
+    eval "$(pyenv virtualenv-init -)"
+    echo "pyenv shims activated ($(pyenv version-name))"
+}
+
+pyenvdeact() {
+    unset PYENV_VERSION
+    export PATH=$(echo "$PATH" | tr ':' '\n' | grep -v '.pyenv/shims' | tr '\n' ':' | sed 's/:$//')
+    hash -r
+    echo "pyenv deactivated (system python: $(python3 --version 2>&1))"
+}

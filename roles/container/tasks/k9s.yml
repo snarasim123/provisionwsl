@@ -34,7 +34,7 @@
   become: true
 
 - name: Download the k9s
-  get_url: url=https://github.com/derailed/k9s/releases/download/v0.27.4/k9s_Linux_amd64.tar.gz dest="{{ user_home }}/tmp/"
+  get_url: url=https://github.com/derailed/k9s/releases/download/{{ k9s_version }}/k9s_Linux_amd64.tar.gz dest="{{ user_home }}/tmp/"
   tags: 
     - k9s
     - container  

@@ -50,3 +50,11 @@ packages_fedora:
   - tk-devel
   - zlib-devel
 # - '@development-libraries'
+
+packages_fedora_gui:
+  - pcmanfm
+  - meld
+  - firefox
+  - chromium
+  - git-cola
+  - gitg
