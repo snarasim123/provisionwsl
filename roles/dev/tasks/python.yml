@@ -1,4 +1,7 @@
 ---
+# system python is upgraded as part of prep for the ansible playbook run,
+# so, this role installs additional python packages needed
+
 # Python packages for git-cola and GUI development tools
 # Installs distro-specific PyQt5 and related packages
 
@@ -15,36 +18,14 @@
     - python
     - dev
 
-- name: Install Python packages for git-cola (Fedora)
-  dnf:
-    name:
-      - python3-qt5
-      - python3-QtPy
-      - python3-send2trash
-    state: present
-  become: true
-  when: is_fedora | default(false)
-  tags:
-    - python
-    - dev
 
-- name: Install Python packages for git-cola (Alpine)
-  apk:
-    name:
-      - py3-pyqt5
-    state: present
-  become: true
-  when: is_alpine | default(false)
-  tags:
-    - python
-    - dev
-
-- name: Install git-cola pip dependencies (all distros)
+- name: Install git-cola pip dependencies (Ubuntu)
   pip:
     name:
       - polib
     executable: /usr/bin/pip3
   become: true
+  when: is_ubuntu | default(false)  
   tags:
     - python
     - dev

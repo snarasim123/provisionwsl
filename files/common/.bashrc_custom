@@ -159,7 +159,25 @@ export HISTFILESIZE=20000
 shopt -s histappend
 
 cd $STARTUP_FOLDER
-export PATH=$HOME/bin:$HOME/.local/bin:/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin:/sbin:/usr/lib/jvm/java-11-openjdk-amd64/bin
+export PATH=$HOME/bin:$HOME/.local/bin:/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin:/sbin:/bin
+
+# Add Java to PATH if installed
+if grep -qi alpine /etc/os-release 2>/dev/null; then
+    # Alpine: auto-detect Java path since package names differ
+    if [ -d /usr/lib/jvm ]; then
+        JAVA_DIR=$(find /usr/lib/jvm -maxdepth 1 -type d -name "java-*" | head -1)
+        if [ -n "$JAVA_DIR" ] && [ -d "$JAVA_DIR/bin" ]; then
+            export JAVA_HOME="$JAVA_DIR"
+            export PATH="$PATH:$JAVA_HOME/bin"
+        fi
+    fi
+else
+    # Ubuntu/Fedora: use standard path
+    if [ -d /usr/lib/jvm/java-11-openjdk-amd64/bin ]; then
+        export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
+        export PATH="$PATH:$JAVA_HOME/bin"
+    fi
+fi
 
 # Pyenv initialization
 export PYENV_ROOT="$HOME/.pyenv"

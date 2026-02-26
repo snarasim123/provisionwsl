@@ -57,5 +57,4 @@ packages_fedora_gui:
   - meld
   - firefox
   - chromium
-  - git-cola
   - gitg

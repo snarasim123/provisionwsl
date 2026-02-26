@@ -1,45 +1,30 @@
-.fix aws sso login by configuring profile
-
 .lazygit
-.fix pyenv or setup virtualenv correctly
-    -turn off pyenv at startup
--fedora install failure
-    -javac failure
-    -pyenv failure
-    -.kube folder not setup
+.install vim plugins without github
 .debug why new kc methods are not getting deployed.    
 .set display env by default
-.move display methods to bash_funcs
-.alpine does not work, add /bin to path
+.move display methods to separate file
+.move kc functions to a separate file
 .document lf requirement as opposed to crlf for profile files
+
 .capture error conditions and jump to role/task?
- 
 .remove github keys with teardown
-.install vim plugins without github
 .support fedora cloud images
 .support new wsl filetype 
 .java other versions
-.tests 
-    -test without secrets
-    -test failure sourcing . files
-.fix kcdesc function to populate with proper filename
+.fix aws sso login by configuring profile
+.test without secrets
+.redo test methods
 
 .vbox support/linux support
 .qemu support
 
-.gcp for alpine, fedora
-.python for fedora
-.pyenv, pipx for ubuntu, fedora, alpine
-.set gcp or aws as default
-.install .kc_funcs and source it, add other aliases
+
 .xwin apps,other window mgrs - xfce4
-.ability to run a single role after setup
 .https://github.com/geerlingguy/ansible-role-redis
 .powershell setup
 .setup newer version of vim
     check and upgrade vim if versions mismatch
-.remove sudo and use become
-review 'become' from all tasks and remove unnecessary entries
+.remove sudo and use become, review 'become' from all tasks and remove unnecessary entries
 .clone code from github instead of localcopy
 *add nvim path for root user - todo review
 *fix git config - todo review
@@ -49,4 +34,4 @@ review 'become' from all tasks and remove unnecessary entries
     -change nvim install dir to variable
 .change ssh key name to include distro fullname
 .add ~/tmp dir to both root and user
-https://github.com/geerlingguy/ansible-role-java
+

@@ -59,5 +59,4 @@ packages_alpine_gui:
   - meld
   - firefox
   - chromium
-  - git-cola
   - gitg
