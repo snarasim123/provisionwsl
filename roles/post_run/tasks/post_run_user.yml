@@ -27,43 +27,6 @@
     - post_run
     - gcp
 
-- name: Add GCP installed marker to .bashrc_custom
-  ansible.builtin.lineinfile:
-    path: "{{ user_home }}/.bashrc_custom"
-    line: '# Google Cloud CLI is installed and configured'
-    insertafter: EOF
-    owner: "{{ target_user }}"
-    group: "{{ target_user }}"
-  when: gcp_cli_installed | default(false)
-  tags:
-    - post_run
-
-- name: Add GCP not installed marker to .bashrc_custom
-  ansible.builtin.lineinfile:
-    path: "{{ user_home }}/.bashrc_custom"
-    line: '# Google Cloud CLI is not installed'
-    insertafter: EOF
-    owner: "{{ target_user }}"
-    group: "{{ target_user }}"
-  when: not (gcp_cli_installed | default(false))
-  tags:
-    - post_run
-
-# - name: Add pyenv to .bash_funcs
-#   blockinfile:
-#     path: "{{ user_home }}/.bash_funcs"
-#     marker: "# {mark} PYENV CONFIGURATION"
-#     block: |
-#       export PYENV_ROOT="$HOME/.pyenv"
-#       [[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
-#     create: yes
-#     owner: "{{ target_user }}"
-#     group: "{{ target_user }}"
-#   when: pyenv_installed_flag | default(false)
-#   tags:
-#     - post_run
-#     - pyenv
-
 - name: Create AWS + Kubernetes integration script
   copy:
     content: |
@@ -90,20 +53,20 @@
     - aws
     - k8s
 
-- name: Source AWS + Kubernetes integration script in .bashrc_custom
-  ansible.builtin.lineinfile:
-    path: "{{ user_home }}/.bashrc_custom"
-    line: '[ -f "$HOME/.aws_k8s_integration.sh" ] && source "$HOME/.aws_k8s_integration.sh"'
-    insertafter: EOF
-    owner: "{{ target_user }}"
-    group: "{{ target_user }}"
-  when:
-    - aws_cli_installed | default(false)
-    - kubernetes_installed | default(false)
-  tags:
-    - post_run
-    - aws
-    - k8s
+# - name: Source AWS + Kubernetes integration script in .bashrc_custom
+#   ansible.builtin.lineinfile:
+#     path: "{{ user_home }}/.bashrc_custom"
+#     line: '[ -f "$HOME/.aws_k8s_integration.sh" ] && source "$HOME/.aws_k8s_integration.sh"'
+#     insertafter: EOF
+#     owner: "{{ target_user }}"
+#     group: "{{ target_user }}"
+#   when:
+#     - aws_cli_installed | default(false)
+#     - kubernetes_installed | default(false)
+#   tags:
+#     - post_run
+#     - aws
+#     - k8s
 
 - name: Create GCP + Kubernetes integration script
   copy:
@@ -131,20 +94,20 @@
     - gcp
     - k8s
 
-- name: Source GCP + Kubernetes integration script in .bashrc_custom
-  ansible.builtin.lineinfile:
-    path: "{{ user_home }}/.bashrc_custom"
-    line: '[ -f "$HOME/.gcp_k8s_integration.sh" ] && source "$HOME/.gcp_k8s_integration.sh"'
-    insertafter: EOF
-    owner: "{{ target_user }}"
-    group: "{{ target_user }}"
-  when:
-    - gcp_cli_installed | default(false)
-    - kubernetes_installed | default(false)
-  tags:
-    - post_run
-    - gcp
-    - k8s
+# - name: Source GCP + Kubernetes integration script in .bashrc_custom
+#   ansible.builtin.lineinfile:
+#     path: "{{ user_home }}/.bashrc_custom"
+#     line: '[ -f "$HOME/.gcp_k8s_integration.sh" ] && source "$HOME/.gcp_k8s_integration.sh"'
+#     insertafter: EOF
+#     owner: "{{ target_user }}"
+#     group: "{{ target_user }}"
+#   when:
+#     - gcp_cli_installed | default(false)
+#     - kubernetes_installed | default(false)
+#   tags:
+#     - post_run
+#     - gcp
+#     - k8s
 
 - name: Set AWS as default k8s config (when both AWS and Kubernetes are installed)
   ansible.builtin.file:

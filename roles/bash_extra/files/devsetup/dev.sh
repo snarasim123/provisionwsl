@@ -32,4 +32,3 @@ cd $current_folder_aadev
 
 cp -r ./.kube_aws ~
 cp -r ./.kube_gcp ~
-echo "KUBECONFIG=$HOME/.kube_aws/config" >> $HOME/.bashrc_custom

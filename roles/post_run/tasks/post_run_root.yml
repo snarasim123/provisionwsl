@@ -17,7 +17,6 @@
   ansible.builtin.lineinfile:
     path: "{{ root_user_home }}/.bashrc_custom"
     line: 'export PATH="/usr/local/google-cloud-sdk/bin:$PATH"'
-    create: yes
     owner: "{{ root_user }}"
     group: "{{ root_user }}"
   become: true
@@ -28,26 +27,3 @@
     - post_run
     - gcp
 
-- name: Add GCP installed marker to .bashrc_custom
-  ansible.builtin.lineinfile:
-    path: "{{ root_user_home }}/.bashrc_custom"
-    line: '# Google Cloud CLI is installed and configured'
-    insertafter: EOF
-    owner: "{{ root_user }}"
-    group: "{{ root_user }}"
-  when: gcp_cli_installed | default(false)
-  become: true
-  tags:
-    - post_run
-
-- name: Add GCP not installed marker to .bashrc_custom
-  ansible.builtin.lineinfile:
-    path: "{{ root_user_home }}/.bashrc_custom"
-    line: '# Google Cloud CLI is not installed'
-    insertafter: EOF
-    owner: "{{ root_user }}"
-    group: "{{ root_user }}"
-  when: not (gcp_cli_installed | default(false))
-  become: true
-  tags:
-    - post_run

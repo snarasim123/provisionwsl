@@ -134,7 +134,6 @@
   ansible.builtin.lineinfile:
     path: "/home/{{ target_user }}/.bashrc"
     line: 'export PATH="/usr/local/google-cloud-sdk/bin:$PATH"'
-    create: yes
   tags:
     - gcp
     - cloud
