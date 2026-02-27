@@ -9,7 +9,7 @@
     - editor
   become: yes
   
-- name: remove vim files and directories
+- name: remove vim config files, plugins and directories
   ansible.builtin.file:
     state: absent
     path: "{{ vim_dir }}"
@@ -18,7 +18,7 @@
     - editor
   become: true
 
-- name: remove existing vim symlinks
+- name: remove existing vim config symlinks
   ansible.builtin.file:
     state: absent
     path: "{{ user_home }}/{{ item }}"
@@ -29,7 +29,7 @@
     - vim
     - editor
         
-- name: Create vim directories
+- name: Create vim config directories
   ansible.builtin.file:
     path: "{{ item }}"
     state: directory
@@ -38,8 +38,8 @@
     group: "{{ target_user }}"
   with_items:
     - "{{ vim_dir }}"
-    - "{{ vim_dir }}/autoload"
-    - "{{ vim_dir }}/plugged"
+    # - "{{ vim_dir }}/autoload"
+    # - "{{ vim_dir }}/plugged"
   tags: 
     - vim
     - editor
@@ -48,30 +48,45 @@
 - name: Copy vim files (with plugins)
   copy:
     src: "{{ item }}"
-    dest: "{{ vim_dir }}"
+    dest: "{{ user_home }}"
     owner: "{{ target_user }}"
     group: "{{ target_user }}"
     mode: 0644
   loop:
-    - .vimrc
-    - vim_shortcuts.txt
-  when: not (github_skipped | default(false))
+    # - .vimrc
+    # - vim_shortcuts.txt
+    - .vim.tar
+  # when: not (github_skipped | default(false))
   tags: 
     - vim
     - editor
   become: true
 
-- name: Copy vim files (no plugins)
-  copy:
-    src: "{{ item.src }}"
-    dest: "{{ vim_dir }}/{{ item.dest }}"
-    owner: "{{ target_user }}"
-    group: "{{ target_user }}"
-    mode: 0644
-  loop:
-    - { src: '.vimrc_noplug', dest: '.vimrc' }
-    - { src: 'vim_shortcuts.txt', dest: 'vim_shortcuts.txt' }
-  when: github_skipped | default(false)
+# - name: Copy vim files (no plugins)
+#   copy:
+#     src: "{{ item.src }}"
+#     dest: "{{ vim_dir }}/{{ item.dest }}"
+#     owner: "{{ target_user }}"
+#     group: "{{ target_user }}"
+#     mode: 0644
+#   loop:
+#     - { src: '.vimrc_noplug', dest: '.vimrc' }
+#     - { src: 'vim_shortcuts.txt', dest: 'vim_shortcuts.txt' }
+#   when: github_skipped | default(false)
+#   tags: 
+#     - vim
+#     - editor
+#   become: true
+
+
+
+- name: untar vim plugins 
+  ansible.builtin.unarchive:
+    src: "{{ user_home }}/.vim.tar"
+    dest: "{{ user_home }}"
+    owner: "{{ target_user }}" 
+    group: "{{ target_user }}" 
+    mode: '0766'
   tags: 
     - vim
     - editor
@@ -93,16 +108,16 @@
     - editor
   become: true
 
-- name: Download vim plug plugin manager
-  ansible.builtin.get_url:
-    url: https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
-    dest: "{{ item }}"
-    mode: '0440'
-  with_items:
-    - "{{ vim_dir }}/autoload"
-  tags: 
-    - vim
-    - editor
+# - name: Download vim plug plugin manager
+#   ansible.builtin.get_url:
+#     url: https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+#     dest: "{{ item }}"
+#     mode: '0440'
+#   with_items:
+#     - "{{ vim_dir }}/autoload"
+#   tags: 
+#     - vim
+#     - editor
 
 - name: Change plugin mgr file ownership, group and permissions
   ansible.builtin.file:
@@ -114,50 +129,50 @@
     - vim
     - editor
 
-- name: Print message when skipping plugin deployment
-  ansible.builtin.debug:
-    msg: "Skipping vim plugin deployment - github tag is skipped (no SSH keys configured)"
-  when: github_skipped | default(false)
-  tags:
-    - vim
-    - editor
+# - name: Print message when skipping plugin deployment
+#   ansible.builtin.debug:
+#     msg: "Skipping vim plugin deployment - github tag is skipped (no SSH keys configured)"
+#   when: github_skipped | default(false)
+#   tags:
+#     - vim
+#     - editor
 
-- name: Deploy plugins
-  git:
-    dest: "{{ vim_dir }}/plugged/{{ item.name }}"
-    repo: "{{ item.url }}"
-    clone: yes
-    update: yes
-    recursive: no  
-  loop:
-  - name: delimitMate
-    url: git@github.com:Raimondi/delimitMate.git
-  - name: nerdtree
-    url: git@github.com:preservim/nerdtree
-  - name: minibufexpl.vim
-    url: git@github.com:fholgado/minibufexpl.vim
-  - name: molokai
-    url: git@github.com:tomasr/molokai
-  - name: cobalt
-    url: git@github.com:gkjgh/cobalt.git
-  - name: vim-airline
-    url: git@github.com:vim-airline/vim-airline.git
-  - name: setcolors.vim
-    url: git@github.com:felixhummel/setcolors.vim
-  - name: vim-fugitive
-    url: git@github.com:tpope/vim-fugitive.git
-  - name: vim-gitgutter
-    url: git@github.com:airblade/vim-gitgutter.git
-  - name: vim-quickui
-    url: git@github.com:skywind3000/vim-quickui
-  - name: vim-gutentags
-    url: git@github.com:ludovicchabant/vim-gutentags.git
-  when: not (github_skipped | default(false))
-  ignore_errors: yes
-  tags: 
-    - vim
-    - editor
-  become: true
+# - name: Deploy plugins
+#   git:
+#     dest: "{{ vim_dir }}/plugged/{{ item.name }}"
+#     repo: "{{ item.url }}"
+#     clone: yes
+#     update: yes
+#     recursive: no  
+#   loop:
+#   - name: delimitMate
+#     url: git@github.com:Raimondi/delimitMate.git
+#   - name: nerdtree
+#     url: git@github.com:preservim/nerdtree
+#   - name: minibufexpl.vim
+#     url: git@github.com:fholgado/minibufexpl.vim
+#   - name: molokai
+#     url: git@github.com:tomasr/molokai
+#   - name: cobalt
+#     url: git@github.com:gkjgh/cobalt.git
+#   - name: vim-airline
+#     url: git@github.com:vim-airline/vim-airline.git
+#   - name: setcolors.vim
+#     url: git@github.com:felixhummel/setcolors.vim
+#   - name: vim-fugitive
+#     url: git@github.com:tpope/vim-fugitive.git
+#   - name: vim-gitgutter
+#     url: git@github.com:airblade/vim-gitgutter.git
+#   - name: vim-quickui
+#     url: git@github.com:skywind3000/vim-quickui
+#   - name: vim-gutentags
+#     url: git@github.com:ludovicchabant/vim-gutentags.git
+#   when: not (github_skipped | default(false))
+#   ignore_errors: yes
+#   tags: 
+#     - vim
+#     - editor
+#   become: true
 
 
 
