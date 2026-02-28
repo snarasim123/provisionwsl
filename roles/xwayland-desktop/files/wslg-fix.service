@@ -1,0 +1,14 @@
+[Unit]
+After=wslg.service
+
+[Service]
+Type=oneshot
+ExecStart=-/usr/bin/umount /tmp/.X11-unix
+ExecStart=/usr/bin/rm -rf /tmp/.X11-unix
+ExecStart=/usr/bin/mkdir -m 1777 /tmp/.X11-unix
+ExecStart=/usr/bin/ln -s /mnt/wslg/.X11-unix/X0 /tmp/.X11-unix/X0
+ExecStart=/usr/bin/chmod 0777 /mnt/wslg/runtime-dir
+ExecStart=/usr/bin/chmod 0666 /mnt/wslg/runtime-dir/wayland-0.lock
+
+[Install]
+WantedBy=multi-user.target

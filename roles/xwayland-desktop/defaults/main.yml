@@ -1,0 +1,15 @@
+---
+# Default resolution for the Xwayland virtual screen
+xwayland_resolution: "1920x1080"
+
+# Desktop metapackage to install
+desktop_metapackage: "ubuntu-mate-desktop"
+
+# Monitor refresh rate (used in monitors.xml)
+monitor_refresh_rate: "59.963"
+
+# Whether to enable automatic login
+autologin_enabled: true
+
+# WSL distro instance name
+wsl_distro_name_override: "sample_ubuntu_2404"

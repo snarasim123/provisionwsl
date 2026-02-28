@@ -1,4 +1,4 @@
-export ps_distro_id=ubuntu2204
+export ps_distro_id=ubuntu2404
 export skipsteps=github,cloud,container,git,dev,python,java,gui
 
 

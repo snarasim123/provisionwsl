@@ -1,0 +1,220 @@
+---
+###############################################################################
+# xwayland-desktop: Install Ubuntu MATE Desktop with XWayland on WSL2/WSLg
+# Reference: https://gist.github.com/tdcosta100/e28636c216515ca88d1f2e7a2e188912
+# Target: Ubuntu 24.04 (sample_ubuntu_2404)
+###############################################################################
+
+# ── 1. Prerequisites ─────────────────────────────────────────────────────────
+
+- name: Ensure systemd is enabled in /etc/wsl.conf
+  become: true
+  blockinfile:
+    path: /etc/wsl.conf
+    create: yes
+    block: |
+      [boot]
+      systemd=true
+    marker: "# {mark} ANSIBLE MANAGED - systemd boot"
+  tags:
+    - xwayland-desktop
+
+- name: Update apt cache
+  become: true
+  apt:
+    update_cache: yes
+    cache_valid_time: 3600
+  tags:
+    - xwayland-desktop
+
+- name: Upgrade all packages
+  become: true
+  apt:
+    upgrade: dist
+  tags:
+    - xwayland-desktop
+
+# ── 2. Install desktop environment & xwayland ────────────────────────────────
+
+- name: Install {{ desktop_metapackage }} and xwayland
+  become: true
+  apt:
+    name:
+      - "{{ desktop_metapackage }}"
+      - xwayland
+    state: present
+  environment:
+    DEBIAN_FRONTEND: noninteractive
+  tags:
+    - xwayland-desktop
+
+# ── 3. Create and configure systemd services ─────────────────────────────────
+
+- name: Install wslg-fix.service unit file
+  become: true
+  copy:
+    src: wslg-fix.service
+    dest: /etc/systemd/system/wslg-fix.service
+    owner: root
+    group: root
+    mode: '0644'
+  tags:
+    - xwayland-desktop
+
+- name: Enable wslg-fix.service
+  become: true
+  systemd:
+    name: wslg-fix.service
+    enabled: yes
+    daemon_reload: yes
+  tags:
+    - xwayland-desktop
+
+- name: Mask wslg-session user service (remove Wayland references)
+  become: true
+  file:
+    src: /dev/null
+    dest: /etc/systemd/user/wslg-session.service
+    state: link
+    force: yes
+  tags:
+    - xwayland-desktop
+
+- name: Set default systemd target to multi-user (prevent shell on distro open)
+  become: true
+  command: systemctl set-default multi-user.target
+  changed_when: true
+  tags:
+    - xwayland-desktop
+
+# ── 4. Replace default Xorg by XWayland ──────────────────────────────────────
+
+- name: Deploy Xorg.Xwayland wrapper script
+  become: true
+  copy:
+    src: Xorg.Xwayland
+    dest: /usr/bin/Xorg.Xwayland
+    owner: root
+    group: root
+    mode: '0755'
+  tags:
+    - xwayland-desktop
+
+- name: Set resolution in Xorg.Xwayland script
+  become: true
+  replace:
+    path: /usr/bin/Xorg.Xwayland
+    regexp: '@@XWAYLAND_RESOLUTION@@'
+    replace: "{{ xwayland_resolution }}"
+  tags:
+    - xwayland-desktop
+
+- name: Divert original Xorg binary (dpkg-divert)
+  become: true
+  command: dpkg-divert --local --add --rename /usr/bin/Xorg
+  args:
+    creates: /usr/bin/Xorg.distrib
+  tags:
+    - xwayland-desktop
+
+- name: Register Xorg.Xwayland as Xorg alternative
+  become: true
+  command: update-alternatives --install /usr/bin/Xorg Xorg /usr/bin/Xorg.Xwayland 100
+  changed_when: true
+  tags:
+    - xwayland-desktop
+
+# ── 5. Monitor resolution configuration ──────────────────────────────────────
+
+- name: Ensure user .config directory exists
+  file:
+    path: "{{ user_home }}/.config"
+    state: directory
+    owner: "{{ target_user }}"
+    group: "{{ target_user }}"
+    mode: '0755'
+  tags:
+    - xwayland-desktop
+
+- name: Deploy monitors.xml for user
+  template:
+    src: monitors.xml.j2
+    dest: "{{ user_home }}/.config/monitors.xml"
+    owner: "{{ target_user }}"
+    group: "{{ target_user }}"
+    mode: '0644'
+  tags:
+    - xwayland-desktop
+
+# ── 6. LightDM configuration (MATE default display manager) ──────────────────
+
+- name: Configure LightDM autologin
+  become: true
+  blockinfile:
+    path: /etc/lightdm/lightdm.conf
+    create: yes
+    block: |
+      [Seat:*]
+      autologin-user={{ target_user }}
+      autologin-user-timeout=0
+    marker: "# {mark} ANSIBLE MANAGED - autologin"
+  when: autologin_enabled | default(true)
+  tags:
+    - xwayland-desktop
+
+# ── 7. GPU / rendering environment variables ─────────────────────────────────
+
+- name: Set GALLIUM_DRIVER=d3d12 for GPU acceleration in WSL
+  become: true
+  copy:
+    content: |
+      export GALLIUM_DRIVER="d3d12"
+    dest: /etc/profile.d/wsl-gpu.sh
+    owner: root
+    group: root
+    mode: '0644'
+  tags:
+    - xwayland-desktop
+
+- name: Ensure GALLIUM_DRIVER is in /etc/environment
+  become: true
+  lineinfile:
+    path: /etc/environment
+    regexp: '^GALLIUM_DRIVER='
+    line: 'GALLIUM_DRIVER="d3d12"'
+    state: present
+  tags:
+    - xwayland-desktop
+
+# ── 8. Helper script to start the desktop ────────────────────────────────────
+
+- name: Create start-desktop helper script
+  become: true
+  copy:
+    content: |
+      #!/bin/bash
+      ###############################################################
+      # start-desktop.sh - Start the MATE desktop via XWayland
+      # Usage: sudo ./start-desktop.sh
+      # To stop: sudo poweroff  (from GUI or terminal)
+      ###############################################################
+      set -e
+      echo "Starting graphical target..."
+      systemctl start graphical.target
+      echo "Desktop is running. Use 'sudo poweroff' to shut down cleanly."
+    dest: /usr/local/bin/start-desktop.sh
+    owner: root
+    group: root
+    mode: '0755'
+  tags:
+    - xwayland-desktop
+
+- name: Display post-install message
+  debug:
+    msg: >
+      XWayland MATE Desktop role complete.
+      To start the desktop run:  sudo systemctl start graphical.target
+      To shut down cleanly:      sudo poweroff
+      Then terminate WSL:        wsl.exe --terminate {{ wsl_distro_name_override }}
+  tags:
+    - xwayland-desktop

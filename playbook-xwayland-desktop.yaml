@@ -1,0 +1,7 @@
+- hosts: wsl
+  gather_facts: true
+  vars_files:
+    - vars/user_environment.yml
+  roles:
+    - facts
+    - xwayland-desktop

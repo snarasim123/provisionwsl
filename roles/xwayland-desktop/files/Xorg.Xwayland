@@ -1,0 +1,44 @@
+#!/bin/bash
+for arg do
+  shift
+  case $arg in
+    # Xwayland doesn't support vtxx argument. So we convert to ttyxx instead
+    vt*)
+      set -- "$@" "${arg//vt/tty}"
+      ;;
+    # -keeptty is not supported at all by Xwayland
+    -keeptty)
+      ;;
+    # -novtswitch is not supported at all by Xwayland
+    -novtswitch)
+      ;;
+    # other arguments are kept intact
+    *)
+      set -- "$@" "$arg"
+      ;;
+  esac
+done
+
+# Check if the runtime dir is present, and create it if not
+if [ ! -d $HOME/runtime-dir ]
+then
+  mkdir $HOME/runtime-dir
+  ln -s /mnt/wslg/runtime-dir/wayland-0 /mnt/wslg/runtime-dir/wayland-0.lock $HOME/runtime-dir/
+fi
+
+# Point the XDG_RUNTIME_DIR variable to $HOME/runtime-dir
+export XDG_RUNTIME_DIR=$HOME/runtime-dir
+
+# Find an available display number
+for displayNumber in $(seq 1 100)
+do
+  [ ! -e /tmp/.X11-unix/X$displayNumber ] && break
+done
+
+# Here you can change or add options to fit your needs
+# Resolution is replaced by Ansible during deployment
+command=("/usr/bin/Xwayland" ":${displayNumber}" "-geometry" "@@XWAYLAND_RESOLUTION@@" "-fullscreen" "$@")
+
+systemd-cat -t /usr/bin/Xorg echo "Starting Xwayland:" "${command[@]}"
+
+exec "${command[@]}"

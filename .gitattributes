@@ -29,6 +29,9 @@
 # CSV files use LF
 *.csv text eol=lf
 
+# Profile files use LF (sourced in Linux/WSL)
+profiles/* text eol=lf
+
 # Binary files should not be modified
 *.png binary
 *.jpg binary

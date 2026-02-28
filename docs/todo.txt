@@ -1,10 +1,11 @@
 .lazygit
-.install vim plugins without github
+*.install vim plugins without github
 .debug why new kc methods are not getting deployed.    
 .set display env by default
 .move display methods to separate file
 .move kc functions to a separate file
 .document lf requirement as opposed to crlf for profile files
+.make pre-removal and re-install of system python optional
 
 .capture error conditions and jump to role/task?
 .remove github keys with teardown
