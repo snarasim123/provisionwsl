@@ -1,6 +1,11 @@
 secret.sh
 unused/secret.sh
 secrets.*
-*.tar
+# *.tar
 *.tar.gz
 *.vhdx
+tmp/alpine-minirootfs-3.20.0-x86_64.tar
+tmp/fedora_3704.tar
+tmp/ubuntu2004.tar
+tmp/ubuntu-jammy-wsl-amd64-wsl.rootfs.tar
+tmp/ubuntu-noble-wsl-amd64-24.04lts.rootfs.tar
