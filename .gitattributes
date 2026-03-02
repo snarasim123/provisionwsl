@@ -31,6 +31,8 @@
 
 # Profile files use LF (sourced in Linux/WSL)
 profiles/* text eol=lf
+#bash startup scripts use lf
+files/common/* text eol=lf
 
 # Binary files should not be modified
 *.png binary
