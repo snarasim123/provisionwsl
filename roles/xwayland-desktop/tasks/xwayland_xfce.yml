@@ -1,0 +1,124 @@
+---
+###############################################################################
+# xwayland-desktop: XFCE Desktop Environment packages
+###############################################################################
+
+- name: Install exo-utils
+  become: true
+  apt:
+    name: exo-utils
+    state: present
+  environment:
+    DEBIAN_FRONTEND: noninteractive
+  tags:
+    - xwayland-desktop
+
+- name: Install xfce4-appfinder
+  become: true
+  apt:
+    name: xfce4-appfinder
+    state: present
+  environment:
+    DEBIAN_FRONTEND: noninteractive
+  tags:
+    - xwayland-desktop
+
+- name: Install xfce4-notifyd
+  become: true
+  apt:
+    name: xfce4-notifyd
+    state: present
+  environment:
+    DEBIAN_FRONTEND: noninteractive
+  tags:
+    - xwayland-desktop
+
+- name: Install xfce4-panel
+  become: true
+  apt:
+    name: xfce4-panel
+    state: present
+  environment:
+    DEBIAN_FRONTEND: noninteractive
+  tags:
+    - xwayland-desktop
+
+- name: Install xfce4-session
+  become: true
+  apt:
+    name: xfce4-session
+    state: present
+  environment:
+    DEBIAN_FRONTEND: noninteractive
+  tags:
+    - xwayland-desktop
+
+- name: Install xfce4-settings
+  become: true
+  apt:
+    name: xfce4-settings
+    state: present
+  environment:
+    DEBIAN_FRONTEND: noninteractive
+  tags:
+    - xwayland-desktop
+
+- name: Install xfce4-terminal
+  become: true
+  apt:
+    name: xfce4-terminal
+    state: present
+  environment:
+    DEBIAN_FRONTEND: noninteractive
+  tags:
+    - xwayland-desktop
+
+- name: Install xfconf
+  become: true
+  apt:
+    name: xfconf
+    state: present
+  environment:
+    DEBIAN_FRONTEND: noninteractive
+  tags:
+    - xwayland-desktop
+
+- name: Install xfdesktop4
+  become: true
+  apt:
+    name: xfdesktop4
+    state: present
+  environment:
+    DEBIAN_FRONTEND: noninteractive
+  tags:
+    - xwayland-desktop
+
+- name: Install xfwm4
+  become: true
+  apt:
+    name: xfwm4
+    state: present
+  environment:
+    DEBIAN_FRONTEND: noninteractive
+  tags:
+    - xwayland-desktop
+
+- name: Install thunar
+  become: true
+  apt:
+    name: thunar
+    state: present
+  environment:
+    DEBIAN_FRONTEND: noninteractive
+  tags:
+    - xwayland-desktop
+
+- name: Install thunar-volman
+  become: true
+  apt:
+    name: thunar-volman
+    state: present
+  environment:
+    DEBIAN_FRONTEND: noninteractive
+  tags:
+    - xwayland-desktop

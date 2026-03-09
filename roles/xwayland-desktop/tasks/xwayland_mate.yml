@@ -5,44 +5,209 @@
 # Target: Ubuntu 24.04 (sample_ubuntu_2404)
 ###############################################################################
 
-# ── 1. Prerequisites ─────────────────────────────────────────────────────────
+# ── Install desktop environment & xwayland ────────────────────────────────
 
-- name: Ensure systemd is enabled in /etc/wsl.conf
-  become: true
-  blockinfile:
-    path: /etc/wsl.conf
-    create: yes
-    block: |
-      [boot]
-      systemd=true
-    marker: "# {mark} ANSIBLE MANAGED - systemd boot"
-  tags:
-    - xwayland-desktop
+# Pre-install the largest dependencies individually so progress is visible
+# and any single-package failure is easy to diagnose.
 
-- name: Update apt cache
+- name: Install xterm
   become: true
   apt:
-    update_cache: yes
-    cache_valid_time: 3600
-  tags:
-    - xwayland-desktop
-
-- name: Upgrade all packages
-  become: true
-  apt:
-    upgrade: dist
-  tags:
-    - xwayland-desktop
-
-# ── 2. Install desktop environment & xwayland ────────────────────────────────
-
-- name: Install {{ desktop_metapackage }} and xwayland
-  become: true
-  apt:
-    name:
-      - "{{ desktop_metapackage }}"
-      - xwayland
+    name: xterm
     state: present
+  environment:
+    DEBIAN_FRONTEND: noninteractive
+  tags:
+    - xwayland-desktop
+
+- name: Install fonts-dejavu-core
+  become: true
+  apt:
+    name: fonts-dejavu-core
+    state: present
+  environment:
+    DEBIAN_FRONTEND: noninteractive
+  tags:
+    - xwayland-desktop
+
+- name: Install printer-driver-pnm2ppa
+  become: true
+  apt:
+    name: printer-driver-pnm2ppa
+    state: present
+  environment:
+    DEBIAN_FRONTEND: noninteractive
+  tags:
+    - xwayland-desktop
+
+- name: Install language-selector-common
+  become: true
+  apt:
+    name: language-selector-common
+    state: present
+  environment:
+    DEBIAN_FRONTEND: noninteractive
+  tags:
+    - xwayland-desktop
+
+# Skipped: update-manager — pulls in heavy GNOME deps (gdm3, gnome-shell)
+# when installed standalone. Let the desktop metapackage resolve it instead.
+
+- name: Fix dpkg state before metapackage install
+  become: true
+  command: dpkg --configure -a
+  changed_when: false
+  ignore_errors: true
+  tags:
+    - xwayland-desktop
+
+- name: Fix broken dependencies before metapackage install
+  become: true
+  command: apt-get -f install -y
+  environment:
+    DEBIAN_FRONTEND: noninteractive
+  changed_when: false
+  ignore_errors: true
+  tags:
+    - xwayland-desktop
+
+- name: Install {{ desktop_metapackage }}
+  become: true
+  apt:
+    name: "{{ desktop_metapackage }}"
+    state: present
+  ignore_errors: true
+  environment:
+    DEBIAN_FRONTEND: noninteractive
+  tags:
+    - xwayland-desktop
+
+# Pre-install the largest xwayland dependencies individually
+
+# - name: Install libc6
+#   become: true
+#   apt:
+#     name: libc6
+#     state: present
+#   environment:
+#     DEBIAN_FRONTEND: noninteractive
+#   tags:
+#     - xwayland-desktop
+
+# - name: Install libgcrypt20
+#   become: true
+#   apt:
+#     name: libgcrypt20
+#     state: present
+#   environment:
+#     DEBIAN_FRONTEND: noninteractive
+#   tags:
+#     - xwayland-desktop
+
+# - name: Install libepoxy0
+#   become: true
+#   apt:
+#     name: libepoxy0
+#     state: present
+#   environment:
+#     DEBIAN_FRONTEND: noninteractive
+#   tags:
+#     - xwayland-desktop
+
+# - name: Install libpixman-1-0
+#   become: true
+#   apt:
+#     name: libpixman-1-0
+#     state: present
+#   environment:
+#     DEBIAN_FRONTEND: noninteractive
+#   tags:
+#     - xwayland-desktop
+
+# - name: Install libgl1
+#   become: true
+#   apt:
+#     name: libgl1
+#     state: present
+#   environment:
+#     DEBIAN_FRONTEND: noninteractive
+#   tags:
+#     - xwayland-desktop
+
+# - name: Install libtirpc3t64
+#   become: true
+#   apt:
+#     name: libtirpc3t64
+#     state: present
+#   environment:
+#     DEBIAN_FRONTEND: noninteractive
+#   tags:
+#     - xwayland-desktop
+
+# - name: Install libxfont2
+#   become: true
+#   apt:
+#     name: libxfont2
+#     state: present
+#   environment:
+#     DEBIAN_FRONTEND: noninteractive
+#   tags:
+#     - xwayland-desktop
+
+# - name: Install xserver-common
+#   become: true
+#   apt:
+#     name: xserver-common
+#     state: present
+#   environment:
+#     DEBIAN_FRONTEND: noninteractive
+#   tags:
+#     - xwayland-desktop
+
+# - name: Install libgbm1
+#   become: true
+#   apt:
+#     name: libgbm1
+#     state: present
+#   environment:
+#     DEBIAN_FRONTEND: noninteractive
+#   tags:
+#     - xwayland-desktop
+
+# - name: Install libdrm2
+#   become: true
+#   apt:
+#     name: libdrm2
+#     state: present
+#   environment:
+#     DEBIAN_FRONTEND: noninteractive
+#   tags:
+#     - xwayland-desktop
+
+- name: Fix dpkg state before metapackage install 2
+  become: true
+  command: dpkg --configure -a
+  changed_when: false
+  ignore_errors: true
+  tags:
+    - xwayland-desktop
+
+- name: Fix broken dependencies before metapackage install 2
+  become: true 
+  command: apt-get -f install -y
+  environment:
+    DEBIAN_FRONTEND: noninteractive
+  changed_when: false
+  ignore_errors: true
+  tags:
+    - xwayland-desktop
+
+- name: Install xwayland
+  become: true
+  apt:
+    name: xwayland
+    state: present
+  ignore_errors: true
   environment:
     DEBIAN_FRONTEND: noninteractive
   tags:

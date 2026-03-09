@@ -36,20 +36,40 @@
   tags: 
     - user    
 
-- name: root_user - enable systemd, if wsl.conf exists
+- name: root_user - Read /etc/wsl.conf
+  ansible.builtin.slurp:
+    src: /etc/wsl.conf
+  register: wslconf_content
+  become: true
+  when: is_wsl and wslconf_exists.stat.exists
+  tags:
+    - user
+
+- name: root_user - enable systemd in wsl.conf if not already set
   ansible.builtin.blockinfile:
     path: /etc/wsl.conf
-    block:  |
+    block: |
       [boot]
       systemd=true
+    marker: "## {mark} ANSIBLE MANAGED - systemd"
+    create: true
+  become: true
+  when: is_wsl and (not wslconf_exists.stat.exists or (wslconf_content.content | b64decode) is not search('systemd\s*=\s*true'))
+  tags:
+    - user
+
+- name: root_user - set default user in wsl.conf
+  ansible.builtin.blockinfile:
+    path: /etc/wsl.conf
+    block: |
       [user]
       default={{ target_user }}
-    marker: "## {mark} ANSIBLE MANAGED BLOCK"
+    marker: "## {mark} ANSIBLE MANAGED - default user"
     create: true
   become: true
   when: is_wsl
-  tags: 
-    - user    
+  tags:
+    - user
 
 - name: change default shell to /bin/bash for root
   ansible.builtin.user:

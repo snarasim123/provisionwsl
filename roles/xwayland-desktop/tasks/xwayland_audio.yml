@@ -1,0 +1,64 @@
+---
+###############################################################################
+# xwayland-desktop: Audio / Media packages
+###############################################################################
+
+- name: Install alsa-utils
+  become: true
+  apt:
+    name: alsa-utils
+    state: present
+  environment:
+    DEBIAN_FRONTEND: noninteractive
+  tags:
+    - xwayland-desktop
+
+- name: Install pulseaudio
+  become: true
+  apt:
+    name: pulseaudio
+    state: present
+  environment:
+    DEBIAN_FRONTEND: noninteractive
+  tags:
+    - xwayland-desktop
+
+- name: Install pulseaudio-utils
+  become: true
+  apt:
+    name: pulseaudio-utils
+    state: present
+  environment:
+    DEBIAN_FRONTEND: noninteractive
+  tags:
+    - xwayland-desktop
+
+- name: Install pipewire-bin
+  become: true
+  apt:
+    name: pipewire-bin
+    state: present
+  environment:
+    DEBIAN_FRONTEND: noninteractive
+  tags:
+    - xwayland-desktop
+
+- name: Install pipewire-pulse
+  become: true
+  apt:
+    name: pipewire-pulse
+    state: present
+  environment:
+    DEBIAN_FRONTEND: noninteractive
+  tags:
+    - xwayland-desktop
+
+- name: Install wireplumber
+  become: true
+  apt:
+    name: wireplumber
+    state: present
+  environment:
+    DEBIAN_FRONTEND: noninteractive
+  tags:
+    - xwayland-desktop

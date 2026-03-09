@@ -1,0 +1,34 @@
+---
+###############################################################################
+# xwayland-desktop: Bluetooth packages
+###############################################################################
+
+- name: Install blueman
+  become: true
+  apt:
+    name: blueman
+    state: present
+  environment:
+    DEBIAN_FRONTEND: noninteractive
+  tags:
+    - xwayland-desktop
+
+- name: Install bluez
+  become: true
+  apt:
+    name: bluez
+    state: present
+  environment:
+    DEBIAN_FRONTEND: noninteractive
+  tags:
+    - xwayland-desktop
+
+- name: Install gnome-bluetooth-sendto
+  become: true
+  apt:
+    name: gnome-bluetooth-sendto
+    state: present
+  environment:
+    DEBIAN_FRONTEND: noninteractive
+  tags:
+    - xwayland-desktop

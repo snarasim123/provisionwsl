@@ -1,0 +1,49 @@
+---
+###############################################################################
+# xwayland-desktop: Prerequisites
+###############################################################################
+
+- name: Ensure systemd is enabled in /etc/wsl.conf
+  become: true
+  lineinfile:
+    path: /etc/wsl.conf
+    regexp: '^systemd\s*='
+    line: 'systemd=true'
+    insertafter: '^\[boot\]'
+    create: no
+  tags:
+    - xwayland-desktop
+
+- name: Ensure python3 points to system Python 3.12
+  become: true
+  alternatives:
+    name: python3
+    path: /usr/bin/python3.12
+    link: /usr/bin/python3
+    priority: 100
+  tags:
+    - xwayland-desktop
+
+- name: Update apt cache
+  become: true
+  apt:
+    update_cache: yes
+    cache_valid_time: 3600
+  tags:
+    - xwayland-desktop
+
+- name: Fix dpkg if interrupted
+  become: true
+  command: dpkg --configure -a
+  changed_when: false
+  ignore_errors: true
+  tags:
+    - xwayland-desktop
+
+- name: Upgrade all packages
+  become: true
+  apt:
+    upgrade: safe
+  ignore_errors: true
+  tags:
+    - xwayland-desktop

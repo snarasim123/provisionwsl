@@ -1,0 +1,74 @@
+---
+###############################################################################
+# xwayland-desktop: Package Management packages
+###############################################################################
+
+- name: Install aptdaemon
+  become: true
+  apt:
+    name: aptdaemon
+    state: present
+  environment:
+    DEBIAN_FRONTEND: noninteractive
+  tags:
+    - xwayland-desktop
+
+- name: Install snapd
+  become: true
+  apt:
+    name: snapd
+    state: present
+  environment:
+    DEBIAN_FRONTEND: noninteractive
+  tags:
+    - xwayland-desktop
+
+- name: Install synaptic
+  become: true
+  apt:
+    name: synaptic
+    state: present
+  environment:
+    DEBIAN_FRONTEND: noninteractive
+  tags:
+    - xwayland-desktop
+
+# - name: Install update-manager
+#   become: true
+#   apt:
+#     name: update-manager
+#     state: present
+#   environment:
+#     DEBIAN_FRONTEND: noninteractive
+#   tags:
+#     - xwayland-desktop
+
+# - name: Install update-manager-core
+#   become: true
+#   apt:
+#     name: update-manager-core
+#     state: present
+#   environment:
+#     DEBIAN_FRONTEND: noninteractive
+#   tags:
+#     - xwayland-desktop
+
+# - name: Install update-notifier
+#   become: true
+#   apt:
+#     name: update-notifier
+#     state: present
+#   environment:
+#     DEBIAN_FRONTEND: noninteractive
+#   tags:
+#     - xwayland-desktop
+
+# - name: Install ubuntu-release-upgrader-core
+#   become: true
+#   apt:
+#     name: ubuntu-release-upgrader-core
+#     state: present
+#   environment:
+#     DEBIAN_FRONTEND: noninteractive
+#   tags:
+#     - xwayland-desktop

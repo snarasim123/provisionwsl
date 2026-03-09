@@ -1,0 +1,114 @@
+---
+###############################################################################
+# xwayland-desktop: Security & Crypto packages for XWayland MATE Desktop
+###############################################################################
+
+- name: Install gnupg-utils
+  become: true
+  apt:
+    name: gnupg-utils
+    state: present
+  environment:
+    DEBIAN_FRONTEND: noninteractive
+  tags:
+    - xwayland-desktop
+
+- name: Install gpg
+  become: true
+  apt:
+    name: gpg
+    state: present
+  environment:
+    DEBIAN_FRONTEND: noninteractive
+  tags:
+    - xwayland-desktop
+
+- name: Install gpg-agent
+  become: true
+  apt:
+    name: gpg-agent
+    state: present
+  environment:
+    DEBIAN_FRONTEND: noninteractive
+  tags:
+    - xwayland-desktop
+
+- name: Install gpgconf
+  become: true
+  apt:
+    name: gpgconf
+    state: present
+  environment:
+    DEBIAN_FRONTEND: noninteractive
+  tags:
+    - xwayland-desktop
+
+- name: Install gpgsm
+  become: true
+  apt:
+    name: gpgsm
+    state: present
+  environment:
+    DEBIAN_FRONTEND: noninteractive
+  tags:
+    - xwayland-desktop
+
+- name: Install gpgv
+  become: true
+  apt:
+    name: gpgv
+    state: present
+  environment:
+    DEBIAN_FRONTEND: noninteractive
+  tags:
+    - xwayland-desktop
+
+- name: Install dirmngr
+  become: true
+  apt:
+    name: dirmngr
+    state: present
+  environment:
+    DEBIAN_FRONTEND: noninteractive
+  tags:
+    - xwayland-desktop
+
+- name: Install openssh-client
+  become: true
+  apt:
+    name: openssh-client
+    state: present
+  environment:
+    DEBIAN_FRONTEND: noninteractive
+  tags:
+    - xwayland-desktop
+
+- name: Install openssl
+  become: true
+  apt:
+    name: openssl
+    state: present
+  environment:
+    DEBIAN_FRONTEND: noninteractive
+  tags:
+    - xwayland-desktop
+
+- name: Install pinentry-curses
+  become: true
+  apt:
+    name: pinentry-curses
+    state: present
+  environment:
+    DEBIAN_FRONTEND: noninteractive
+  tags:
+    - xwayland-desktop
+
+- name: Install pinentry-gnome3
+  become: true
+  apt:
+    name: pinentry-gnome3
+    state: present
+  environment:
+    DEBIAN_FRONTEND: noninteractive
+  tags:
+    - xwayland-desktop

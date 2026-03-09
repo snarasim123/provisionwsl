@@ -33,6 +33,18 @@
 profiles/* text eol=lf
 #bash startup scripts use lf
 files/common/* text eol=lf
+files/common/.alias text eol=lf
+files/common/.bashrc text eol=lf
+files/common/.bashrc_custom text eol=lf
+files/common/.bash_funcs text eol=lf
+files/common/.bash_profile text eol=lf
+files/common/dircolors256dark text eol=lf
+files/common/dircolorsansi-light text eol=lf
+files/common/kubetop.sh text eol=lf
+files/common/kube_aws.sh text eol=lf
+files/common/kube_gcp.sh text eol=lf
+files/common/prompt.sh text eol=lf
+files/common/variables.sh text eol=lf
 
 # Binary files should not be modified
 *.png binary

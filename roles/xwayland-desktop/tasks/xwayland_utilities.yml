@@ -1,0 +1,164 @@
+---
+###############################################################################
+# xwayland-desktop: Utility packages
+###############################################################################
+
+- name: Install bc
+  become: true
+  apt:
+    name: bc
+    state: present
+  environment:
+    DEBIAN_FRONTEND: noninteractive
+  tags:
+    - xwayland-desktop
+
+- name: Install file
+  become: true
+  apt:
+    name: file
+    state: present
+  environment:
+    DEBIAN_FRONTEND: noninteractive
+  tags:
+    - xwayland-desktop
+
+- name: Install gawk
+  become: true
+  apt:
+    name: gawk
+    state: present
+  environment:
+    DEBIAN_FRONTEND: noninteractive
+  tags:
+    - xwayland-desktop
+
+- name: Install gdb
+  become: true
+  apt:
+    name: gdb
+    state: present
+  environment:
+    DEBIAN_FRONTEND: noninteractive
+  tags:
+    - xwayland-desktop
+
+- name: Install lsof
+  become: true
+  apt:
+    name: lsof
+    state: present
+  environment:
+    DEBIAN_FRONTEND: noninteractive
+  tags:
+    - xwayland-desktop
+
+- name: Install mawk
+  become: true
+  apt:
+    name: mawk
+    state: present
+  environment:
+    DEBIAN_FRONTEND: noninteractive
+  tags:
+    - xwayland-desktop
+
+- name: Install parted
+  become: true
+  apt:
+    name: parted
+    state: present
+  environment:
+    DEBIAN_FRONTEND: noninteractive
+  tags:
+    - xwayland-desktop
+
+- name: Install patch
+  become: true
+  apt:
+    name: patch
+    state: present
+  environment:
+    DEBIAN_FRONTEND: noninteractive
+  tags:
+    - xwayland-desktop
+
+- name: Install pciutils
+  become: true
+  apt:
+    name: pciutils
+    state: present
+  environment:
+    DEBIAN_FRONTEND: noninteractive
+  tags:
+    - xwayland-desktop
+
+- name: Install sed
+  become: true
+  apt:
+    name: sed
+    state: present
+  environment:
+    DEBIAN_FRONTEND: noninteractive
+  tags:
+    - xwayland-desktop
+
+- name: Install squashfs-tools
+  become: true
+  apt:
+    name: squashfs-tools
+    state: present
+  environment:
+    DEBIAN_FRONTEND: noninteractive
+  tags:
+    - xwayland-desktop
+
+- name: Install tar
+  become: true
+  apt:
+    name: tar
+    state: present
+  environment:
+    DEBIAN_FRONTEND: noninteractive
+  tags:
+    - xwayland-desktop
+
+- name: Install unzip
+  become: true
+  apt:
+    name: unzip
+    state: present
+  environment:
+    DEBIAN_FRONTEND: noninteractive
+  tags:
+    - xwayland-desktop
+
+- name: Install zip
+  become: true
+  apt:
+    name: zip
+    state: present
+  environment:
+    DEBIAN_FRONTEND: noninteractive
+  tags:
+    - xwayland-desktop
+
+- name: Install xz-utils
+  become: true
+  apt:
+    name: xz-utils
+    state: present
+  environment:
+    DEBIAN_FRONTEND: noninteractive
+  tags:
+    - xwayland-desktop
+
+- name: Install zstd
+  become: true
+  apt:
+    name: zstd
+    state: present
+  environment:
+    DEBIAN_FRONTEND: noninteractive
+  tags:
+    - xwayland-desktop

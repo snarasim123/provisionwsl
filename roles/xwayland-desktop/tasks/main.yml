@@ -1,3 +1,24 @@
 ---
+- include_tasks: xwayland_prerequisites.yml
+  when: is_ubuntu
+
+- include_tasks: xwayland_utilities.yml
+  when: is_ubuntu
+
+- include_tasks: xwayland_security.yml
+  when: is_ubuntu
+
+- include_tasks: xwayland_audio.yml
+  when: is_ubuntu
+
+- include_tasks: xwayland_bluetooth.yml
+  when: is_ubuntu
+
+# - include_tasks: xwayland_xfce.yml
+#   when: is_ubuntu
+
+# - include_tasks: xwayland_pkgmgmt.yml
+#   when: is_ubuntu
+
 - include_tasks: xwayland_mate.yml
   when: is_ubuntu
