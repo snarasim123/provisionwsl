@@ -1,0 +1,55 @@
+---
+###############################################################################
+# xwayland-desktop: Install Ubuntu MATE Desktop with XWayland on WSL2/WSLg
+# Reference: https://gist.github.com/tdcosta100/e28636c216515ca88d1f2e7a2e188912
+# Target: Ubuntu 24.04 (sample_ubuntu_2404)
+###############################################################################
+
+# ── Install desktop environment & xwayland ────────────────────────────────
+
+- name: Fix dpkg state before metapackage install
+  become: true
+  command: dpkg --configure -a
+  changed_when: false
+  ignore_errors: true
+  tags:
+    - xwayland-desktop
+
+- name: Fix broken dependencies before metapackage install
+  become: true
+  command: apt-get -f install -y
+  environment:
+    DEBIAN_FRONTEND: noninteractive
+  changed_when: false
+  ignore_errors: true
+  tags:
+    - xwayland-desktop
+
+- name: Install {{ desktop_metapackage }}
+  become: true
+  apt:
+    name: "{{ desktop_metapackage }}"
+    state: present
+  ignore_errors: true
+  environment:
+    DEBIAN_FRONTEND: noninteractive
+  tags:
+    - xwayland-desktop
+
+- name: Fix dpkg state before metapackage install 2
+  become: true
+  command: dpkg --configure -a
+  changed_when: false
+  ignore_errors: true
+  tags:
+    - xwayland-desktop
+
+- name: Fix broken dependencies before metapackage install 2
+  become: true 
+  command: apt-get -f install -y
+  environment:
+    DEBIAN_FRONTEND: noninteractive
+  changed_when: false
+  ignore_errors: true
+  tags:
+    - xwayland-desktop

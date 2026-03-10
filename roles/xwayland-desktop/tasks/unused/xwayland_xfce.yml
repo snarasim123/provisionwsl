@@ -1,0 +1,14 @@
+---
+###############################################################################
+# xwayland-desktop: XFCE Desktop Environment packages
+###############################################################################
+
+- name: Install exo-utils
+  become: true
+  apt:
+    name: exo-utils
+    state: present
+  environment:
+    DEBIAN_FRONTEND: noninteractive
+  tags:
+    - xwayland-desktop

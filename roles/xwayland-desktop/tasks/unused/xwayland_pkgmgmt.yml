@@ -1,0 +1,34 @@
+---
+###############################################################################
+# xwayland-desktop: Package Management packages
+###############################################################################
+
+- name: Install aptdaemon
+  become: true
+  apt:
+    name: aptdaemon
+    state: present
+  environment:
+    DEBIAN_FRONTEND: noninteractive
+  tags:
+    - xwayland-desktop
+
+- name: Install snapd
+  become: true
+  apt:
+    name: snapd
+    state: present
+  environment:
+    DEBIAN_FRONTEND: noninteractive
+  tags:
+    - xwayland-desktop
+
+- name: Install synaptic
+  become: true
+  apt:
+    name: synaptic
+    state: present
+  environment:
+    DEBIAN_FRONTEND: noninteractive
+  tags:
+    - xwayland-desktop

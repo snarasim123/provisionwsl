@@ -34,6 +34,7 @@
     - container
     - bash_extra
     - dev
+    - xwayland-desktop
     - post_run
   ### Change to your user! ###
   # user: root
