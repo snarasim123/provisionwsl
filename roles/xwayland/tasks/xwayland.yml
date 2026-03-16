@@ -1,6 +1,6 @@
 ---
 ###############################################################################
-# xwayland-desktop: XWayland install, systemd services, Xorg divert,
+# xwayland: XWayland install, systemd services, Xorg divert,
 #                    monitor config, LightDM, GPU env, start-desktop helper
 ###############################################################################
 
@@ -13,7 +13,8 @@
   environment:
     DEBIAN_FRONTEND: noninteractive
   tags:
-    - xwayland-desktop
+    - gui
+    - xwayland
 
 # ── 3. Create and configure systemd services ─────────────────────────────────
 
@@ -26,7 +27,8 @@
     group: root
     mode: '0644'
   tags:
-    - xwayland-desktop
+    - gui
+    - xwayland
 
 - name: Enable wslg-fix.service
   become: true
@@ -35,7 +37,8 @@
     enabled: yes
     daemon_reload: yes
   tags:
-    - xwayland-desktop
+    - gui
+    - xwayland
 
 - name: Mask wslg-session user service (remove Wayland references)
   become: true
@@ -45,14 +48,16 @@
     state: link
     force: yes
   tags:
-    - xwayland-desktop
+    - gui
+    - xwayland
 
 - name: Set default systemd target to multi-user (prevent shell on distro open)
   become: true
   command: systemctl set-default multi-user.target
   changed_when: true
   tags:
-    - xwayland-desktop
+    - gui
+    - xwayland
 
 # ── 4. Replace default Xorg by XWayland ──────────────────────────────────────
 
@@ -65,7 +70,8 @@
     group: root
     mode: '0755'
   tags:
-    - xwayland-desktop
+    - gui
+    - xwayland
 
 - name: Set resolution in Xorg.Xwayland script
   become: true
@@ -74,7 +80,8 @@
     regexp: '@@XWAYLAND_RESOLUTION@@'
     replace: "{{ xwayland_resolution }}"
   tags:
-    - xwayland-desktop
+    - gui
+    - xwayland
 
 - name: Divert original Xorg binary (dpkg-divert)
   become: true
@@ -82,14 +89,16 @@
   args:
     creates: /usr/bin/Xorg.distrib
   tags:
-    - xwayland-desktop
+    - gui
+    - xwayland
 
 - name: Register Xorg.Xwayland as Xorg alternative
   become: true
   command: update-alternatives --install /usr/bin/Xorg Xorg /usr/bin/Xorg.Xwayland 100
   changed_when: true
   tags:
-    - xwayland-desktop
+    - gui
+    - xwayland
 
 # ── 5. Monitor resolution configuration ──────────────────────────────────────
 
@@ -101,7 +110,8 @@
     group: "{{ target_user }}"
     mode: '0755'
   tags:
-    - xwayland-desktop
+    - gui
+    - xwayland
 
 - name: Deploy monitors.xml for user
   template:
@@ -111,7 +121,8 @@
     group: "{{ target_user }}"
     mode: '0644'
   tags:
-    - xwayland-desktop
+    - gui
+    - xwayland
 
 # ── 6. LightDM configuration (MATE default display manager) ──────────────────
 
@@ -127,7 +138,8 @@
     marker: "# {mark} ANSIBLE MANAGED - autologin"
   when: autologin_enabled | default(true)
   tags:
-    - xwayland-desktop
+    - gui
+    - xwayland
 
 # ── 7. GPU / rendering environment variables ─────────────────────────────────
 
@@ -141,7 +153,8 @@
     group: root
     mode: '0644'
   tags:
-    - xwayland-desktop
+    - gui
+    - xwayland
 
 - name: Ensure GALLIUM_DRIVER is in /etc/environment
   become: true
@@ -151,7 +164,8 @@
     line: 'GALLIUM_DRIVER="d3d12"'
     state: present
   tags:
-    - xwayland-desktop
+    - gui
+    - xwayland
 
 # ── 8. Helper script to start the desktop ────────────────────────────────────
 
@@ -174,7 +188,8 @@
     group: root
     mode: '0755'
   tags:
-    - xwayland-desktop
+    - gui
+    - xwayland
 
 - name: Display post-install message
   debug:
@@ -184,4 +199,5 @@
       To shut down cleanly:      sudo poweroff
       Then terminate WSL:        wsl.exe --terminate {{ wsl_distro_name_override }}
   tags:
-    - xwayland-desktop
+    - gui
+    - xwayland

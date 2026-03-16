@@ -1,6 +1,6 @@
 ---
 ###############################################################################
-# xwayland-desktop: Prerequisites
+# mate-desktop: Prerequisites
 ###############################################################################
 
 - name: Ensure systemd is enabled in /etc/wsl.conf
@@ -12,7 +12,8 @@
     insertafter: '^\[boot\]'
     create: no
   tags:
-    - xwayland-desktop
+    - gui
+    - mate-desktop
 
 - name: Ensure python3 points to system Python 3.12
   become: true
@@ -22,7 +23,8 @@
     link: /usr/bin/python3
     priority: 100
   tags:
-    - xwayland-desktop
+    - gui
+    - mate-desktop
 
 - name: Update apt cache
   become: true
@@ -30,7 +32,8 @@
     update_cache: yes
     cache_valid_time: 3600
   tags:
-    - xwayland-desktop
+    - gui
+    - mate-desktop
 
 - name: Fix dpkg if interrupted
   become: true
@@ -38,7 +41,8 @@
   changed_when: false
   ignore_errors: true
   tags:
-    - xwayland-desktop
+    - gui
+    - mate-desktop
 
 - name: Upgrade all packages
   become: true
@@ -46,4 +50,5 @@
     upgrade: safe
   ignore_errors: true
   tags:
-    - xwayland-desktop
+    - gui
+    - mate-desktop

@@ -30,7 +30,7 @@ kcget(){
     kubectl get pods 
 else
     echo "Looking for pods matching : $1"
-    kubectl get pods -A --no-headers -o custom-columns="NAMESPACE:.metadata.namespace,NAME:.metadata.name" | grep -i $1 
+    kubectl get pods -A --no-headers -o custom-columns="NAMESPACE:.metadata.namespace,NAME:.metadata.name,STATUS:.status.phase,RESTARTS:.status.containerStatuses[0].restartCount,AGE:.metadata.creationTimestamp" | grep -i $1 
 fi
 }
 

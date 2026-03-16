@@ -30,11 +30,12 @@
     - packages    
     - git
     - editor  
-    - gui
+    #- gui
     - container
     - bash_extra
     - dev
-    - xwayland-desktop
+    - mate-desktop
+    - xwayland
     - post_run
   ### Change to your user! ###
   # user: root

@@ -1,0 +1,9 @@
+---
+- include_tasks: prerequisites.yml
+  when: is_ubuntu
+
+- include_tasks: utilities.yml
+  when: is_ubuntu
+
+- include_tasks: desktop_mate.yml
+  when: is_ubuntu

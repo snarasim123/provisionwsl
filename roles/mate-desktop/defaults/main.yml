@@ -1,0 +1,3 @@
+---
+# Desktop metapackage to install
+desktop_metapackage: "task-mate-desktop"

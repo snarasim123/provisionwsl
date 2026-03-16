@@ -4,4 +4,5 @@
     - vars/user_environment.yml
   roles:
     - facts
-    - xwayland-desktop
+    - mate-desktop
+    - xwayland
