@@ -56,7 +56,7 @@
 - name: Download Go tarball
   get_url:
     url: "https://go.dev/dl/go{{ golang_version }}.linux-{{ go_arch }}.tar.gz"
-    dest: "/tmp/go{{ golang_version }}.linux-{{ go_arch }}.tar.gz"
+    dest: "{{ user_home }}/tmp/go{{ golang_version }}.linux-{{ go_arch }}.tar.gz"
     mode: '0644'
   when: go_needs_install | bool
   tags:
@@ -75,7 +75,7 @@
 
 - name: Extract Go tarball to /usr/local
   unarchive:
-    src: "/tmp/go{{ golang_version }}.linux-{{ go_arch }}.tar.gz"
+    src: "{{ user_home }}/tmp/go{{ golang_version }}.linux-{{ go_arch }}.tar.gz"
     dest: /usr/local
     remote_src: true
   become: true
@@ -86,7 +86,7 @@
 
 - name: Clean up Go tarball
   file:
-    path: "/tmp/go{{ golang_version }}.linux-{{ go_arch }}.tar.gz"
+    path: "{{ user_home }}/tmp/go{{ golang_version }}.linux-{{ go_arch }}.tar.gz"
     state: absent
   when: go_needs_install | bool
   tags:
@@ -95,7 +95,7 @@
 
 - name: Set Go environment variables in profile
   blockinfile:
-    path: "{{ user_home }}/.bashrc"
+    path: "{{ user_home }}/.bashrc_custom"
     marker: "# {mark} ANSIBLE MANAGED BLOCK - golang"
     block: |
       export GOROOT=/usr/local/go
@@ -207,7 +207,7 @@
   args:
     executable: /bin/bash
     creates: "{{ user_home }}/.gvm/scripts/gvm"
-  become: false
+  become: true
   become_user: "{{ target_user }}"
   when: golang_install_gvm | bool and (not gvm_installed.stat.exists | default(true))
   tags:

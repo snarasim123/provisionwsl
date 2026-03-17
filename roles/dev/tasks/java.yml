@@ -30,7 +30,7 @@
     curl -s "https://get.sdkman.io" | bash
   args:
     creates: "{{ user_home }}/.sdkman/bin/sdkman-init.sh"
-  become: false
+  become: true
   become_user: "{{ target_user }}"
   when: not sdkman_installed.stat.exists
   tags:
@@ -44,7 +44,7 @@
     sdk install java 11.0.21-tem || true
   args:
     executable: /bin/bash
-  become: false
+  become: true
   become_user: "{{ target_user }}"
   register: java11_install
   changed_when: "'Done installing' in java11_install.stdout"
@@ -59,7 +59,7 @@
     sdk install java 17.0.9-tem || true
   args:
     executable: /bin/bash
-  become: false
+  become: true
   become_user: "{{ target_user }}"
   register: java17_install
   changed_when: "'Done installing' in java17_install.stdout"
@@ -74,7 +74,7 @@
     sdk install java 21.0.1-tem || true
   args:
     executable: /bin/bash
-  become: false
+  become: true
   become_user: "{{ target_user }}"
   register: java21_install
   changed_when: "'Done installing' in java21_install.stdout"
@@ -89,7 +89,7 @@
     sdk default java 11.0.21-tem
   args:
     executable: /bin/bash
-  become: false
+  become: true
   become_user: "{{ target_user }}"
   tags:
     - jdk
@@ -102,7 +102,7 @@
     java -version 2>&1
   args:
     executable: /bin/bash
-  become: false
+  become: true
   become_user: "{{ target_user }}"
   register: java_version
   changed_when: false
@@ -125,7 +125,7 @@
     sdk list java | grep installed || echo "No Java versions installed"
   args:
     executable: /bin/bash
-  become: false
+  become: true
   become_user: "{{ target_user }}"
   register: java_list
   changed_when: false
@@ -137,6 +137,20 @@
 - name: Display installed Java versions
   debug:
     msg: "{{ java_list.stdout_lines }}"
+  tags:
+    - jdk
+    - java
+    - sdkman
+
+- name: Add SDKMAN init to .bashrc_custom
+  blockinfile:
+    path: "{{ user_home }}/.bashrc_custom"
+    marker: "# {mark} ANSIBLE MANAGED BLOCK - sdkman"
+    block: |
+      export SDKMAN_DIR="{{ user_home }}/.sdkman"
+      [[ -s "$SDKMAN_DIR/bin/sdkman-init.sh" ]] && source "$SDKMAN_DIR/bin/sdkman-init.sh"
+  become: true
+  become_user: "{{ target_user }}"
   tags:
     - jdk
     - java
