@@ -1,0 +1,230 @@
+# Go (Golang) installation tasks
+# Installs Go from official tarball and optionally installs GVM (Go Version Manager)
+# GVM allows managing multiple Go versions side by side
+# Works on Ubuntu, Fedora, and Alpine
+# Version is defined in vars/language_versions.yml as golang_version
+# To enable: uncomment in dev/tasks/main.yml
+---
+
+- name: Check if Go is already installed
+  stat:
+    path: "/usr/local/go/bin/go"
+  register: go_installed
+  tags:
+    - golang
+    - dev
+
+- name: Get installed Go version
+  command: /usr/local/go/bin/go version
+  register: go_current_version_output
+  changed_when: false
+  failed_when: false
+  when: go_installed.stat.exists
+  tags:
+    - golang
+    - dev
+
+- name: Parse installed Go version
+  set_fact:
+    go_current_version: "{{ go_current_version_output.stdout | regex_search('go([0-9]+\\.[0-9]+\\.?[0-9]*)', '\\1') | first | default('0') }}"
+  when: go_installed.stat.exists and go_current_version_output.stdout is defined
+  tags:
+    - golang
+    - dev
+
+- name: Set go_needs_install fact
+  set_fact:
+    go_needs_install: "{{ not go_installed.stat.exists or (go_current_version is defined and go_current_version is version(golang_version, '<')) }}"
+  tags:
+    - golang
+    - dev
+
+- name: Display current Go version
+  debug:
+    msg: "Current Go version: {{ go_current_version | default('not installed') }}, Target version: {{ golang_version }}, Needs install: {{ go_needs_install }}"
+  tags:
+    - golang
+    - dev
+
+- name: Determine Go architecture
+  set_fact:
+    go_arch: "{{ 'arm64' if ansible_architecture == 'aarch64' else 'amd64' }}"
+  tags:
+    - golang
+    - dev
+
+- name: Download Go tarball
+  get_url:
+    url: "https://go.dev/dl/go{{ golang_version }}.linux-{{ go_arch }}.tar.gz"
+    dest: "/tmp/go{{ golang_version }}.linux-{{ go_arch }}.tar.gz"
+    mode: '0644'
+  when: go_needs_install | bool
+  tags:
+    - golang
+    - dev
+
+- name: Remove existing Go installation
+  file:
+    path: /usr/local/go
+    state: absent
+  become: true
+  when: go_needs_install | bool
+  tags:
+    - golang
+    - dev
+
+- name: Extract Go tarball to /usr/local
+  unarchive:
+    src: "/tmp/go{{ golang_version }}.linux-{{ go_arch }}.tar.gz"
+    dest: /usr/local
+    remote_src: true
+  become: true
+  when: go_needs_install | bool
+  tags:
+    - golang
+    - dev
+
+- name: Clean up Go tarball
+  file:
+    path: "/tmp/go{{ golang_version }}.linux-{{ go_arch }}.tar.gz"
+    state: absent
+  when: go_needs_install | bool
+  tags:
+    - golang
+    - dev
+
+- name: Set Go environment variables in profile
+  blockinfile:
+    path: "{{ user_home }}/.bashrc"
+    marker: "# {mark} ANSIBLE MANAGED BLOCK - golang"
+    block: |
+      export GOROOT=/usr/local/go
+      export GOPATH={{ user_home }}/go
+      export PATH=$GOPATH/bin:$GOROOT/bin:$PATH
+  become: false
+  become_user: "{{ target_user }}"
+  tags:
+    - golang
+    - dev
+
+- name: Create GOPATH directory
+  file:
+    path: "{{ user_home }}/go"
+    state: directory
+    owner: "{{ target_user }}"
+    mode: '0755'
+  tags:
+    - golang
+    - dev
+
+- name: Verify Go installation
+  command: /usr/local/go/bin/go version
+  register: go_verify
+  changed_when: false
+  tags:
+    - golang
+    - dev
+
+- name: Display Go version
+  debug:
+    msg: "{{ go_verify.stdout }}"
+  tags:
+    - golang
+    - dev
+
+# --- GVM (Go Version Manager) - optional ---
+# GVM lets you install and switch between multiple Go versions
+# Similar to pyenv for Python or nvm for Node.js
+# Usage: gvm install go1.21.0 && gvm use go1.21.0
+
+- name: Install GVM dependencies on Ubuntu/Debian
+  apt:
+    name:
+      - curl
+      - git
+      - mercurial
+      - make
+      - binutils
+      - bison
+      - gcc
+      - build-essential
+    state: present
+  become: true
+  when: (is_ubuntu | bool or is_debian | bool) and golang_install_gvm | bool
+  tags:
+    - golang
+    - gvm
+    - dev
+
+- name: Install GVM dependencies on Fedora
+  dnf:
+    name:
+      - curl
+      - git
+      - make
+      - bison
+      - gcc
+      - glibc-devel
+    state: present
+  become: true
+  when: is_fedora | bool and golang_install_gvm | bool
+  tags:
+    - golang
+    - gvm
+    - dev
+
+- name: Install GVM dependencies on Alpine
+  apk:
+    name:
+      - curl
+      - git
+      - make
+      - bison
+      - gcc
+      - musl-dev
+      - bash
+    state: present
+  become: true
+  when: is_alpine | bool and golang_install_gvm | bool
+  tags:
+    - golang
+    - gvm
+    - dev
+
+- name: Check if GVM is already installed
+  stat:
+    path: "{{ user_home }}/.gvm/scripts/gvm"
+  register: gvm_installed
+  when: golang_install_gvm | bool
+  tags:
+    - golang
+    - gvm
+    - dev
+
+- name: Install GVM
+  shell: |
+    bash < <(curl -s -S -L https://raw.githubusercontent.com/moovweb/gvm/master/binscripts/gvm-installer)
+  args:
+    executable: /bin/bash
+    creates: "{{ user_home }}/.gvm/scripts/gvm"
+  become: false
+  become_user: "{{ target_user }}"
+  when: golang_install_gvm | bool and (not gvm_installed.stat.exists | default(true))
+  tags:
+    - golang
+    - gvm
+    - dev
+
+- name: Display GVM info
+  debug:
+    msg: >-
+      GVM installed. Usage:
+      source ~/.gvm/scripts/gvm;
+      gvm install go1.21.0;
+      gvm use go1.21.0;
+      gvm list
+  when: golang_install_gvm | bool
+  tags:
+    - golang
+    - gvm
+    - dev
