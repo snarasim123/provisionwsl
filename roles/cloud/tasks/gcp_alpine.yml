@@ -3,7 +3,7 @@
 # Alpine doesn't have an official gcloud package, so we use the tarball method
 # https://cloud.google.com/sdk/docs/install-sdk#linux
 
-- name: Get Python version
+- name: Get Python version from alpine
   ansible.builtin.command: python3 --version
   register: python_version_output
   changed_when: false
@@ -12,7 +12,7 @@
     - gcp
     - cloud
 
-- name: Extract Python version number
+- name: Extract Python version number ( alpine)
   ansible.builtin.set_fact:
     python_version: "{{ python_version_output.stdout | regex_search('Python ([0-9]+\\.[0-9]+)', '\\1') | first | default('0.0') }}"
   when: python_version_output.rc == 0
@@ -20,7 +20,7 @@
     - gcp
     - cloud
 
-- name: Set Python version to 0.0 if not found
+- name: Set Python version to 0.0 if not found ( alpine)
   ansible.builtin.set_fact:
     python_version: "0.0"
   when: python_version_output.rc != 0
@@ -28,14 +28,14 @@
     - gcp
     - cloud
 
-- name: Display detected Python version
+- name: Display detected Python version (alpine)
   ansible.builtin.debug:
     msg: "Detected Python version: {{ python_version }}"
   tags:
     - gcp
     - cloud
 
-- name: Confirm Python version is supported for Google Cloud CLI
+- name: Confirm Python version is supported for Google Cloud CLI (alpine)
   ansible.builtin.assert:
     that:
       - python_version is version(gcp_cli_python_min_version, '>=')
@@ -62,6 +62,7 @@
     - gcp
     - cloud
 
+# todo - dup of roles/cloud/tasks/gcp_debian.yml - Check if Google Cloud CLI tar file exists 74 - rename this
 - name: Check if Google Cloud CLI tar file exists
   ansible.builtin.stat:
     path: "/home/{{ target_user }}/tmp/{{ gcp_cli_archive_name_x86_64 }}"
@@ -70,6 +71,7 @@
     - gcp
     - cloud
 
+# todo - dup of roles/cloud/tasks/gcp_debian.yml - Remove existing Google Cloud CLI tar file if present 79 - rename this
 - name: Remove existing Google Cloud CLI tar file if present
   ansible.builtin.file:
     path: "/home/{{ target_user }}/tmp/{{ gcp_cli_archive_name_x86_64 }}"
@@ -79,6 +81,7 @@
     - gcp
     - cloud
 
+# todo - dup of roles/cloud/tasks/gcp_debian.yml - Download Google Cloud CLI tar file 85 - rename this
 - name: Download Google Cloud CLI tar file
   ansible.builtin.get_url:
     url: https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/{{ gcp_cli_archive_name_x86_64 }}
@@ -88,6 +91,7 @@
     - gcp
     - cloud
 
+# todo - dup of roles/cloud/tasks/gcp_debian.yml - Extract Google Cloud CLI tar file to /usr/local 91 - rename this
 - name: Extract Google Cloud CLI tar file to /usr/local
   ansible.builtin.unarchive:
     src: "/home/{{ target_user }}/tmp/{{ gcp_cli_archive_name_x86_64 }}"
@@ -98,6 +102,7 @@
     - gcp
     - cloud
 
+# todo - dup of roles/cloud/tasks/gcp_debian.yml - Ensure install.sh has executable permissions 98 - rename this
 - name: Ensure install.sh has executable permissions
   ansible.builtin.file:
     path: "/usr/local/google-cloud-sdk/install.sh"
@@ -107,6 +112,7 @@
     - gcp
     - cloud
 
+# todo - dup of roles/cloud/tasks/gcp_debian.yml - Run Google Cloud CLI install script 104 - rename this
 - name: Run Google Cloud CLI install script
   ansible.builtin.shell:
     cmd: /usr/local/google-cloud-sdk/install.sh --quiet --path-update true --command-completion true 2>&1
@@ -117,6 +123,7 @@
     - gcp
     - cloud
 
+# todo - dup of roles/cloud/tasks/gcp_debian.yml - Print Google Cloud CLI install script output 111 - rename this
 - name: Print Google Cloud CLI install script output
   ansible.builtin.debug:
     msg: 
@@ -126,6 +133,7 @@
     - gcp
     - cloud
 
+# todo - dup of roles/cloud/tasks/gcp_debian.yml - Verify gcloud install location 141 - rename this
 - name: Verify gcloud install location
   ansible.builtin.command:
     cmd: which gcloud
@@ -138,6 +146,7 @@
     - gcp
     - cloud
 
+# todo - dup of roles/cloud/tasks/gcp_debian.yml - Print gcloud install location 153 - rename this
 - name: Print gcloud install location
   ansible.builtin.debug:
     msg: "gcloud installed at: {{ gcloud_location.stdout | default('gcloud not found in PATH') }}"
@@ -145,6 +154,7 @@
     - gcp
     - cloud
 
+# todo - dup of roles/cloud/tasks/gcp_debian.yml - Verify gcloud version 160 - rename this
 - name: Verify gcloud version
   ansible.builtin.command:
     cmd: gcloud --version
@@ -157,6 +167,7 @@
     - gcp
     - cloud
 
+# todo - dup of roles/cloud/tasks/gcp_debian.yml - Print gcloud version 172 - rename this
 - name: Print gcloud version
   ansible.builtin.debug:
     msg: "{{ gcloud_version.stdout_lines | default(['gcloud version not available']) }}"
@@ -164,6 +175,7 @@
     - gcp
     - cloud
 
+# todo - dup of roles/cloud/tasks/gcp_debian.yml - Set fact that GCP CLI is installed 179 - rename this
 - name: Set fact that GCP CLI is installed
   ansible.builtin.set_fact:
     gcp_cli_installed: true
@@ -186,6 +198,7 @@
     - cloud
     - gke
 
+# todo - dup of roles/cloud/tasks/gcp_debian.yml - Remove Google Cloud CLI tar file from tmp folder 117 - rename this
 - name: Remove Google Cloud CLI tar file from tmp folder
   ansible.builtin.file:
     path: "/home/{{ target_user }}/tmp/{{ gcp_cli_archive_name_x86_64 }}"

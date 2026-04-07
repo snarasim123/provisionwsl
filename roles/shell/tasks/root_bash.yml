@@ -1,4 +1,4 @@
----
+# todo - dup of roles/shell/tasks/bash.yml - remove files and directories 2 - rename this
 - name: remove files and directories
   ansible.builtin.file:
     state: "{{ item }}"
@@ -14,6 +14,7 @@
     - shell
     - bash    
     
+# todo - dup of roles/shell/tasks/bash.yml - Create a directory if it does not exist 33 - rename this
 - name: Create a directory if it does not exist
   ansible.builtin.file:
     path: "{{ root_user_home }}/bashfiles"
@@ -24,6 +25,7 @@
     - shell
     - bash    
 
+# todo - dup of roles/shell/tasks/bash.yml - remove existing bash files from home 16 - rename this
 - name: remove existing bash files from home
   ansible.builtin.file:
     state: absent
@@ -42,6 +44,7 @@
     - shell
     - bash    
     
+# todo - dup of roles/shell/tasks/bash.yml - Copy bash files from shared common files 42 - rename this
 - name: Copy bash files from shared common files
   copy:
     src: "{{ playbook_dir }}/files/common/{{ item }}"
@@ -64,6 +67,7 @@
     - shell
     - bash
 
+# todo - dup of roles/shell/tasks/bash.yml - Add Google Cloud SDK to PATH in .bashrc_custom 95 - rename this
 - name: Add Google Cloud SDK to PATH in .bashrc_custom
   ansible.builtin.lineinfile:
     path: "{{ root_user_home }}/bashfiles/.bashrc_custom"
@@ -79,6 +83,7 @@
 
 
 
+# todo - dup of roles/editor/tasks/root_vim.yml - Create symbolic link 81 - rename this
 - name: Create symbolic link 
   file:
     src: "{{ root_user_home }}/bashfiles/{{ item }}"
@@ -100,6 +105,7 @@
     - bash    
 
 
+# todo - dup of roles/shell/tasks/bash.yml - Create .dircolor symbolic link 84 - rename this
 - name: Create .dircolor symbolic link 
   file:
    src: "{{ root_user_home }}/bashfiles/dircolors256dark"

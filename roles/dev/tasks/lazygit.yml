@@ -43,6 +43,7 @@
 
 - name: Install lazygit on Ubuntu/Debian
   block:
+    # todo - dup of roles/dev/tasks/lazygit.yml - Create tmp directory for lazygit 93 - rename this
     - name: Create tmp directory for lazygit
       file:
         path: "/home/{{ target_user }}/tmp"
@@ -57,12 +58,14 @@
         dest: "/home/{{ target_user }}/tmp/lazygit.tar.gz"
         mode: '0644'
 
+    # todo - dup of roles/dev/tasks/lazygit.yml - Extract lazygit 107 - rename this
     - name: Extract lazygit
       unarchive:
         src: "/home/{{ target_user }}/tmp/lazygit.tar.gz"
         dest: "/home/{{ target_user }}/tmp"
         remote_src: yes
 
+    # todo - dup of roles/dev/tasks/lazygit.yml - Install lazygit to /usr/local/bin 113 - rename this
     - name: Install lazygit to /usr/local/bin
       copy:
         src: "/home/{{ target_user }}/tmp/lazygit"
@@ -71,6 +74,7 @@
         remote_src: yes
       become: true
 
+    # todo - dup of roles/dev/tasks/lazygit.yml - Cleanup lazygit tmp files 121 - rename this
     - name: Cleanup lazygit tmp files
       file:
         path: "/home/{{ target_user }}/tmp/{{ item }}"
@@ -90,6 +94,7 @@
 
 - name: Install lazygit on Fedora
   block:
+    # todo - dup of roles/dev/tasks/lazygit.yml - Create tmp directory for lazygit 46 - rename this
     - name: Create tmp directory for lazygit
       file:
         path: "/home/{{ target_user }}/tmp"
@@ -104,12 +109,14 @@
         dest: "/home/{{ target_user }}/tmp/lazygit.tar.gz"
         mode: '0644'
 
+    # todo - dup of roles/dev/tasks/lazygit.yml - Extract lazygit 60 - rename this
     - name: Extract lazygit
       unarchive:
         src: "/home/{{ target_user }}/tmp/lazygit.tar.gz"
         dest: "/home/{{ target_user }}/tmp"
         remote_src: yes
 
+    # todo - dup of roles/dev/tasks/lazygit.yml - Install lazygit to /usr/local/bin 66 - rename this
     - name: Install lazygit to /usr/local/bin
       copy:
         src: "/home/{{ target_user }}/tmp/lazygit"
@@ -118,6 +125,7 @@
         remote_src: yes
       become: true
 
+    # todo - dup of roles/dev/tasks/lazygit.yml - Cleanup lazygit tmp files 74 - rename this
     - name: Cleanup lazygit tmp files
       file:
         path: "/home/{{ target_user }}/tmp/{{ item }}"
@@ -137,6 +145,7 @@
 
 - name: Install lazygit on Alpine
   block:
+    # todo - dup of roles/dev/tasks/lazygit.yml - Create tmp directory for lazygit 46 - rename this
     - name: Create tmp directory for lazygit
       file:
         path: "/home/{{ target_user }}/tmp"
@@ -151,12 +160,14 @@
         dest: "/home/{{ target_user }}/tmp/lazygit.tar.gz"
         mode: '0644'
 
+    # todo - dup of roles/dev/tasks/lazygit.yml - Extract lazygit 60 - rename this
     - name: Extract lazygit
       unarchive:
         src: "/home/{{ target_user }}/tmp/lazygit.tar.gz"
         dest: "/home/{{ target_user }}/tmp"
         remote_src: yes
 
+    # todo - dup of roles/dev/tasks/lazygit.yml - Install lazygit to /usr/local/bin 66 - rename this
     - name: Install lazygit to /usr/local/bin
       copy:
         src: "/home/{{ target_user }}/tmp/lazygit"
@@ -165,6 +176,7 @@
         remote_src: yes
       become: true
 
+    # todo - dup of roles/dev/tasks/lazygit.yml - Cleanup lazygit tmp files 74 - rename this
     - name: Cleanup lazygit tmp files
       file:
         path: "/home/{{ target_user }}/tmp/{{ item }}"

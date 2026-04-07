@@ -1,4 +1,4 @@
----
+# todo - dup of roles/editor/tasks/root_vim.yml - Install required packages 2 - rename this
 - name: Install required packages
   package:
     name:
@@ -45,6 +45,7 @@
     - editor
   become: true
 
+# todo - dup of roles/editor/tasks/root_vim.yml - Copy vim files (with plugins) 49 - rename this
 - name: Copy vim files (with plugins)
   copy:
     src: "{{ item }}"
@@ -92,6 +93,7 @@
     - editor
   become: true
 
+# todo - dup of roles/editor/tasks/root_vim.yml - Create symbolic link 81 - rename this
 - name: Create symbolic link 
   file:
    src: "{{ vim_dir }}/{{ item }}"
@@ -119,6 +121,7 @@
 #     - vim
 #     - editor
 
+# todo - dup of roles/editor/tasks/root_vim.yml - Change plugin mgr file ownership, group and permissions 108 - rename this
 - name: Change plugin mgr file ownership, group and permissions
   ansible.builtin.file:
     path: "{{ vim_dir }}/autoload/plug.vim"

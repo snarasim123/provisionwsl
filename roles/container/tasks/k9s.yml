@@ -24,6 +24,7 @@
     - container  
   become: true
 
+# todo - dup of roles/container/tasks/k9s.yml - remove existing  k9s archive 73 - rename this
 - name: remove existing  k9s archive
   ansible.builtin.file:
     state: absent
@@ -70,6 +71,7 @@
     - container  
   become: true
 
+# todo - dup of roles/container/tasks/k9s.yml - remove existing  k9s archive 27 - rename this
 - name: remove existing  k9s archive
   ansible.builtin.file:
     state: absent

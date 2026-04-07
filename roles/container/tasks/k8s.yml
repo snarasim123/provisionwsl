@@ -26,6 +26,7 @@
     - container
   become: true
 
+# todo - dup of roles/container/tasks/k8s.yml - remove existing .kube_aws.zip 131 - rename this
 - name: remove existing .kube_aws.zip
   ansible.builtin.file:
     state: absent
@@ -35,6 +36,7 @@
     - container
   become: true
 
+# todo - dup of roles/container/tasks/k8s.yml - remove existing .kube_gcp.zip 140 - rename this
 - name: remove existing .kube_gcp.zip
   ansible.builtin.file:
     state: absent
@@ -128,6 +130,7 @@
     - container
   become: true
 
+# todo - dup of roles/container/tasks/k8s.yml - remove existing .kube_aws.zip 29 - rename this
 - name: remove existing .kube_aws.zip
   ansible.builtin.file:
     state: absent
@@ -137,6 +140,7 @@
     - container
   become: true
 
+# todo - dup of roles/container/tasks/k8s.yml - remove existing .kube_gcp.zip 38 - rename this
 - name: remove existing .kube_gcp.zip
   ansible.builtin.file:
     state: absent

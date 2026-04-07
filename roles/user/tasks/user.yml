@@ -79,5 +79,6 @@
     path: /etc/sudoers
     line: '{{ target_user }} ALL=(ALL) NOPASSWD: ALL'
   when: check.found == 0
+  become: true
   tags: 
     - user  

@@ -1,6 +1,6 @@
 # SDKMAN and JDK installation tasks
-# Installs SDKMAN, Java 11, 17, 21 and sets Java 11 as default
-# To enable: add jdk.yml to tools/tasks/main.yml
+# Installs SDKMAN and Java versions defined in vars/language_versions.yml
+# To enable: uncomment in dev/tasks/main.yml
 ---
 
 - name: Install dependencies for SDKMAN
@@ -38,55 +38,26 @@
     - java
     - sdkman
 
-- name: Install Java 11 via SDKMAN
+- name: Install Java versions via SDKMAN
   shell: |
     source {{ user_home }}/.sdkman/bin/sdkman-init.sh
-    sdk install java 11.0.21-tem || true
+    sdk install java {{ item }} || true
   args:
     executable: /bin/bash
   become: true
   become_user: "{{ target_user }}"
-  register: java11_install
-  changed_when: "'Done installing' in java11_install.stdout"
+  loop: "{{ java_versions }}"
+  register: java_install
+  changed_when: "'Done installing' in java_install.stdout"
   tags:
     - jdk
     - java
     - sdkman
 
-- name: Install Java 17 via SDKMAN
+- name: Set Java {{ java_default_version }} as default
   shell: |
     source {{ user_home }}/.sdkman/bin/sdkman-init.sh
-    sdk install java 17.0.9-tem || true
-  args:
-    executable: /bin/bash
-  become: true
-  become_user: "{{ target_user }}"
-  register: java17_install
-  changed_when: "'Done installing' in java17_install.stdout"
-  tags:
-    - jdk
-    - java
-    - sdkman
-
-- name: Install Java 21 via SDKMAN
-  shell: |
-    source {{ user_home }}/.sdkman/bin/sdkman-init.sh
-    sdk install java 21.0.1-tem || true
-  args:
-    executable: /bin/bash
-  become: true
-  become_user: "{{ target_user }}"
-  register: java21_install
-  changed_when: "'Done installing' in java21_install.stdout"
-  tags:
-    - jdk
-    - java
-    - sdkman
-
-- name: Set Java 11 as default
-  shell: |
-    source {{ user_home }}/.sdkman/bin/sdkman-init.sh
-    sdk default java 11.0.21-tem
+    sdk default java {{ java_default_version }}
   args:
     executable: /bin/bash
   become: true
@@ -122,7 +93,9 @@
 - name: List all installed Java versions
   shell: |
     source {{ user_home }}/.sdkman/bin/sdkman-init.sh
-    sdk list java | grep installed || echo "No Java versions installed"
+    sdk current java
+    echo "---"
+    ls -1 {{ user_home }}/.sdkman/candidates/java/ | grep -v current
   args:
     executable: /bin/bash
   become: true

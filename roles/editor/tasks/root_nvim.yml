@@ -1,4 +1,4 @@
----
+# todo - dup of roles/editor/tasks/nvim.yml - remove nvim config files and directories 12 - rename this
 - name: remove nvim config files and directories
   ansible.builtin.file:
     state: absent
@@ -8,6 +8,7 @@
     - editor
   become: true
 
+# todo - dup of roles/editor/tasks/nvim.yml - Create nvim config directories 22 - rename this
 - name: Create nvim config directories
   ansible.builtin.file:
     path: "{{ item }}"
@@ -22,6 +23,7 @@
     - editor
   become: true
 
+# todo - dup of roles/editor/tasks/nvim.yml - Copy init.lua file 36 - rename this
 - name: Copy init.lua file
   copy:
     src: "{{ item }}"
@@ -36,6 +38,7 @@
     - editor
   become: true
 
+# todo - dup of roles/editor/tasks/nvim.yml - Copy initcolors.lua file 50 - rename this
 - name: Copy initcolors.lua file
   copy:
     src: "{{ item }}"
@@ -51,6 +54,7 @@
   become: true
 
 # binary installed by user commont to root and user.
+# todo - dup of roles/editor/tasks/nvim.yml - Add nvim path to .bashrc 80 - rename this
 - name: Add nvim path to .bashrc
   ansible.builtin.lineinfile:
     path: "{{ root_user_home }}/.bashrc_custom"

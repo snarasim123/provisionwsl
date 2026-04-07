@@ -86,7 +86,11 @@ function Kickoff {
   
 
   Write-Log( "\`r\`n##### Configuring  {0} instance... " -f "$Distro_Name")
-  wsl -d $Distro_Name $basedir_unixpath/install.sh $Profile_Path_unix $basedir_unixpath $Target_User -u root 2>&1 | Tee-Object -Append -FilePath $LogFile
+  wsl -d $Distro_Name -u root -- bash $basedir_unixpath/install.sh $Profile_Path_unix $basedir_unixpath $Target_User 2>&1 | Tee-Object -Append -FilePath $LogFile
+  if ($LASTEXITCODE -ne 0) {
+    Write-Log( "`r`n##### Configuration failed for {0}. exit code: {1}" -f "$Distro_Name", $LASTEXITCODE)
+    exit $LASTEXITCODE
+  }
 
   Write-Log( "`r`n##### Restarting {0} instance... " -f "$Distro_Name")
   wsl --terminate $Distro_Name

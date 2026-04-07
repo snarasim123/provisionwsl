@@ -228,3 +228,73 @@
     - golang
     - gvm
     - dev
+
+- name: Install Go {{ golang_version }} via GVM
+  shell: |
+    source {{ user_home }}/.gvm/scripts/gvm
+    gvm install go{{ golang_version }} -B || true
+  args:
+    executable: /bin/bash
+  become: true
+  become_user: "{{ target_user }}"
+  register: gvm_go_install
+  changed_when: "'Installing' in gvm_go_install.stdout or 'already installed' not in gvm_go_install.stderr"
+  when: golang_install_gvm | bool
+  tags:
+    - golang
+    - gvm
+    - dev
+
+- name: Install additional Go versions via GVM
+  shell: |
+    source {{ user_home }}/.gvm/scripts/gvm
+    gvm install go{{ item }} -B || true
+  args:
+    executable: /bin/bash
+  become: true
+  become_user: "{{ target_user }}"
+  loop: "{{ golang_additional_versions }}"
+  when: golang_install_gvm | bool and golang_additional_versions is defined
+  tags:
+    - golang
+    - gvm
+    - dev
+
+- name: Set Go {{ golang_version }} as default via GVM
+  shell: |
+    source {{ user_home }}/.gvm/scripts/gvm
+    gvm use go{{ golang_version }} --default
+  args:
+    executable: /bin/bash
+  become: true
+  become_user: "{{ target_user }}"
+  when: golang_install_gvm | bool
+  tags:
+    - golang
+    - gvm
+    - dev
+
+- name: Verify GVM Go version
+  shell: |
+    source {{ user_home }}/.gvm/scripts/gvm
+    gvm list
+  args:
+    executable: /bin/bash
+  become: true
+  become_user: "{{ target_user }}"
+  register: gvm_go_list
+  changed_when: false
+  when: golang_install_gvm | bool
+  tags:
+    - golang
+    - gvm
+    - dev
+
+- name: Display GVM installed Go versions
+  debug:
+    msg: "{{ gvm_go_list.stdout_lines }}"
+  when: golang_install_gvm | bool
+  tags:
+    - golang
+    - gvm
+    - dev

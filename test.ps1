@@ -30,7 +30,7 @@ $results = @()
 # --- Configuration ---
 
 $BashProfileFiles  = @(".alias", ".bash_funcs", ".bash_profile", ".bashrc", ".bashrc_custom", "prompt.sh", "variables.sh")
-$BashCompareSkip   = @(".bashrc_custom")  # modified by Ansible post-copy (lineinfile tasks)
+$BashCompareSkip   = @(".bashrc_custom",".bashrc")  # modified by Ansible post-copy (lineinfile tasks)
 $BashSourceSubDir  = "files\common"
 $KubeDirectories   = @(".kube", ".kube_aws", ".kube_gcp")
 $SshKeyFiles       = @("~/.ssh/id_rsa", "~/.ssh/id_rsa.pub")
@@ -53,6 +53,12 @@ function Run-Test {
     Write-Log ("  TEST: $TestName")
     Write-Log ("=" * 50)
     try {
+        # change this to inmemory exec of command
+        # Using -Raw, read the file in full, as a single, multi-line string.
+        # $simple_script = Get-Content -Raw ./simple_script.sh
+
+        # !! The \-escaping is needed up to PowerShell 7.2.x
+        # wsl bash -c ($simple_script -replace '"', '\"')
         $tmpFile = [System.IO.Path]::GetTempFileName()
         $utf8NoBom = New-Object System.Text.UTF8Encoding $false
         # Ensure standard PATH is set (Alpine's login shell may not include /usr/bin, /bin etc.)

@@ -3,7 +3,7 @@
 # https://docs.cloud.google.com/sdk/docs/install-sdk#red-hatfedoracentos
 # https://cloud.google.com/sdk/docs/install#rpm
 
-- name: Get Python version
+- name: Get Python version from fedora
   ansible.builtin.command: python3 --version
   register: python_version_output
   changed_when: false
@@ -12,7 +12,7 @@
     - gcp
     - cloud
 
-- name: Extract Python version number
+- name: Extract Python version number (fedora)
   ansible.builtin.set_fact:
     python_version: "{{ python_version_output.stdout | regex_search('Python ([0-9]+\\.[0-9]+)', '\\1') | first | default('0.0') }}"
   when: python_version_output.rc == 0
@@ -20,7 +20,7 @@
     - gcp
     - cloud
 
-- name: Set Python version to 0.0 if not found
+- name: Set Python version to 0.0 if not found (fedora)
   ansible.builtin.set_fact:
     python_version: "0.0"
   when: python_version_output.rc != 0
@@ -28,14 +28,14 @@
     - gcp
     - cloud
 
-- name: Display detected Python version
+- name: Display detected Python version (fedora)
   ansible.builtin.debug:
     msg: "Detected Python version: {{ python_version }}"
   tags:
     - gcp
     - cloud
 
-- name: Confirm Python version is supported for Google Cloud CLI
+- name: Confirm Python version is supported for Google Cloud CLI (fedora)
   ansible.builtin.assert:
     that:
       - python_version is version(gcp_cli_python_min_version, '>=')
@@ -82,7 +82,7 @@
     - gcp
     - cloud
 
-- name: Verify gcloud install location
+- name: Verify gcloud install location (fedora)
   ansible.builtin.command:
     cmd: which gcloud
   register: gcloud_location
@@ -92,14 +92,14 @@
     - gcp
     - cloud
 
-- name: Print gcloud install location
+- name: Print gcloud install location (fedora)
   ansible.builtin.debug:
     msg: "gcloud installed at: {{ gcloud_location.stdout | default('gcloud not found in PATH') }}"
   tags:
     - gcp
     - cloud
 
-- name: Verify gcloud version
+- name: Verify gcloud version (fedora)
   ansible.builtin.command:
     cmd: gcloud --version
   register: gcloud_version
@@ -109,14 +109,14 @@
     - gcp
     - cloud
 
-- name: Print gcloud version
+- name: Print gcloud version (fedora)
   ansible.builtin.debug:
     msg: "{{ gcloud_version.stdout_lines | default(['gcloud version not available']) }}"
   tags:
     - gcp
     - cloud
 
-- name: Set fact that GCP CLI is installed
+- name: Set fact that GCP CLI is installed (fedora)
   ansible.builtin.set_fact:
     gcp_cli_installed: true
   when: gcloud_version.rc == 0

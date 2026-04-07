@@ -7,6 +7,15 @@
 # Uses variables from prep-install.sh:
 # PYTHON_VERSION, PYTHON_CMD, PYTHON_BIN, PYTHON_DEV_PKG, PIP_CMD, PIP_LOCAL_BIN
 
+disable_problematic_fedora_repos() {
+    local wslu_copr_repo="/etc/yum.repos.d/_copr:copr.fedorainfracloud.org:wslutilities:wslu.repo"
+
+    if [[ -f "$wslu_copr_repo" ]]; then
+        echo "Disabling broken Fedora COPR repo: $wslu_copr_repo"
+        sudo sed -i 's/^enabled=.*/enabled=0/' "$wslu_copr_repo"
+    fi
+}
+
 remove_python_fedora() {
     # Remove pre-installed Python versions (be careful - Fedora depends on Python)
     # Only remove pip, not Python itself as dnf depends on it
@@ -25,6 +34,8 @@ build_python3_dnf() {
 }
 
 install_python_fedora() {
+    disable_problematic_fedora_repos
+
     # Install dependencies for Python
     sudo dnf install -y dnf-plugins-core
     

@@ -43,6 +43,8 @@ upgrade() {
         ansible-galaxy collection install community.general
         ansible-galaxy collection install kubernetes.core
     elif [[ "$distro_type" == "fedora" ]] ; then
+        disable_problematic_fedora_repos
+
         sudo dnf update -y
         sudo dnf install unzip -y
         

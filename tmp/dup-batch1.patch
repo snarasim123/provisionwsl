@@ -1,0 +1,1634 @@
+﻿*** Begin Patch
+*** Update File: C:\Users\SrinivasaNarasimhan\code\provisionwsl\roles\cloud\tasks\aws_common.yml
+@@
+----
+-- name: remove existing aws file
+-  ansible.builtin.file:
+-    state: absent
+-    path: "/home/{{ target_user }}/tmp/{{ item }}"
+-  with_items:
+-    - awscli-bundle.zip
+-  tags: 
+-    - aws
+-    - cloud
+-  become: true
+-
+-- name: remove existing aws folder
+-  ansible.builtin.file:
+-    state: absent
+-    path: "/home/{{ target_user }}/tmp/aws"
+-  tags: 
+-    - aws
+-    - cloud
+-  become: true
+-
+-- name: Download the awscli bundle.
+-  get_url: url=https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip dest="/home/{{ target_user }}/tmp/awscli-bundle.zip"
+-  tags: 
+-    - aws
+-    - cloud
+-
+-- name: Unarchive the installer.
+-  unarchive: src="/home/{{ target_user }}/tmp/awscli-bundle.zip" dest="/home/{{ target_user }}/tmp" 
+-  tags: 
+-    - aws
+-    - cloud
+-
+-- name: Install awscli package.
+-  shell:  "/home/{{ target_user }}/tmp/aws/install --update"
+-  tags: 
+-    - aws
+-    - cloud
+-  become: true
+-
+-- name: remove existing aws folder
+-  ansible.builtin.file:
+-    state: absent
+-    path: "/home/{{ target_user }}/tmp/aws"
+-  tags: 
+-    - aws
+-    - cloud
+-  become: true
+-
+-- name: remove existing aws file
+-  ansible.builtin.file:
+-    state: absent
+-    path: "/home/{{ target_user }}/tmp/{{ item }}"
+-  with_items:
+-    - awscli-bundle.zip
+-  tags: 
+-    - aws
+-    - cloud
+-  become: true
+-
+-- name: Set aws_cli_installed flag for post_run
+-  ansible.builtin.set_fact:
+-    aws_cli_installed: true
+-  tags:
+-    - aws
+-    - cloud
++---
++# todo - dup of roles\cloud\tasks\aws_common.yml - remove existing aws file 50 - rename this
++- name: remove existing aws file
++  ansible.builtin.file:
++    state: absent
++    path: "/home/{{ target_user }}/tmp/{{ item }}"
++  with_items:
++    - awscli-bundle.zip
++  tags: 
++    - aws
++    - cloud
++  become: true
++
++# todo - dup of roles\cloud\tasks\aws_common.yml - remove existing aws folder 41 - rename this
++- name: remove existing aws folder
++  ansible.builtin.file:
++    state: absent
++    path: "/home/{{ target_user }}/tmp/aws"
++  tags: 
++    - aws
++    - cloud
++  become: true
++
++- name: Download the awscli bundle.
++  get_url: url=https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip dest="/home/{{ target_user }}/tmp/awscli-bundle.zip"
++  tags: 
++    - aws
++    - cloud
++
++- name: Unarchive the installer.
++  unarchive: src="/home/{{ target_user }}/tmp/awscli-bundle.zip" dest="/home/{{ target_user }}/tmp" 
++  tags: 
++    - aws
++    - cloud
++
++- name: Install awscli package.
++  shell:  "/home/{{ target_user }}/tmp/aws/install --update"
++  tags: 
++    - aws
++    - cloud
++  become: true
++
++# todo - dup of roles\cloud\tasks\aws_common.yml - remove existing aws folder 13 - rename this
++- name: remove existing aws folder
++  ansible.builtin.file:
++    state: absent
++    path: "/home/{{ target_user }}/tmp/aws"
++  tags: 
++    - aws
++    - cloud
++  become: true
++
++# todo - dup of roles\cloud\tasks\aws_common.yml - remove existing aws file 2 - rename this
++- name: remove existing aws file
++  ansible.builtin.file:
++    state: absent
++    path: "/home/{{ target_user }}/tmp/{{ item }}"
++  with_items:
++    - awscli-bundle.zip
++  tags: 
++    - aws
++    - cloud
++  become: true
++
++- name: Set aws_cli_installed flag for post_run
++  ansible.builtin.set_fact:
++    aws_cli_installed: true
++  tags:
++    - aws
++    - cloud
+*** Update File: C:\Users\SrinivasaNarasimhan\code\provisionwsl\roles\container\tasks\k8s.yml
+@@
+----
+-- name: remove existing bin k8s 
+-  ansible.builtin.file:
+-    state: absent
+-    path: "{{ user_home }}/bin/kubectl"
+-  tags: 
+-    - k8s
+-    - container
+-  become: true
+-
+-- name: remove existing bin kube_aws.sh 
+-  ansible.builtin.file:
+-    state: absent
+-    path: "{{ user_home }}/bin/kube_aws.sh"
+-  tags: 
+-    - k8s
+-    - container
+-  become: true
+-
+-- name: remove existing bin kube_gcp.sh 
+-  ansible.builtin.file:
+-    state: absent
+-    path: "{{ user_home }}/bin/kube_gcp.sh"
+-  tags: 
+-    - k8s
+-    - container
+-  become: true
+-
+-- name: remove existing .kube_aws.zip
+-  ansible.builtin.file:
+-    state: absent
+-    path: "{{ user_home }}/.kube_aws.zip"
+-  tags: 
+-    - k8s
+-    - container
+-  become: true
+-
+-- name: remove existing .kube_gcp.zip
+-  ansible.builtin.file:
+-    state: absent
+-    path: "{{ user_home }}/.kube_gcp.zip"
+-  tags: 
+-    - k8s
+-    - container
+-  become: true
+-
+-- name: Download the k8s
+-  get_url: url=https://s3.us-west-2.amazonaws.com/amazon-eks/1.25.6/2023-01-30/bin/linux/amd64/kubectl dest="{{ user_home }}/bin/"
+-  tags: 
+-    - k8s
+-    - container
+-  become: true
+-
+-- name: Give  permissions to kubectl
+-  ansible.builtin.file:
+-    path: "{{ user_home }}/bin/kubectl"
+-    owner: "{{ target_user }}" 
+-    group: "{{ target_user }}" 
+-    mode: '0755'
+-  tags: 
+-    - k8s
+-    - container
+-  become: true
+-
+-- name: Copy .kube_aws.zip file
+-  copy:
+-    src: "{{ playbook_dir }}/files/common/.kube_aws.zip"
+-    dest: "{{ user_home }}"
+-    owner: "{{ target_user }}"
+-    group: "{{ target_user }}"
+-    mode: '0744'
+-  tags: 
+-    - k8s
+-    - container
+-  become: true
+-
+-- name: Copy .kube_gcp.zip file
+-  copy:
+-    src: "{{ playbook_dir }}/files/common/.kube_gcp.zip"
+-    dest: "{{ user_home }}"
+-    owner: "{{ target_user }}"
+-    group: "{{ target_user }}"
+-    mode: '0744'
+-  tags: 
+-    - k8s
+-    - container
+-  become: true
+-
+-- name: Extract .kube_aws.zip into {userhome}/.kube_aws
+-  ansible.builtin.unarchive:
+-    src: "{{ user_home }}/.kube_aws.zip"
+-    dest: "{{ user_home }}"
+-    mode: '0744'
+-  tags: 
+-    - k8s
+-    - container
+-  become: true
+-
+-- name: Give  permissions to .kube_aws folder
+-  ansible.builtin.file:
+-    path: "{{ user_home }}/.kube_aws"
+-    owner: "{{ target_user }}" 
+-    group: "{{ target_user }}" 
+-    mode: '0755'
+-  tags: 
+-    - k8s
+-    - container
+-  become: true
+-
+-- name: Extract .kube_gcp.zip into {userhome}/.kube_aws
+-  ansible.builtin.unarchive:
+-    src: "{{ user_home }}/.kube_gcp.zip"
+-    dest: "{{ user_home }}"    
+-    mode: '0744'
+-  tags: 
+-    - k8s
+-    - container
+-  become: true
+-
+-- name: Give  permissions to .kube_gcp folder
+-  ansible.builtin.file:
+-    path: "{{ user_home }}/.kube_gcp"
+-    owner: "{{ target_user }}" 
+-    group: "{{ target_user }}" 
+-    mode: '0755'
+-  tags: 
+-    - k8s
+-    - container
+-  become: true
+-
+-- name: remove existing .kube_aws.zip
+-  ansible.builtin.file:
+-    state: absent
+-    path: "{{ user_home }}/.kube_aws.zip"
+-  tags: 
+-    - k8s
+-    - container
+-  become: true
+-
+-- name: remove existing .kube_gcp.zip
+-  ansible.builtin.file:
+-    state: absent
+-    path: "{{ user_home }}/.kube_gcp.zip"
+-  tags: 
+-    - k8s
+-    - container
+-  become: true
+-  
+-- name: Copy gcp config switcher script
+-  copy:
+-    src: "{{ playbook_dir }}/files/common/kube_gcp.sh"
+-    dest: "{{ user_home }}/bin"
+-    owner: "{{ target_user }}"
+-    group: "{{ target_user }}"
+-    mode: '0744'
+-  tags: 
+-    - k8s
+-    - container
+-  become: true
+-
+-- name: Copy aws config switcher script
+-  copy:
+-    src: "{{ playbook_dir }}/files/common/kube_aws.sh"
+-    dest: "{{ user_home }}/bin"
+-    owner: "{{ target_user }}"
+-    group: "{{ target_user }}"
+-    mode: '0744'
+-  tags: 
+-    - k8s
+-    - container
+-  become: true
+-
+-- name: Set kubernetes_installed flag for post_run
+-  set_fact:
+-    kubernetes_installed: true
+-  tags:
+-    - k8s
+-    - container
++---
++- name: remove existing bin k8s 
++  ansible.builtin.file:
++    state: absent
++    path: "{{ user_home }}/bin/kubectl"
++  tags: 
++    - k8s
++    - container
++  become: true
++
++- name: remove existing bin kube_aws.sh 
++  ansible.builtin.file:
++    state: absent
++    path: "{{ user_home }}/bin/kube_aws.sh"
++  tags: 
++    - k8s
++    - container
++  become: true
++
++- name: remove existing bin kube_gcp.sh 
++  ansible.builtin.file:
++    state: absent
++    path: "{{ user_home }}/bin/kube_gcp.sh"
++  tags: 
++    - k8s
++    - container
++  become: true
++
++# todo - dup of roles\container\tasks\k8s.yml - remove existing .kube_aws.zip 131 - rename this
++- name: remove existing .kube_aws.zip
++  ansible.builtin.file:
++    state: absent
++    path: "{{ user_home }}/.kube_aws.zip"
++  tags: 
++    - k8s
++    - container
++  become: true
++
++# todo - dup of roles\container\tasks\k8s.yml - remove existing .kube_gcp.zip 140 - rename this
++- name: remove existing .kube_gcp.zip
++  ansible.builtin.file:
++    state: absent
++    path: "{{ user_home }}/.kube_gcp.zip"
++  tags: 
++    - k8s
++    - container
++  become: true
++
++- name: Download the k8s
++  get_url: url=https://s3.us-west-2.amazonaws.com/amazon-eks/1.25.6/2023-01-30/bin/linux/amd64/kubectl dest="{{ user_home }}/bin/"
++  tags: 
++    - k8s
++    - container
++  become: true
++
++- name: Give  permissions to kubectl
++  ansible.builtin.file:
++    path: "{{ user_home }}/bin/kubectl"
++    owner: "{{ target_user }}" 
++    group: "{{ target_user }}" 
++    mode: '0755'
++  tags: 
++    - k8s
++    - container
++  become: true
++
++- name: Copy .kube_aws.zip file
++  copy:
++    src: "{{ playbook_dir }}/files/common/.kube_aws.zip"
++    dest: "{{ user_home }}"
++    owner: "{{ target_user }}"
++    group: "{{ target_user }}"
++    mode: '0744'
++  tags: 
++    - k8s
++    - container
++  become: true
++
++- name: Copy .kube_gcp.zip file
++  copy:
++    src: "{{ playbook_dir }}/files/common/.kube_gcp.zip"
++    dest: "{{ user_home }}"
++    owner: "{{ target_user }}"
++    group: "{{ target_user }}"
++    mode: '0744'
++  tags: 
++    - k8s
++    - container
++  become: true
++
++- name: Extract .kube_aws.zip into {userhome}/.kube_aws
++  ansible.builtin.unarchive:
++    src: "{{ user_home }}/.kube_aws.zip"
++    dest: "{{ user_home }}"
++    mode: '0744'
++  tags: 
++    - k8s
++    - container
++  become: true
++
++- name: Give  permissions to .kube_aws folder
++  ansible.builtin.file:
++    path: "{{ user_home }}/.kube_aws"
++    owner: "{{ target_user }}" 
++    group: "{{ target_user }}" 
++    mode: '0755'
++  tags: 
++    - k8s
++    - container
++  become: true
++
++- name: Extract .kube_gcp.zip into {userhome}/.kube_aws
++  ansible.builtin.unarchive:
++    src: "{{ user_home }}/.kube_gcp.zip"
++    dest: "{{ user_home }}"    
++    mode: '0744'
++  tags: 
++    - k8s
++    - container
++  become: true
++
++- name: Give  permissions to .kube_gcp folder
++  ansible.builtin.file:
++    path: "{{ user_home }}/.kube_gcp"
++    owner: "{{ target_user }}" 
++    group: "{{ target_user }}" 
++    mode: '0755'
++  tags: 
++    - k8s
++    - container
++  become: true
++
++# todo - dup of roles\container\tasks\k8s.yml - remove existing .kube_aws.zip 29 - rename this
++- name: remove existing .kube_aws.zip
++  ansible.builtin.file:
++    state: absent
++    path: "{{ user_home }}/.kube_aws.zip"
++  tags: 
++    - k8s
++    - container
++  become: true
++
++# todo - dup of roles\container\tasks\k8s.yml - remove existing .kube_gcp.zip 38 - rename this
++- name: remove existing .kube_gcp.zip
++  ansible.builtin.file:
++    state: absent
++    path: "{{ user_home }}/.kube_gcp.zip"
++  tags: 
++    - k8s
++    - container
++  become: true
++  
++- name: Copy gcp config switcher script
++  copy:
++    src: "{{ playbook_dir }}/files/common/kube_gcp.sh"
++    dest: "{{ user_home }}/bin"
++    owner: "{{ target_user }}"
++    group: "{{ target_user }}"
++    mode: '0744'
++  tags: 
++    - k8s
++    - container
++  become: true
++
++- name: Copy aws config switcher script
++  copy:
++    src: "{{ playbook_dir }}/files/common/kube_aws.sh"
++    dest: "{{ user_home }}/bin"
++    owner: "{{ target_user }}"
++    group: "{{ target_user }}"
++    mode: '0744'
++  tags: 
++    - k8s
++    - container
++  become: true
++
++- name: Set kubernetes_installed flag for post_run
++  set_fact:
++    kubernetes_installed: true
++  tags:
++    - k8s
++    - container
+*** Update File: C:\Users\SrinivasaNarasimhan\code\provisionwsl\roles\container\tasks\k9s.yml
+@@
+-# # k9s
+-# # echo "##    Installing k9s..."  >> $install_log 2>&1
+-# cd $temp_folder
+-# wget https://github.com/derailed/k9s/releases/download/v0.27.4/k9s_Linux_amd64.tar.gz
+-# tar -xvf k9s_Linux_amd64.tar.gz
+-# mv ./k9s $HOME/bin
+-
+----
+-- name: remove existing bin k9s 
+-  ansible.builtin.file:
+-    state: absent
+-    path: "{{ user_home }}/bin/k9s"
+-  tags: 
+-    - k9s
+-    - container  
+-  become: true
+-
+-- name: remove existing tmp k9s 
+-  ansible.builtin.file:
+-    state: absent
+-    path: "{{ user_home }}/tmp/k9s"
+-  tags: 
+-    - k9s
+-    - container  
+-  become: true
+-
+-- name: remove existing  k9s archive
+-  ansible.builtin.file:
+-    state: absent
+-    path: "{{ user_home }}/tmp/k9s_Linux_amd64.tar.gz"
+-  tags: 
+-    - k9s
+-    - container  
+-  become: true
+-
+-- name: Download the k9s
+-  get_url: url=https://github.com/derailed/k9s/releases/download/{{ k9s_version }}/k9s_Linux_amd64.tar.gz dest="{{ user_home }}/tmp/"
+-  tags: 
+-    - k9s
+-    - container  
+-
+-- name: Unarchive k9s
+-  unarchive: src="{{ user_home }}/tmp/k9s_Linux_amd64.tar.gz" dest="{{ user_home }}/tmp" 
+-  tags: 
+-    - k9s
+-    - container  
+-
+-- name: Install k9s package
+-  copy:
+-    src: "{{ user_home }}/tmp/k9s"
+-    dest: "{{ user_home }}/bin/"
+-    mode: 0755
+-    owner: "{{ target_user }}" 
+-    group: "{{ target_user }}"
+-  tags: 
+-    - k9s
+-    - container  
+-  become: true
+-
+-- name: remove existing k9s file
+-  ansible.builtin.file:
+-    state: absent
+-    path: "{{ user_home }}/tmp/{{item}}"
+-  with_items:
+-    - k9s
+-    - LICENSE
+-    - README.md
+-  tags: 
+-    - k9s
+-    - container  
+-  become: true
+-
+-- name: remove existing  k9s archive
+-  ansible.builtin.file:
+-    state: absent
+-    path: "{{ user_home }}/tmp/k9s_Linux_amd64.tar.gz"
+-  tags: 
+-    - k9s
+-    - container  
+-  become: true
++# # k9s
++# # echo "##    Installing k9s..."  >> $install_log 2>&1
++# cd $temp_folder
++# wget https://github.com/derailed/k9s/releases/download/v0.27.4/k9s_Linux_amd64.tar.gz
++# tar -xvf k9s_Linux_amd64.tar.gz
++# mv ./k9s $HOME/bin
++
++---
++- name: remove existing bin k9s 
++  ansible.builtin.file:
++    state: absent
++    path: "{{ user_home }}/bin/k9s"
++  tags: 
++    - k9s
++    - container  
++  become: true
++
++- name: remove existing tmp k9s 
++  ansible.builtin.file:
++    state: absent
++    path: "{{ user_home }}/tmp/k9s"
++  tags: 
++    - k9s
++    - container  
++  become: true
++
++# todo - dup of roles\container\tasks\k9s.yml - remove existing  k9s archive 73 - rename this
++- name: remove existing  k9s archive
++  ansible.builtin.file:
++    state: absent
++    path: "{{ user_home }}/tmp/k9s_Linux_amd64.tar.gz"
++  tags: 
++    - k9s
++    - container  
++  become: true
++
++- name: Download the k9s
++  get_url: url=https://github.com/derailed/k9s/releases/download/{{ k9s_version }}/k9s_Linux_amd64.tar.gz dest="{{ user_home }}/tmp/"
++  tags: 
++    - k9s
++    - container  
++
++- name: Unarchive k9s
++  unarchive: src="{{ user_home }}/tmp/k9s_Linux_amd64.tar.gz" dest="{{ user_home }}/tmp" 
++  tags: 
++    - k9s
++    - container  
++
++- name: Install k9s package
++  copy:
++    src: "{{ user_home }}/tmp/k9s"
++    dest: "{{ user_home }}/bin/"
++    mode: 0755
++    owner: "{{ target_user }}" 
++    group: "{{ target_user }}"
++  tags: 
++    - k9s
++    - container  
++  become: true
++
++- name: remove existing k9s file
++  ansible.builtin.file:
++    state: absent
++    path: "{{ user_home }}/tmp/{{item}}"
++  with_items:
++    - k9s
++    - LICENSE
++    - README.md
++  tags: 
++    - k9s
++    - container  
++  become: true
++
++# todo - dup of roles\container\tasks\k9s.yml - remove existing  k9s archive 27 - rename this
++- name: remove existing  k9s archive
++  ansible.builtin.file:
++    state: absent
++    path: "{{ user_home }}/tmp/k9s_Linux_amd64.tar.gz"
++  tags: 
++    - k9s
++    - container  
++  become: true
+*** Update File: C:\Users\SrinivasaNarasimhan\code\provisionwsl\roles\dev\tasks\lazygit.yml
+@@
+-# Lazygit installation tasks
+-# Installs lazygit - a simple terminal UI for git commands
+-# Works on Ubuntu, Fedora, and Alpine
+-# Version is defined in vars/language_versions.yml as lazygit_version
+----
+-
+-- name: Check if lazygit is already installed
+-  command: which lazygit
+-  register: lazygit_installed
+-  changed_when: false
+-  failed_when: false
+-  tags:
+-    - lazygit
+-    - git
+-    - tools
+-
+-- name: Get installed lazygit version
+-  shell: lazygit --version | grep -oP 'version=\K[0-9]+\.[0-9]+\.[0-9]+'
+-  register: lazygit_current_version
+-  changed_when: false
+-  failed_when: false
+-  when: lazygit_installed.rc == 0
+-  tags:
+-    - lazygit
+-    - git
+-    - tools
+-
+-- name: Set lazygit_needs_install fact
+-  set_fact:
+-    lazygit_needs_install: "{{ lazygit_installed.rc != 0 or (lazygit_current_version.stdout is defined and lazygit_current_version.stdout is version(lazygit_version, '<')) }}"
+-  tags:
+-    - lazygit
+-    - git
+-    - tools
+-
+-- name: Display current lazygit version
+-  debug:
+-    msg: "Current lazygit version: {{ lazygit_current_version.stdout | default('not installed') }}, Target version: {{ lazygit_version }}, Needs install: {{ lazygit_needs_install }}"
+-  tags:
+-    - lazygit
+-    - git
+-    - tools
+-
+-- name: Install lazygit on Ubuntu/Debian
+-  block:
+-    - name: Create tmp directory for lazygit
+-      file:
+-        path: "/home/{{ target_user }}/tmp"
+-        state: directory
+-        mode: '0755'
+-        owner: "{{ target_user }}"
+-        group: "{{ target_user }}"
+-
+-    - name: Download lazygit for Ubuntu/Debian
+-      get_url:
+-        url: "https://github.com/jesseduffield/lazygit/releases/download/v{{ lazygit_version }}/lazygit_{{ lazygit_version }}_Linux_x86_64.tar.gz"
+-        dest: "/home/{{ target_user }}/tmp/lazygit.tar.gz"
+-        mode: '0644'
+-
+-    - name: Extract lazygit
+-      unarchive:
+-        src: "/home/{{ target_user }}/tmp/lazygit.tar.gz"
+-        dest: "/home/{{ target_user }}/tmp"
+-        remote_src: yes
+-
+-    - name: Install lazygit to /usr/local/bin
+-      copy:
+-        src: "/home/{{ target_user }}/tmp/lazygit"
+-        dest: /usr/local/bin/lazygit
+-        mode: '0755'
+-        remote_src: yes
+-      become: true
+-
+-    - name: Cleanup lazygit tmp files
+-      file:
+-        path: "/home/{{ target_user }}/tmp/{{ item }}"
+-        state: absent
+-      loop:
+-        - lazygit.tar.gz
+-        - lazygit
+-        - LICENSE
+-        - README.md
+-  when:
+-    - is_ubuntu | bool or is_debian | bool
+-    - lazygit_needs_install | bool
+-  tags:
+-    - lazygit
+-    - git
+-    - tools
+-
+-- name: Install lazygit on Fedora
+-  block:
+-    - name: Create tmp directory for lazygit
+-      file:
+-        path: "/home/{{ target_user }}/tmp"
+-        state: directory
+-        mode: '0755'
+-        owner: "{{ target_user }}"
+-        group: "{{ target_user }}"
+-
+-    - name: Download lazygit for Fedora
+-      get_url:
+-        url: "https://github.com/jesseduffield/lazygit/releases/download/v{{ lazygit_version }}/lazygit_{{ lazygit_version }}_Linux_x86_64.tar.gz"
+-        dest: "/home/{{ target_user }}/tmp/lazygit.tar.gz"
+-        mode: '0644'
+-
+-    - name: Extract lazygit
+-      unarchive:
+-        src: "/home/{{ target_user }}/tmp/lazygit.tar.gz"
+-        dest: "/home/{{ target_user }}/tmp"
+-        remote_src: yes
+-
+-    - name: Install lazygit to /usr/local/bin
+-      copy:
+-        src: "/home/{{ target_user }}/tmp/lazygit"
+-        dest: /usr/local/bin/lazygit
+-        mode: '0755'
+-        remote_src: yes
+-      become: true
+-
+-    - name: Cleanup lazygit tmp files
+-      file:
+-        path: "/home/{{ target_user }}/tmp/{{ item }}"
+-        state: absent
+-      loop:
+-        - lazygit.tar.gz
+-        - lazygit
+-        - LICENSE
+-        - README.md
+-  when:
+-    - is_fedora | bool
+-    - lazygit_needs_install | bool
+-  tags:
+-    - lazygit
+-    - git
+-    - tools
+-
+-- name: Install lazygit on Alpine
+-  block:
+-    - name: Create tmp directory for lazygit
+-      file:
+-        path: "/home/{{ target_user }}/tmp"
+-        state: directory
+-        mode: '0755'
+-        owner: "{{ target_user }}"
+-        group: "{{ target_user }}"
+-
+-    - name: Download lazygit for Alpine
+-      get_url:
+-        url: "https://github.com/jesseduffield/lazygit/releases/download/v{{ lazygit_version }}/lazygit_{{ lazygit_version }}_Linux_x86_64.tar.gz"
+-        dest: "/home/{{ target_user }}/tmp/lazygit.tar.gz"
+-        mode: '0644'
+-
+-    - name: Extract lazygit
+-      unarchive:
+-        src: "/home/{{ target_user }}/tmp/lazygit.tar.gz"
+-        dest: "/home/{{ target_user }}/tmp"
+-        remote_src: yes
+-
+-    - name: Install lazygit to /usr/local/bin
+-      copy:
+-        src: "/home/{{ target_user }}/tmp/lazygit"
+-        dest: /usr/local/bin/lazygit
+-        mode: '0755'
+-        remote_src: yes
+-      become: true
+-
+-    - name: Cleanup lazygit tmp files
+-      file:
+-        path: "/home/{{ target_user }}/tmp/{{ item }}"
+-        state: absent
+-      loop:
+-        - lazygit.tar.gz
+-        - lazygit
+-        - LICENSE
+-        - README.md
+-  when:
+-    - is_alpine | bool
+-    - lazygit_needs_install | bool
+-  tags:
+-    - lazygit
+-    - git
+-    - tools
+-
+-- name: Verify lazygit installation
+-  command: lazygit --version
+-  register: lazygit_verify
+-  changed_when: false
+-  tags:
+-    - lazygit
+-    - git
+-    - tools
+-
+-- name: Display lazygit version
+-  debug:
+-    msg: "{{ lazygit_verify.stdout }}"
+-  tags:
+-    - lazygit
+-    - git
+-    - tools
++# Lazygit installation tasks
++# Installs lazygit - a simple terminal UI for git commands
++# Works on Ubuntu, Fedora, and Alpine
++# Version is defined in vars/language_versions.yml as lazygit_version
++---
++
++- name: Check if lazygit is already installed
++  command: which lazygit
++  register: lazygit_installed
++  changed_when: false
++  failed_when: false
++  tags:
++    - lazygit
++    - git
++    - tools
++
++- name: Get installed lazygit version
++  shell: lazygit --version | grep -oP 'version=\K[0-9]+\.[0-9]+\.[0-9]+'
++  register: lazygit_current_version
++  changed_when: false
++  failed_when: false
++  when: lazygit_installed.rc == 0
++  tags:
++    - lazygit
++    - git
++    - tools
++
++- name: Set lazygit_needs_install fact
++  set_fact:
++    lazygit_needs_install: "{{ lazygit_installed.rc != 0 or (lazygit_current_version.stdout is defined and lazygit_current_version.stdout is version(lazygit_version, '<')) }}"
++  tags:
++    - lazygit
++    - git
++    - tools
++
++- name: Display current lazygit version
++  debug:
++    msg: "Current lazygit version: {{ lazygit_current_version.stdout | default('not installed') }}, Target version: {{ lazygit_version }}, Needs install: {{ lazygit_needs_install }}"
++  tags:
++    - lazygit
++    - git
++    - tools
++
++- name: Install lazygit on Ubuntu/Debian
++  block:
++    # todo - dup of roles\dev\tasks\lazygit.yml - Create tmp directory for lazygit 93 - rename this
++    - name: Create tmp directory for lazygit
++      file:
++        path: "/home/{{ target_user }}/tmp"
++        state: directory
++        mode: '0755'
++        owner: "{{ target_user }}"
++        group: "{{ target_user }}"
++
++    - name: Download lazygit for Ubuntu/Debian
++      get_url:
++        url: "https://github.com/jesseduffield/lazygit/releases/download/v{{ lazygit_version }}/lazygit_{{ lazygit_version }}_Linux_x86_64.tar.gz"
++        dest: "/home/{{ target_user }}/tmp/lazygit.tar.gz"
++        mode: '0644'
++
++    # todo - dup of roles\dev\tasks\lazygit.yml - Extract lazygit 107 - rename this
++    - name: Extract lazygit
++      unarchive:
++        src: "/home/{{ target_user }}/tmp/lazygit.tar.gz"
++        dest: "/home/{{ target_user }}/tmp"
++        remote_src: yes
++
++    # todo - dup of roles\dev\tasks\lazygit.yml - Install lazygit to /usr/local/bin 113 - rename this
++    - name: Install lazygit to /usr/local/bin
++      copy:
++        src: "/home/{{ target_user }}/tmp/lazygit"
++        dest: /usr/local/bin/lazygit
++        mode: '0755'
++        remote_src: yes
++      become: true
++
++    # todo - dup of roles\dev\tasks\lazygit.yml - Cleanup lazygit tmp files 121 - rename this
++    - name: Cleanup lazygit tmp files
++      file:
++        path: "/home/{{ target_user }}/tmp/{{ item }}"
++        state: absent
++      loop:
++        - lazygit.tar.gz
++        - lazygit
++        - LICENSE
++        - README.md
++  when:
++    - is_ubuntu | bool or is_debian | bool
++    - lazygit_needs_install | bool
++  tags:
++    - lazygit
++    - git
++    - tools
++
++- name: Install lazygit on Fedora
++  block:
++    # todo - dup of roles\dev\tasks\lazygit.yml - Create tmp directory for lazygit 46 - rename this
++    - name: Create tmp directory for lazygit
++      file:
++        path: "/home/{{ target_user }}/tmp"
++        state: directory
++        mode: '0755'
++        owner: "{{ target_user }}"
++        group: "{{ target_user }}"
++
++    - name: Download lazygit for Fedora
++      get_url:
++        url: "https://github.com/jesseduffield/lazygit/releases/download/v{{ lazygit_version }}/lazygit_{{ lazygit_version }}_Linux_x86_64.tar.gz"
++        dest: "/home/{{ target_user }}/tmp/lazygit.tar.gz"
++        mode: '0644'
++
++    # todo - dup of roles\dev\tasks\lazygit.yml - Extract lazygit 60 - rename this
++    - name: Extract lazygit
++      unarchive:
++        src: "/home/{{ target_user }}/tmp/lazygit.tar.gz"
++        dest: "/home/{{ target_user }}/tmp"
++        remote_src: yes
++
++    # todo - dup of roles\dev\tasks\lazygit.yml - Install lazygit to /usr/local/bin 66 - rename this
++    - name: Install lazygit to /usr/local/bin
++      copy:
++        src: "/home/{{ target_user }}/tmp/lazygit"
++        dest: /usr/local/bin/lazygit
++        mode: '0755'
++        remote_src: yes
++      become: true
++
++    # todo - dup of roles\dev\tasks\lazygit.yml - Cleanup lazygit tmp files 74 - rename this
++    - name: Cleanup lazygit tmp files
++      file:
++        path: "/home/{{ target_user }}/tmp/{{ item }}"
++        state: absent
++      loop:
++        - lazygit.tar.gz
++        - lazygit
++        - LICENSE
++        - README.md
++  when:
++    - is_fedora | bool
++    - lazygit_needs_install | bool
++  tags:
++    - lazygit
++    - git
++    - tools
++
++- name: Install lazygit on Alpine
++  block:
++    # todo - dup of roles\dev\tasks\lazygit.yml - Create tmp directory for lazygit 46 - rename this
++    - name: Create tmp directory for lazygit
++      file:
++        path: "/home/{{ target_user }}/tmp"
++        state: directory
++        mode: '0755'
++        owner: "{{ target_user }}"
++        group: "{{ target_user }}"
++
++    - name: Download lazygit for Alpine
++      get_url:
++        url: "https://github.com/jesseduffield/lazygit/releases/download/v{{ lazygit_version }}/lazygit_{{ lazygit_version }}_Linux_x86_64.tar.gz"
++        dest: "/home/{{ target_user }}/tmp/lazygit.tar.gz"
++        mode: '0644'
++
++    # todo - dup of roles\dev\tasks\lazygit.yml - Extract lazygit 60 - rename this
++    - name: Extract lazygit
++      unarchive:
++        src: "/home/{{ target_user }}/tmp/lazygit.tar.gz"
++        dest: "/home/{{ target_user }}/tmp"
++        remote_src: yes
++
++    # todo - dup of roles\dev\tasks\lazygit.yml - Install lazygit to /usr/local/bin 66 - rename this
++    - name: Install lazygit to /usr/local/bin
++      copy:
++        src: "/home/{{ target_user }}/tmp/lazygit"
++        dest: /usr/local/bin/lazygit
++        mode: '0755'
++        remote_src: yes
++      become: true
++
++    # todo - dup of roles\dev\tasks\lazygit.yml - Cleanup lazygit tmp files 74 - rename this
++    - name: Cleanup lazygit tmp files
++      file:
++        path: "/home/{{ target_user }}/tmp/{{ item }}"
++        state: absent
++      loop:
++        - lazygit.tar.gz
++        - lazygit
++        - LICENSE
++        - README.md
++  when:
++    - is_alpine | bool
++    - lazygit_needs_install | bool
++  tags:
++    - lazygit
++    - git
++    - tools
++
++- name: Verify lazygit installation
++  command: lazygit --version
++  register: lazygit_verify
++  changed_when: false
++  tags:
++    - lazygit
++    - git
++    - tools
++
++- name: Display lazygit version
++  debug:
++    msg: "{{ lazygit_verify.stdout }}"
++  tags:
++    - lazygit
++    - git
++    - tools
+*** Update File: C:\Users\SrinivasaNarasimhan\code\provisionwsl\roles\git\tasks\gitcore.yml
+@@
+----
+-- set_fact:
+-    git_reinstall_from_source: false
+-
+-- name: Print Task msg
+-  ansible.builtin.debug:
+-    msg: install/update git and configure 
+-  tags: 
+-    - git
+-    - gitcore
+-
+-- name: Get installed version.
+-  command: git --version
+-  changed_when: false
+-  failed_when: false
+-  check_mode: false
+-  register: git_installed_version
+-  tags: 
+-    - git
+-    - gitcore
+-
+-- name: Print git installed version
+-  ansible.builtin.debug:
+-    msg: git version "{{ git_installed_version.stdout }}"
+-  # when:
+-    # - (git_installed_version.rc == 0) 
+-  tags: 
+-    - git
+-    - gitcore
+-
+-- name: Force git install if the version numbers do not match.
+-  set_fact:
+-    git_reinstall_from_source: true
+-  when:
+-    - (git_installed_version.rc == 0) and (git_installed_version.stdout | regex_replace("^.*?([0-9\.]+)$", "\\1") is version(git_version, operator="!="))
+-    - (git_installed_version.stdout != 0)
+-  become: true
+-  tags: 
+-    - git
+-    - gitcore
+-
+-- name: Ensure git is uninstalled (Debian).
+-  ansible.builtin.apt:
+-    name: "git"
+-    state: absent
+-  when: 
+-    - git_reinstall_from_source | bool
+-    - is_ubuntu
+-  become: true
+-  tags: 
+-    - git
+-    - gitcore
+-
+-- name: Ensure git is uninstalled (fedora).
+-  ansible.builtin.dnf:
+-    name: "git"
+-    state: absent  
+-  when: 
+-    - git_reinstall_from_source | bool
+-    - is_fedora
+-  become: true
+-  tags: 
+-    - git
+-    - gitcore
+-
+-- name: Ensure git is uninstalled (alpine).
+-  community.general.apk:
+-    name: "git"
+-    state: absent
+-  when: 
+-    - git_reinstall_from_source | bool
+-    - is_alpine
+-  become: true
+-  tags: 
+-    - git
+-    - gitcore
+-
+-- name: Download git.
+-  get_url:
+-    url: "https://www.kernel.org/pub/software/scm/git/git-{{ git_version }}.tar.gz"
+-    dest: "{{ user_home }}/tmp/git-{{ git_version }}.tar.gz"
+-    owner: "{{ target_user }}"
+-    group: "{{ target_user }}"
+-    mode: "0777"
+-  when: 
+-    (git_installed_version.rc != 0) or (git_reinstall_from_source | bool)
+-  become: true
+-  tags: 
+-    - git
+-    - gitcore
+-
+-- name: Change file ownership, group and permissions
+-  ansible.builtin.file:
+-    path: "{{ user_home }}/tmp/git-{{ git_version }}.tar.gz"
+-    owner: "{{ target_user }}"
+-    group: "{{ target_user }}"
+-    mode: "0777"
+-  become: true
+-  tags: 
+-    - git
+-    - gitcore
+-
+-- name: Expand git archive.
+-  unarchive:
+-    src: "{{ user_home }}/tmp/git-{{ git_version }}.tar.gz"
+-    dest: "{{ user_home }}/tmp"
+-    creates: "{{ user_home }}/tmp/git-{{ git_version }}"
+-    owner: "{{ target_user }}"
+-    group: "{{ target_user }}"
+-    mode: "0777"
+-  when: (git_installed_version.rc != 0) or (git_reinstall_from_source | bool)
+-  become: true
+-  tags: 
+-    - git
+-    - gitcore
+-
+-- name: Change file ownership, group and permissions
+-  ansible.builtin.file:
+-    path: "{{ user_home }}/tmp/git-{{ git_version }}"
+-    owner: "{{ target_user }}"
+-    group: "{{ target_user }}"
+-    mode: "0777"
+-  become: true
+-  tags: 
+-    - git
+-    - gitcore
+-
+-- name: configure git build.
+-  command:     
+-    sudo "{{ user_home }}/tmp/git-{{ git_version }}/configure" --prefix="{{ git_install_path }}"
+-    chdir="{{ user_home }}/tmp/git-{{ git_version }}"
+-  when: (git_installed_version.rc != 0) or (git_reinstall_from_source | bool)
+-  become: true
+-  # become_user: "{{ root_user }}"
+-  tags: 
+-    - git
+-    - gitcore
+-
+-- name: git build.
+-  command:     
+-    sudo make {{ item }}
+-    chdir="{{ user_home }}/tmp/git-{{ git_version }}"
+-  with_items:
+-    - all
+-  when: (git_installed_version.rc != 0) or (git_reinstall_from_source | bool)
+-  become: true
+-  tags: 
+-    - git
+-    - gitcore
+-
+-- name: git install.
+-  command:     
+-    sudo make {{ item }}
+-    chdir="{{ user_home }}/tmp/git-{{ git_version }}"
+-  with_items:
+-    - install
+-  when: (git_installed_version.rc != 0) or (git_reinstall_from_source | bool)
+-  become: true
+-  tags: 
+-    - git
+-    - gitcore
+-
+-- name: Create system config directory
+-  ansible.builtin.file:
+-    path: /usr/etc
+-    state: directory
+-    mode: '0755'
+-  become: true
+-  tags: 
+-    - git
+-    - gitcore      
+-
+-- name: create system gitconfig file
+-  copy:
+-    content: ""
+-    dest: "/usr/etc/gitconfig"
+-    force: false
+-    group: sys
+-    owner: root
+-    mode: 0655
+-  become: true
+-  tags: 
+-    - git
+-    - gitcore  
+-
+-- name: create global gitconfig file
+-  copy:
+-    content: ""
+-    dest: "{{ user_home }}/.gitconfig"
+-    force: false
+-    group: snarasim
+-    owner: snarasim
+-    mode: 0775
+-  become: true
+-  tags: 
+-    - git
+-    - gitcore  
+-
+-- name: update system gitconfig with core.editor
+-  community.general.ini_file:
+-    path: /usr/etc/gitconfig
+-    section: core
+-    option: editor
+-    value : "vim"
+-    state: present
+-    follow : true
+-  become: true
+-  tags: 
+-    - git
+-    - gitcore  
+-
+-- name: update system gitconfig with core.autocrlf
+-  community.general.ini_file:
+-    path: /usr/etc/gitconfig
+-    section: core
+-    option: autocrlf
+-    value : "false"
+-    state: present
+-    follow : true
+-  become: true
+-  tags: 
+-    - git
+-    - gitcore
+-
+-- name: update system gitconfig with core.eol
+-  community.general.ini_file:
+-    path: /usr/etc/gitconfig
+-    section: core
+-    option: eol
+-    value : "native"
+-    state: present
+-    follow : true
+-  become: true
+-  tags: 
+-    - git
+-    - gitcore
+-
+-- name: update global  gitconfig with user.name
+-  community.general.ini_file:
+-    path: "{{ user_home }}/.gitconfig"
+-    section: user
+-    option: name
+-    value : "{{ target_user }}"
+-    state: present
+-    follow : true
+-  become: true
+-  tags: 
+-    - git
+-    - gitcore
+-
+-- name: update global  gitconfig with user.email
+-  community.general.ini_file:
+-    path: "{{ user_home }}/.gitconfig"
+-    section: user
+-    option: email
+-    value : "{{ git_user_email }}"
+-    state: present
+-    follow : true
+-  become: true
+-  tags: 
+-    - git
+-    - gitcore
+-
+-- name: update global  gitconfig with core.editor
+-  community.general.ini_file:
+-    path: "{{ user_home }}/.gitconfig"
+-    section: core
+-    option: editor
+-    value : "vim"
+-    state: present
+-    follow : true
+-  become: true
+-  tags: 
+-    - git
+-    - gitcore
++---
++- set_fact:
++    git_reinstall_from_source: false
++
++- name: Print Task msg
++  ansible.builtin.debug:
++    msg: install/update git and configure 
++  tags: 
++    - git
++    - gitcore
++
++- name: Get installed version.
++  command: git --version
++  changed_when: false
++  failed_when: false
++  check_mode: false
++  register: git_installed_version
++  tags: 
++    - git
++    - gitcore
++
++- name: Print git installed version
++  ansible.builtin.debug:
++    msg: git version "{{ git_installed_version.stdout }}"
++  # when:
++    # - (git_installed_version.rc == 0) 
++  tags: 
++    - git
++    - gitcore
++
++- name: Force git install if the version numbers do not match.
++  set_fact:
++    git_reinstall_from_source: true
++  when:
++    - (git_installed_version.rc == 0) and (git_installed_version.stdout | regex_replace("^.*?([0-9\.]+)$", "\\1") is version(git_version, operator="!="))
++    - (git_installed_version.stdout != 0)
++  become: true
++  tags: 
++    - git
++    - gitcore
++
++- name: Ensure git is uninstalled (Debian).
++  ansible.builtin.apt:
++    name: "git"
++    state: absent
++  when: 
++    - git_reinstall_from_source | bool
++    - is_ubuntu
++  become: true
++  tags: 
++    - git
++    - gitcore
++
++- name: Ensure git is uninstalled (fedora).
++  ansible.builtin.dnf:
++    name: "git"
++    state: absent  
++  when: 
++    - git_reinstall_from_source | bool
++    - is_fedora
++  become: true
++  tags: 
++    - git
++    - gitcore
++
++- name: Ensure git is uninstalled (alpine).
++  community.general.apk:
++    name: "git"
++    state: absent
++  when: 
++    - git_reinstall_from_source | bool
++    - is_alpine
++  become: true
++  tags: 
++    - git
++    - gitcore
++
++- name: Download git.
++  get_url:
++    url: "https://www.kernel.org/pub/software/scm/git/git-{{ git_version }}.tar.gz"
++    dest: "{{ user_home }}/tmp/git-{{ git_version }}.tar.gz"
++    owner: "{{ target_user }}"
++    group: "{{ target_user }}"
++    mode: "0777"
++  when: 
++    (git_installed_version.rc != 0) or (git_reinstall_from_source | bool)
++  become: true
++  tags: 
++    - git
++    - gitcore
++
++# todo - dup of roles\git\tasks\gitcore.yml - Change file ownership, group and permissions 117 - rename this
++- name: Change file ownership, group and permissions
++  ansible.builtin.file:
++    path: "{{ user_home }}/tmp/git-{{ git_version }}.tar.gz"
++    owner: "{{ target_user }}"
++    group: "{{ target_user }}"
++    mode: "0777"
++  become: true
++  tags: 
++    - git
++    - gitcore
++
++- name: Expand git archive.
++  unarchive:
++    src: "{{ user_home }}/tmp/git-{{ git_version }}.tar.gz"
++    dest: "{{ user_home }}/tmp"
++    creates: "{{ user_home }}/tmp/git-{{ git_version }}"
++    owner: "{{ target_user }}"
++    group: "{{ target_user }}"
++    mode: "0777"
++  when: (git_installed_version.rc != 0) or (git_reinstall_from_source | bool)
++  become: true
++  tags: 
++    - git
++    - gitcore
++
++# todo - dup of roles\git\tasks\gitcore.yml - Change file ownership, group and permissions 92 - rename this
++- name: Change file ownership, group and permissions
++  ansible.builtin.file:
++    path: "{{ user_home }}/tmp/git-{{ git_version }}"
++    owner: "{{ target_user }}"
++    group: "{{ target_user }}"
++    mode: "0777"
++  become: true
++  tags: 
++    - git
++    - gitcore
++
++- name: configure git build.
++  command:     
++    sudo "{{ user_home }}/tmp/git-{{ git_version }}/configure" --prefix="{{ git_install_path }}"
++    chdir="{{ user_home }}/tmp/git-{{ git_version }}"
++  when: (git_installed_version.rc != 0) or (git_reinstall_from_source | bool)
++  become: true
++  # become_user: "{{ root_user }}"
++  tags: 
++    - git
++    - gitcore
++
++- name: git build.
++  command:     
++    sudo make {{ item }}
++    chdir="{{ user_home }}/tmp/git-{{ git_version }}"
++  with_items:
++    - all
++  when: (git_installed_version.rc != 0) or (git_reinstall_from_source | bool)
++  become: true
++  tags: 
++    - git
++    - gitcore
++
++- name: git install.
++  command:     
++    sudo make {{ item }}
++    chdir="{{ user_home }}/tmp/git-{{ git_version }}"
++  with_items:
++    - install
++  when: (git_installed_version.rc != 0) or (git_reinstall_from_source | bool)
++  become: true
++  tags: 
++    - git
++    - gitcore
++
++- name: Create system config directory
++  ansible.builtin.file:
++    path: /usr/etc
++    state: directory
++    mode: '0755'
++  become: true
++  tags: 
++    - git
++    - gitcore      
++
++- name: create system gitconfig file
++  copy:
++    content: ""
++    dest: "/usr/etc/gitconfig"
++    force: false
++    group: sys
++    owner: root
++    mode: 0655
++  become: true
++  tags: 
++    - git
++    - gitcore  
++
++- name: create global gitconfig file
++  copy:
++    content: ""
++    dest: "{{ user_home }}/.gitconfig"
++    force: false
++    group: snarasim
++    owner: snarasim
++    mode: 0775
++  become: true
++  tags: 
++    - git
++    - gitcore  
++
++- name: update system gitconfig with core.editor
++  community.general.ini_file:
++    path: /usr/etc/gitconfig
++    section: core
++    option: editor
++    value : "vim"
++    state: present
++    follow : true
++  become: true
++  tags: 
++    - git
++    - gitcore  
++
++- name: update system gitconfig with core.autocrlf
++  community.general.ini_file:
++    path: /usr/etc/gitconfig
++    section: core
++    option: autocrlf
++    value : "false"
++    state: present
++    follow : true
++  become: true
++  tags: 
++    - git
++    - gitcore
++
++- name: update system gitconfig with core.eol
++  community.general.ini_file:
++    path: /usr/etc/gitconfig
++    section: core
++    option: eol
++    value : "native"
++    state: present
++    follow : true
++  become: true
++  tags: 
++    - git
++    - gitcore
++
++- name: update global  gitconfig with user.name
++  community.general.ini_file:
++    path: "{{ user_home }}/.gitconfig"
++    section: user
++    option: name
++    value : "{{ target_user }}"
++    state: present
++    follow : true
++  become: true
++  tags: 
++    - git
++    - gitcore
++
++- name: update global  gitconfig with user.email
++  community.general.ini_file:
++    path: "{{ user_home }}/.gitconfig"
++    section: user
++    option: email
++    value : "{{ git_user_email }}"
++    state: present
++    follow : true
++  become: true
++  tags: 
++    - git
++    - gitcore
++
++- name: update global  gitconfig with core.editor
++  community.general.ini_file:
++    path: "{{ user_home }}/.gitconfig"
++    section: core
++    option: editor
++    value : "vim"
++    state: present
++    follow : true
++  become: true
++  tags: 
++    - git
++    - gitcore
+*** End Patch

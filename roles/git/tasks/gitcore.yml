@@ -89,6 +89,7 @@
     - git
     - gitcore
 
+# todo - dup of roles/git/tasks/gitcore.yml - Change file ownership, group and permissions 117 - rename this
 - name: Change file ownership, group and permissions
   ansible.builtin.file:
     path: "{{ user_home }}/tmp/git-{{ git_version }}.tar.gz"
@@ -114,6 +115,7 @@
     - git
     - gitcore
 
+# todo - dup of roles/git/tasks/gitcore.yml - Change file ownership, group and permissions 92 - rename this
 - name: Change file ownership, group and permissions
   ansible.builtin.file:
     path: "{{ user_home }}/tmp/git-{{ git_version }}"

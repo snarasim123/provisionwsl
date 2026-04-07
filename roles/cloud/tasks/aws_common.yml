@@ -1,5 +1,5 @@
 ---
-- name: remove existing aws file
+- name: remove existing aws file if any
   ansible.builtin.file:
     state: absent
     path: "/home/{{ target_user }}/tmp/{{ item }}"
@@ -10,7 +10,7 @@
     - cloud
   become: true
 
-- name: remove existing aws folder
+- name: remove existing aws folder if any
   ansible.builtin.file:
     state: absent
     path: "/home/{{ target_user }}/tmp/aws"
@@ -38,7 +38,7 @@
     - cloud
   become: true
 
-- name: remove existing aws folder
+- name: remove created aws folder for install 
   ansible.builtin.file:
     state: absent
     path: "/home/{{ target_user }}/tmp/aws"
@@ -47,7 +47,7 @@
     - cloud
   become: true
 
-- name: remove existing aws file
+- name: remove downloaded aws file
   ansible.builtin.file:
     state: absent
     path: "/home/{{ target_user }}/tmp/{{ item }}"

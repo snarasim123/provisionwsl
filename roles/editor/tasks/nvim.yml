@@ -9,6 +9,7 @@
   become: true
   when: is_fedora or is_ubuntu
 
+# todo - dup of roles/editor/tasks/root_nvim.yml - remove nvim config files and directories 2 - rename this
 - name: remove nvim config files and directories
   ansible.builtin.file:
     state: absent
@@ -19,6 +20,7 @@
   become: true
   
 
+# todo - dup of roles/editor/tasks/root_nvim.yml - Create nvim config directories 11 - rename this
 - name: Create nvim config directories
   ansible.builtin.file:
     path: "{{ item }}"
@@ -33,6 +35,7 @@
     - editor
   become: true
 
+# todo - dup of roles/editor/tasks/root_nvim.yml - Copy init.lua file 25 - rename this
 - name: Copy init.lua file
   copy:
     src: "{{ item }}"
@@ -47,6 +50,7 @@
     - editor
   become: true
 
+# todo - dup of roles/editor/tasks/root_nvim.yml - Copy initcolors.lua file 39 - rename this
 - name: Copy initcolors.lua file
   copy:
     src: "{{ item }}"
@@ -77,6 +81,7 @@
 
 #  apk add --no-cache neovim=0.10.4-r0
 
+# todo - dup of roles/editor/tasks/root_nvim.yml - Add nvim path to .bashrc 54 - rename this
 - name: Add nvim path to .bashrc
   ansible.builtin.lineinfile:
     path: "{{ user_home }}/.bashrc_custom"

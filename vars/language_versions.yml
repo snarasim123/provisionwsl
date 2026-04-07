@@ -16,7 +16,16 @@ pyenv_global_version: "3.12.4"
 
 # Go (Golang) configuration
 golang_version: "1.24.1"
+golang_additional_versions:
+  - "1.21.13"
 golang_install_gvm: true
 
 # Lazygit configuration
 lazygit_version: "0.44.1"
+
+# Java/SDKMAN configuration
+java_versions:
+  - "11.0.21-tem"
+  - "17.0.9-tem"
+  - "21.0.1-tem"
+java_default_version: "11.0.21-tem"
