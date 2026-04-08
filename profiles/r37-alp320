@@ -4,7 +4,7 @@ export ps_distro_id=alpine320
 export ps_install_dir=C:\Users\snara\wsl
 # default_user now sourced from vars/user_environment.yml via kickoff.ps1
 #export default_user=snarasim
-export skipsteps=github,gui
+export skipsteps=gui
 
 
 

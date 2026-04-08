@@ -1,6 +1,7 @@
 ---
 - include_tasks: gitcore.yml
 - include_tasks: github.yml
+  when: git_run_github_tasks | default(false)
 
 # set user email, set editor, diff tool, install diff tool
 # https://github.com/dandavison/delta

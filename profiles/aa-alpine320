@@ -1,6 +1,6 @@
 
 export ps_distro_id=alpine320
-export skipsteps=github,gui
+export skipsteps=gui
 
 
 

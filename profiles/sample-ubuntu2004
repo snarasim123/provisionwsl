@@ -1,7 +1,7 @@
 export distro_type=ubuntu
 export ps_distro_source=d:\soft\wsl\ubuntu2004.tar
 export ps_install_dir=C:\Users\snara\wsl
-export skipsteps=github,gui
+export skipsteps=gui
 
 # export distro_name=r37-ubu2004-mini
 # export ps_distro_id=ubuntu2204

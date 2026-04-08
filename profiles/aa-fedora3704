@@ -10,4 +10,4 @@ export ps_distro_source=C:\Users\SrinivasaNarasimhan\code\setup2\ansible\tmp\fed
 
 # export run_as_user=root
 # export upgrade=true
-export skipsteps=github,gui
+export skipsteps=gui

@@ -1,5 +1,5 @@
 export ps_distro_id=ubuntu2404
-export skipsteps=github,gui
+export skipsteps=gui
 
 
 
