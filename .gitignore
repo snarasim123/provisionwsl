@@ -9,3 +9,9 @@ secrets.*
 tmp/*.tar
 
 
+install/
+*.box
+*.ovf
+tmp/*/metadata.json
+*.vmdk
+tmp/*/Vagrantfile

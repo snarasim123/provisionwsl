@@ -3,6 +3,14 @@
 # mate-desktop: Prerequisites
 ###############################################################################
 
+- name: Check that the /etc/wsl.conf exists (WSL only)
+  stat:
+    path: /etc/wsl.conf
+  register: wsl_conf_stat
+  tags:
+    - gui
+    - mate-desktop
+
 - name: Ensure systemd is enabled in /etc/wsl.conf
   become: true
   lineinfile:
@@ -11,6 +19,7 @@
     line: 'systemd=true'
     insertafter: '^\[boot\]'
     create: no
+  when: wsl_conf_stat.stat.exists
   tags:
     - gui
     - mate-desktop

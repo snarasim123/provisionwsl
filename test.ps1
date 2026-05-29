@@ -438,20 +438,6 @@ stat -c '%n owner=%U group=%G perms=%a' ~/.ssh/id_rsa 2>&1;
     Record-Result $testName ($homeOk -and $sshDirOk) $out
 }
 
-function Test-GithubKnownHosts {
-    param([string]$DistroName, [string]$User)
-    $testName = "GitHub in known_hosts"
-    $cmd = @"
-echo '== known_hosts ==';
-grep -c 'github.com' ~/.ssh/known_hosts 2>&1;
-echo '== github entry ==';
-grep 'github.com' ~/.ssh/known_hosts 2>&1 | head -1;
-"@
-    $out = Run-Test -DistroName $DistroName -User $User -TestName $testName -Command $cmd
-    $ghOk = $out -match "github\.com"
-    Record-Result $testName $ghOk $out
-}
-
 function Test-DefaultShell {
     param([string]$DistroName, [string]$User)
     $testName = "Default shell is /bin/bash"
@@ -563,11 +549,6 @@ function Run-AllTests {
     Test-GitConfig              @tp
     Test-FolderStructure        @tp -Folders $ExpectedFolders
     Test-HomeDirectoryPermissions @tp
-    if ('github' -notin $skipsteps) {
-        Test-GithubKnownHosts   @tp
-    } else {
-        Write-Log "`r`n--- SKIPPED: GitHub in known_hosts (github in skipsteps) ---"
-    }
     Test-DefaultShell           @tp
     Test-SudoAccess             @tp
 

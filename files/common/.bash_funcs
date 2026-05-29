@@ -25,6 +25,10 @@ dusort() {
 du -mh  -d 1 "$1" | sort -h
 }
 
+kubecontext() {
+    kubectl config current-context
+}
+
 kcget(){
     if [ -z "$1" ]; then
     kubectl get pods 

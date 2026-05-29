@@ -4,5 +4,6 @@ user_home: /home/snarasim
 root_user: root
 root_user_home: /root
 git_install_path: /usr
+git_config_file: /etc/gitconfig
 git_user_email: snarasim123@gmail.com
 

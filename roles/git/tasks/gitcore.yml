@@ -162,20 +162,10 @@
     - git
     - gitcore
 
-- name: Create system config directory
-  ansible.builtin.file:
-    path: /usr/etc
-    state: directory
-    mode: '0755'
-  become: true
-  tags: 
-    - git
-    - gitcore      
-
 - name: create system gitconfig file
   copy:
     content: ""
-    dest: "/usr/etc/gitconfig"
+    dest: "{{ git_config_file }}"
     force: false
     group: sys
     owner: root
@@ -200,7 +190,7 @@
 
 - name: update system gitconfig with core.editor
   community.general.ini_file:
-    path: /usr/etc/gitconfig
+    path: "{{ git_config_file }}"
     section: core
     option: editor
     value : "vim"
@@ -213,7 +203,7 @@
 
 - name: update system gitconfig with core.autocrlf
   community.general.ini_file:
-    path: /usr/etc/gitconfig
+    path: "{{ git_config_file }}"
     section: core
     option: autocrlf
     value : "false"
@@ -224,18 +214,18 @@
     - git
     - gitcore
 
-- name: update system gitconfig with core.eol
-  community.general.ini_file:
-    path: /usr/etc/gitconfig
-    section: core
-    option: eol
-    value : "native"
-    state: present
-    follow : true
-  become: true
-  tags: 
-    - git
-    - gitcore
+# - name: update system gitconfig with core.safecrlf
+#   community.general.ini_file:
+#     path: "{{ git_config_file }}"
+#     section: core
+#     option: safecrlf
+#     value : "true"
+#     state: present
+#     follow : true
+#   become: true
+#   tags: 
+#     - git
+#     - gitcore
 
 - name: update global  gitconfig with user.name
   community.general.ini_file:

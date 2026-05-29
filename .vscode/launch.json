@@ -4,6 +4,29 @@
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
+        
+        {
+            "name": "PowerShell: Debug kickoff.ps1",
+            "type": "PowerShell",
+            "request": "launch",
+            "script": "${workspaceFolder}/kickoff.ps1",
+            "args": [
+                "${input:kickoffProfile}"
+            ],
+            "cwd": "${workspaceFolder}",
+            "createTemporaryIntegratedConsole": true
+        },
+        {
+            "name": "PowerShell: Debug teardown.ps1",
+            "type": "PowerShell",
+            "request": "launch",
+            "script": "${workspaceFolder}/teardown.ps1",
+            "args": [
+                "${input:teardownProfile}"
+            ],
+            "cwd": "${workspaceFolder}",
+            "createTemporaryIntegratedConsole": true
+        },
         {
             "type": "bashdb",
             "request": "launch",
@@ -13,5 +36,19 @@
             "showDebugOutput": true,
             "terminalKind": "integrated"
           }
+    ],
+    "inputs": [
+        {
+            "id": "kickoffProfile",
+            "type": "promptString",
+            "description": "Profile path to pass to kickoff.ps1",
+            "default": "${workspaceFolder}/profiles/sample-ubuntu2404-2"
+        },
+        {
+            "id": "teardownProfile",
+            "type": "promptString",
+            "description": "Profile path to pass to teardown.ps1",
+            "default": "${workspaceFolder}/profiles/sample-ubuntu2404-2"
+        }
     ]
 }

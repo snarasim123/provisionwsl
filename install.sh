@@ -55,22 +55,22 @@ run-ansible(){
 
     # Include secrets only when github is not being skipped
     local secrets_args=""
-    if [ -z ${skipsteps+x} ] || ! echo "$skipsteps" | grep -qi "github"; then
-        secrets_args="-e @secrets.yaml --vault-password-file secrets.pass"
-    else
-        echo "github is in skipsteps — skipping secrets"
-    fi
+    # if [ -z ${skipsteps+x} ] || ! echo "$skipsteps" | grep -qi "github"; then
+    #     secrets_args="-e @secrets.yaml --vault-password-file secrets.pass"
+    # else
+    #     echo "github is in skipsteps — skipping secrets"
+    # fi
 
-    if [ -z ${skipsteps+x} ]; 
-    then 
-        echo "skipsteps is unset"; 
+    # if [ -z ${skipsteps+x} ]; 
+    # then 
+        # echo "skipsteps is unset"; 
         ansible-playbook  -i hosts $secrets_args ./playbook.yaml
-    else 
-        echo "skipsteps is set to '$skipsteps'"; 
-        echo "executing ansible command..."
-        echo "ansible-playbook  -i hosts $secrets_args ./playbook.yaml --skip-tags=$skipsteps"
-        ansible-playbook  -i hosts $secrets_args ./playbook.yaml  --skip-tags="$skipsteps"
-    fi    
+    # else 
+    #     echo "skipsteps is set to '$skipsteps'"; 
+    #     echo "executing ansible command..."
+    #     echo "ansible-playbook  -i hosts $secrets_args ./playbook.yaml --skip-tags=$skipsteps"
+    #     ansible-playbook  -i hosts $secrets_args ./playbook.yaml  --skip-tags="$skipsteps"
+    # fi    
 }
 run-ansible-check(){
     # echo "#### Ansible check."

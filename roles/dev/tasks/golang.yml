@@ -101,6 +101,7 @@
       export GOROOT=/usr/local/go
       export GOPATH={{ user_home }}/go
       export PATH=$GOPATH/bin:$GOROOT/bin:$PATH
+      [[ -s "{{ user_home }}/.gvm/scripts/gvm" ]] && source "{{ user_home }}/.gvm/scripts/gvm"
   become: false
   become_user: "{{ target_user }}"
   tags:
@@ -223,6 +224,20 @@
       gvm install go1.21.0;
       gvm use go1.21.0;
       gvm list
+  when: golang_install_gvm | bool
+  tags:
+    - golang
+    - gvm
+    - dev
+
+- name: Add GVM init to .bashrc_custom
+  blockinfile:
+    path: "{{ user_home }}/.bashrc_custom"
+    marker: "# {mark} ANSIBLE MANAGED BLOCK - gvm"
+    block: |
+      [[ -s "{{ user_home }}/.gvm/scripts/gvm" ]] && source "{{ user_home }}/.gvm/scripts/gvm"
+  become: true
+  become_user: "{{ target_user }}"
   when: golang_install_gvm | bool
   tags:
     - golang

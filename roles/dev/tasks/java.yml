@@ -15,6 +15,7 @@
     - jdk
     - java
     - sdkman
+    - dev
 
 - name: Check if SDKMAN is already installed
   stat:
@@ -24,6 +25,7 @@
     - jdk
     - java
     - sdkman
+    - dev
 
 - name: Download and install SDKMAN
   shell: |
@@ -37,6 +39,7 @@
     - jdk
     - java
     - sdkman
+    - dev
 
 - name: Install Java versions via SDKMAN
   shell: |
@@ -53,6 +56,7 @@
     - jdk
     - java
     - sdkman
+    - dev
 
 - name: Set Java {{ java_default_version }} as default
   shell: |
@@ -66,6 +70,7 @@
     - jdk
     - java
     - sdkman
+    - dev
 
 - name: Verify Java installation
   shell: |
@@ -81,6 +86,7 @@
     - jdk
     - java
     - sdkman
+    - dev
 
 - name: Display installed Java version
   debug:
@@ -89,6 +95,7 @@
     - jdk
     - java
     - sdkman
+    - dev
 
 - name: List all installed Java versions
   shell: |
@@ -106,6 +113,7 @@
     - jdk
     - java
     - sdkman
+    - dev
 
 - name: Display installed Java versions
   debug:
@@ -114,6 +122,7 @@
     - jdk
     - java
     - sdkman
+    - dev
 
 - name: Add SDKMAN init to .bashrc_custom
   blockinfile:
@@ -128,3 +137,4 @@
     - jdk
     - java
     - sdkman
+    - dev
