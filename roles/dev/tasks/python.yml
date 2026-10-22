@@ -11,21 +11,11 @@
       - python3-pyqt5
       - python3-qtpy
       - python3-send2trash
+      # polib from apt: pip installs into system python are blocked on 24.04 (PEP 668)
+      - python3-polib
     state: present
   become: true
   when: is_ubuntu | default(false)
-  tags:
-    - python
-    - dev
-
-
-- name: Install git-cola pip dependencies (Ubuntu)
-  pip:
-    name:
-      - polib
-    executable: /usr/bin/pip3
-  become: true
-  when: is_ubuntu | default(false)  
   tags:
     - python
     - dev

@@ -4,4 +4,7 @@
 - include_tasks: pyenv.yml
 - include_tasks: golang.yml
 - include_tasks: java.yml
+  when: not is_alpine
+- include_tasks: java_alpine.yml
+  when: is_alpine
 - include_tasks: lazygit.yml

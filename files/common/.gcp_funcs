@@ -1,0 +1,14 @@
+#!/bin/bash
+gcpsanitycluster(){
+    local creds
+    if ! creds=$(aws sts assume-role --role-arn arn:aws:iam::679329828108:role/global-engineer-role --role-session-name snarasim-sanity --query 'Credentials' --output json); then
+        printf "assume-role failed; AWS credentials in this shell were not changed.\n" >&2
+        return 1
+    fi
+    eval "$(aws sts assume-role --role-arn arn:aws:iam::679329828108:role/global-engineer-role --role-session-name snarasim-sanity --query 'Credentials' --output json | jq -r '"export AWS_ACCESS_KEY_ID=\(.AccessKeyId) AWS_SECRET_ACCESS_KEY=\(.SecretAccessKey) AWS_SESSION_TOKEN=\(.SessionToken)"')"
+}
+
+gcplistcluster(){
+    
+    aws eks list-clusters --region us-west-2
+}

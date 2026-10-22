@@ -11,6 +11,10 @@
 # Flag to track if we're using system Python (set by check_deadsnakes_availability)
 USE_SYSTEM_PYTHON=false
 
+# Extra pip args for system Python (set by install_python_ubuntu_system).
+# Ubuntu 23.04+ marks system Python as externally managed (PEP 668), which blocks pip installs.
+SYSTEM_PIP_ARGS=""
+
 check_deadsnakes_availability() {
     # Check if the configured Python version is available in deadsnakes PPA
     # for the current Ubuntu version
@@ -59,7 +63,12 @@ build_python3_apt() {
     sudo apt install -y build-essential libapt-pkg-dev ${PYTHON_DEV_PKG} dpkg-dev
     
     # Enable deb-src repositories (required for apt-get source)
-    sudo sed -i 's/^# deb-src/deb-src/' /etc/apt/sources.list
+    # Ubuntu 24.04+ uses deb822 format in ubuntu.sources; older releases use sources.list
+    if [ -f /etc/apt/sources.list.d/ubuntu.sources ]; then
+        sudo sed -i 's/^Types: deb$/Types: deb deb-src/' /etc/apt/sources.list.d/ubuntu.sources
+    else
+        sudo sed -i 's/^# deb-src/deb-src/' /etc/apt/sources.list
+    fi
     sudo apt update -y
     
     # Get Ubuntu's python-apt source (matches installed libapt-pkg version)
@@ -105,15 +114,23 @@ install_python_ubuntu_system() {
     echo "Using system Python interpreter..."
     
     # Ensure system Python has pip
-    sudo apt install -y python3-pip python3-venv python3-dev
+    sudo apt install -y python3-pip python3-venv python3-dev python3-apt
     
     # Install dependencies for cryptography
     sudo apt install -y libssl-dev libffi-dev rustc cargo
     
+    # Allow pip installs into an externally managed (PEP 668) system Python
+    if ls /usr/lib/python3*/EXTERNALLY-MANAGED >/dev/null 2>&1; then
+        SYSTEM_PIP_ARGS="--break-system-packages"
+    fi
+
     # Upgrade pip and install required packages using system Python
-    sudo python3 -m pip install --upgrade pip
-    sudo python3 -m pip install --upgrade cryptography
-    sudo python3 -m pip install passlib
+    # (skip pip self-upgrade when apt owns pip, since pip cannot uninstall the apt copy)
+    if [ -z "$SYSTEM_PIP_ARGS" ]; then
+        sudo python3 -m pip install --upgrade pip
+    fi
+    sudo python3 -m pip install $SYSTEM_PIP_ARGS --upgrade cryptography
+    sudo python3 -m pip install $SYSTEM_PIP_ARGS passlib
     
     echo ""
     echo "=========================================================================="

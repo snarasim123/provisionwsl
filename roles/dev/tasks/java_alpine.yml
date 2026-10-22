@@ -1,0 +1,54 @@
+---
+- name: Configure native Alpine JDK
+  tags:
+    - jdk
+    - java
+    - dev
+  block:
+    - name: Install Alpine OpenJDK {{ alpine_java_major_version }}
+      community.general.apk:
+        name: "openjdk{{ alpine_java_major_version }}"
+        state: present
+      become: true
+
+    - name: Remove SDKMAN installer initialization from Bash
+      ansible.builtin.lineinfile:
+        path: "{{ user_home }}/.bashrc"
+        regexp: '^(export SDKMAN_DIR=|\[\[.*sdkman-init\.sh)'
+        state: absent
+      become: true
+      become_user: "{{ target_user }}"
+
+    - name: Remove managed SDKMAN initialization
+      ansible.builtin.blockinfile:
+        path: "{{ user_home }}/.bashrc_custom"
+        marker: "# {mark} ANSIBLE MANAGED BLOCK - sdkman"
+        state: absent
+      become: true
+      become_user: "{{ target_user }}"
+
+    - name: Set Alpine OpenJDK as the user default
+      ansible.builtin.blockinfile:
+        path: "{{ user_home }}/.bashrc_custom"
+        marker: "# {mark} ANSIBLE MANAGED BLOCK - alpine-java"
+        block: |
+          export JAVA_HOME="{{ alpine_java_home }}"
+          export PATH="$JAVA_HOME/bin:$PATH"
+      become: true
+      become_user: "{{ target_user }}"
+
+    - name: Verify Alpine JDK runtime and compiler
+      ansible.builtin.shell: |
+        set -e
+        "$JAVA_HOME/bin/java" -version 2>&1
+        "$JAVA_HOME/bin/javac" -version 2>&1
+      environment:
+        JAVA_HOME: "{{ alpine_java_home }}"
+      become: true
+      become_user: "{{ target_user }}"
+      register: alpine_java_version
+      changed_when: false
+
+    - name: Display Alpine JDK version
+      ansible.builtin.debug:
+        msg: "{{ alpine_java_version.stdout_lines }}"

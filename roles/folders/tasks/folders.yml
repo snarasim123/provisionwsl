@@ -16,6 +16,22 @@
   tags: folders
   become: true
 
+# Pre-create Ansible's remote_tmp for target_user so become_user tasks (dev role) don't warn
+- name: Create ansible remote_tmp directories if they do not exist
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ target_user }}"
+    group: "{{ target_user }}"
+    mode: '0700'
+  loop:
+    - "{{ user_home }}/.ansible"
+    - "{{ user_home }}/.ansible/tmp"
+  tags:
+    - folders
+    - dev
+  become: true
+
 - name: Create temp directory if it does not exist
   ansible.builtin.file:
     path: "{{ user_home }}/tmp"

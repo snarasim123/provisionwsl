@@ -46,12 +46,12 @@ clone-repo(){
 
 run-ansible(){
     echo "#### Ansible setup."
-    cd "$HOME/code/$SCRIPT_FOLDER_NAME"
+    cd "$HOME/code/$SCRIPT_FOLDER_NAME" || return
     local cur_dir="$(pwd)"
     echo "#### current dir $cur_dir"
     local ls_list="$(ls -alR $HOME/code)"
     # echo "#### list of files  $ls_list"    
-    chmod -x secrets.*
+    chmod -x secrets.* 2>/dev/null || true
 
     # Include secrets only when github is not being skipped
     local secrets_args=""
@@ -61,28 +61,24 @@ run-ansible(){
     #     echo "github is in skipsteps — skipping secrets"
     # fi
 
-    # if [ -z ${skipsteps+x} ]; 
-    # then 
-        # echo "skipsteps is unset"; 
-        ansible-playbook  -i hosts $secrets_args ./playbook.yaml
-    # else 
-    #     echo "skipsteps is set to '$skipsteps'"; 
-    #     echo "executing ansible command..."
-    #     echo "ansible-playbook  -i hosts $secrets_args ./playbook.yaml --skip-tags=$skipsteps"
-    #     ansible-playbook  -i hosts $secrets_args ./playbook.yaml  --skip-tags="$skipsteps"
-    # fi    
+    local ansible_args=(-i hosts ./playbook.yaml)
+    if [[ -n "${skipsteps:-}" ]]; then
+        ansible_args+=(--skip-tags "$skipsteps")
+    fi
+    ansible_args+=("$@")
+    printf '#### Running: ansible-playbook'
+    printf ' %q' "${ansible_args[@]}"
+    printf '\n'
+    ansible-playbook $secrets_args "${ansible_args[@]}"
 }
 run-ansible-check(){
-    # echo "#### Ansible check."
-    cd "$HOME/code/$SCRIPT_FOLDER_NAME/ansible"
-    ansible-playbook  -i hosts ./playbook.yaml --check
-    # echo "#### Done check."
+    run-ansible --check
 }
 
 # read -p "*** Press to continue.. " -n 1 -r
 profile_path=$1
 scriptroot_path=$2
-source $profile_path
+source "$profile_path"
 
 # Accept default_user from 3rd arg (passed from kickoff.ps1, sourced from Ansible vars)
 if [[ -n "$3" ]]; then
@@ -101,4 +97,3 @@ else
     run-ansible
 fi
 exit
-

@@ -1,6 +1,6 @@
-#untested
 export distro_type=fedora
-export ps_distro_source=C:\Users\SrinivasaNarasimhan\code\setup2\ansible\tmp\fedora_3704.tar
+export ps_distro_source="C:\Users\SrinivasaNarasimhan\code\provisionwsl\tmp\fedora_3704.tar"
+export skipsteps=gui
 
 # default_user now sourced from vars/user_environment.yml via kickoff.ps1
 #export default_user=snarasim
@@ -10,4 +10,4 @@ export ps_distro_source=C:\Users\SrinivasaNarasimhan\code\setup2\ansible\tmp\fed
 
 # export run_as_user=root
 # export upgrade=true
-export skipsteps=gui
+

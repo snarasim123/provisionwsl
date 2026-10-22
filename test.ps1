@@ -29,7 +29,7 @@ $results = @()
 
 # --- Configuration ---
 
-$BashProfileFiles  = @(".alias", ".bash_funcs", ".bash_profile", ".bashrc", ".bashrc_custom", "prompt.sh", "variables.sh")
+$BashProfileFiles  = @(".alias", ".bash_funcs", ".kc_funcs", ".py_funcs", ".bash_profile", ".bashrc", ".bashrc_custom", "prompt.sh", "variables.sh")
 $BashCompareSkip   = @(".bashrc_custom",".bashrc")  # modified by Ansible post-copy (lineinfile tasks)
 $BashSourceSubDir  = "files\common"
 $KubeDirectories   = @(".kube", ".kube_aws", ".kube_gcp")

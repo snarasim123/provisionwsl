@@ -35,7 +35,7 @@ upgrade() {
         
         # Install Ansible via pip (use system Python if deadsnakes not available)
         if [ "$USE_SYSTEM_PYTHON" = true ]; then
-            sudo python3 -m pip install ansible
+            sudo python3 -m pip install $SYSTEM_PIP_ARGS ansible
         else
             sudo ${PYTHON_CMD} -m pip install ansible
         fi
@@ -112,6 +112,11 @@ elif [[ "$distro_type" == "alpine" ]] ; then
     verify_python_alpine
 fi
 # fi
+
+if ! command -v ansible-playbook >/dev/null 2>&1; then
+    echo "##### ERROR: ansible-playbook not found after prep-install. Check python/pip install errors above." >&2
+    exit 1
+fi
 
 exit
 

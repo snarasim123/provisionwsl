@@ -48,7 +48,7 @@
 
 - name: Determine Go architecture
   set_fact:
-    go_arch: "{{ 'arm64' if ansible_architecture == 'aarch64' else 'amd64' }}"
+    go_arch: "{{ 'arm64' if ansible_facts['architecture'] == 'aarch64' else 'amd64' }}"
   tags:
     - golang
     - dev

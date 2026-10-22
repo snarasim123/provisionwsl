@@ -92,7 +92,7 @@
   ansible.builtin.unarchive:
     src: "{{ user_home }}/.kube_aws.zip"
     dest: "{{ user_home }}"
-    mode: '0744'
+    # no mode here: unarchive applies mode to dest too, which would change $HOME's permissions
   tags: 
     - k8s
     - container
@@ -112,8 +112,8 @@
 - name: Extract .kube_gcp.zip into {userhome}/.kube_aws
   ansible.builtin.unarchive:
     src: "{{ user_home }}/.kube_gcp.zip"
-    dest: "{{ user_home }}"    
-    mode: '0744'
+    dest: "{{ user_home }}"
+    # no mode here: unarchive applies mode to dest too, which would change $HOME's permissions
   tags: 
     - k8s
     - container

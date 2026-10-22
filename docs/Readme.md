@@ -188,6 +188,11 @@ Profiles are stored in the `profiles/` directory. Each profile defines how a WSL
 | `skipsteps` | Comma-separated tags to skip | `github,gui` | No | All roles run if empty. Skip specific tags to customize installation. |
 | `debug_mode` | Set to `check` for Ansible dry run | `check` | No | Normal execution if unset |
 
+The installation script forwards a nonempty `skipsteps` value to Ansible as
+`--skip-tags` in both normal and check mode, and logs the command being run.
+For example, `export skipsteps=gui` skips tagged GUI tasks, including MATE and
+XWayland. An unset or empty value adds no tag exclusions.
+
 > **Note:** The WSL instance name is derived from the profile filename. For example, using profile `profiles/aa-ubu2204-sample` creates a WSL instance named `aa-ubu2204-sample`.
 
 ### Example Profile
@@ -241,6 +246,15 @@ The playbook runs these roles in order (defined in `playbook.yaml`):
 | `bash_extra` | `bash_extra` | Copies additional bash customization files (devsetup, ubuntu-specific scripts) |
 | `dev` | `dev`, `python`, `pyenv` | Installs pyenv (v2.6.22) and pyenv-virtualenv (v1.2.4). Builds Python 3.11.9 and 3.12.4; sets global to 3.12.4. |
 | `post_run` | `post_run` | Adds pyenv to `.bashrc_custom`, configures cloud/K8s PATH integration, creates kube config switcher scripts, sets default `.kube` symlink |
+
+Java setup in the `dev` role uses SDKMAN and the configured Java versions on
+Ubuntu/Fedora. Alpine instead uses one APK-managed JDK selected by
+`alpine_java_major_version` in `vars/language_versions.yml` (default: `"11"`).
+The package name and `alpine_java_home` derive from that major version; patch
+updates follow the Alpine repository. Choose a major available in the configured
+Alpine repositories. Alpine does not use the SDKMAN Java version pins.
+On an Alpine rerun, the role removes SDKMAN Bash initialization left by earlier
+provisioning, but retains downloaded SDKMAN files. Open a fresh shell afterward.
 
 > **Note:** The `tools`, `terminal`, and `db` role directories exist but are **not active** in `playbook.yaml`. Their tasks are either commented out or have no `main.yml`.
 
@@ -458,6 +472,46 @@ Select-String -Path ".\logs\<distro-name>.log" -Pattern "error|failed|fatal"
 ```
 
 ### Common Issues
+
+#### Alpine Java fails to load `libjvm.so`
+
+SDKMAN's configured Temurin builds can require glibc, whereas Alpine uses musl.
+The message can report a missing `libjvm.so` even when the file exists, because
+its native dependencies cannot be resolved. Do not work around this by adding
+library search paths or assuming a libc compatibility package is sufficient.
+The Alpine Java tasks now install and verify APK's native OpenJDK instead,
+using `alpine_java_major_version` (default: `"11"`).
+Copy updated provisioning files into an existing failed instance's checkout
+before rerunning Ansible there; a fresh shell picks up the corrected Java path.
+
+#### XWayland fails with "System has not been booted with systemd"
+
+Writing `systemd=true` to `/etc/wsl.conf` does not change the running init
+system. WSL must restart the distro before systemd becomes PID 1.
+The XWayland role now enables its service and configures the default target
+offline when systemd is not running, without attempting a daemon reload.
+The normal kickoff restart activates these settings after provisioning.
+
+For an instance stopped by this error, terminate it with
+`wsl --terminate <distro-name>`, start it again, and verify
+`wsl -d <distro-name> -- cat /proc/1/comm` reports `systemd`.
+Copy updated provisioning files into its Linux checkout before rerunning
+Ansible there. Do not unregister the instance or rerun kickoff to recover it.
+
+#### MATE prerequisites fail because `/usr/bin/python3.12` does not exist
+
+**Cause:** The MATE prerequisites previously assumed Ubuntu 24.04's system Python
+3.12, even on Ubuntu 22.04, which uses system Python 3.10. The Python installed
+for Ansible and versions managed by pyenv are separate from Ubuntu's system
+Python.
+
+**Solution:** The role now reads Ubuntu's default Python from
+`/usr/share/python3/debian_defaults` before configuring the `python3` alternative.
+There is no need to install Python 3.12 to work around this error.
+For an existing failed instance, copy the updated
+`roles/mate-desktop/tasks/prerequisites.yml` into the instance's provisioning
+checkout (normally `/root/code/provisionwsl`) before rerunning Ansible there.
+Running `kickoff.ps1` again will refuse to overwrite an existing distro.
 
 #### 1. Distro already exists
 ```

@@ -30,12 +30,43 @@
     - gui
     - xwayland
 
+- name: Check the running init system
+  command: cat /proc/1/comm
+  register: xwayland_init
+  changed_when: false
+  check_mode: false
+  tags:
+    - gui
+    - xwayland
+
 - name: Enable wslg-fix.service
   become: true
   systemd:
     name: wslg-fix.service
     enabled: yes
     daemon_reload: yes
+  when: xwayland_init.stdout | trim == 'systemd'
+  tags:
+    - gui
+    - xwayland
+
+- name: Enable wslg-fix.service for the next systemd boot
+  become: true
+  command: systemctl --root=/ enable wslg-fix.service
+  args:
+    creates: /etc/systemd/system/multi-user.target.wants/wslg-fix.service
+  when: xwayland_init.stdout | trim != 'systemd'
+  tags:
+    - gui
+    - xwayland
+
+- name: Report pending systemd activation
+  debug:
+    msg: >
+      Systemd is not PID 1 yet. Services are being configured offline.
+      Restart this WSL distro after provisioning to activate systemd and
+      wslg-fix.service. Desktop startup requires that restart.
+  when: xwayland_init.stdout | trim != 'systemd'
   tags:
     - gui
     - xwayland
@@ -53,7 +84,7 @@
 
 - name: Set default systemd target to multi-user (prevent shell on distro open)
   become: true
-  command: systemctl set-default multi-user.target
+  command: systemctl --root=/ set-default multi-user.target
   changed_when: true
   tags:
     - gui

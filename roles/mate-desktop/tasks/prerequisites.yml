@@ -24,11 +24,29 @@
     - gui
     - mate-desktop
 
-- name: Ensure python3 points to system Python 3.12
+- name: Read Ubuntu system Python version
+  command:
+    argv:
+      - /usr/bin/python3
+      - -c
+      - |
+        import configparser
+        defaults = configparser.ConfigParser()
+        with open('/usr/share/python3/debian_defaults') as source:
+            defaults.read_file(source)
+        print(defaults['DEFAULT']['default-version'])
+  register: mate_system_python
+  changed_when: false
+  check_mode: false
+  tags:
+    - gui
+    - mate-desktop
+
+- name: Ensure python3 points to Ubuntu system Python
   become: true
   alternatives:
     name: python3
-    path: /usr/bin/python3.12
+    path: "/usr/bin/{{ mate_system_python.stdout | trim }}"
     link: /usr/bin/python3
     priority: 100
   tags:

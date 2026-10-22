@@ -21,12 +21,18 @@
   with_items:
     - .alias
     - .bash_funcs
+    - .kc_funcs
+    - .py_funcs
     - .bash_profile
     - .bashrc
     - .bashrc_custom
     - prompt.sh
     - variables.sh
     - .dircolors
+    - clone-code.sh
+    - install-vscode-extensions.sh
+    - .gcp_funcs
+    - .aws_funcs
   tags: 
     - shell
     - bash  
@@ -48,10 +54,12 @@
     dest: "{{ user_home }}/bashfiles/{{ item }}"
     owner: "{{ target_user }}"
     group: "{{ target_user }}"
-    mode: 0644
+    mode: "{{ '0755' if item.endswith('.sh') else '0644' }}"
   loop:
     - .alias
     - .bash_funcs
+    - .kc_funcs
+    - .py_funcs
     - .bash_profile
     - .bashrc
     - .bashrc_custom
@@ -59,6 +67,10 @@
     - variables.sh
     - dircolors256dark
     - dircolorsansi-light
+    - clone-code.sh
+    - install-vscode-extensions.sh
+    - .gcp_funcs
+    - .aws_funcs
   tags: 
     - shell
     - bash
@@ -75,11 +87,17 @@
   with_items:
     - .alias
     - .bash_funcs
+    - .kc_funcs
+    - .py_funcs
     - .bash_profile
     - .bashrc
     - .bashrc_custom
     - prompt.sh
     - variables.sh
+    - clone-code.sh
+    - install-vscode-extensions.sh
+    - .gcp_funcs
+    - .aws_funcs
   tags: 
     - shell
     - bash  

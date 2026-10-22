@@ -85,10 +85,10 @@
   ansible.builtin.unarchive:
     src: "{{ user_home }}/.vim.tar"
     dest: "{{ user_home }}"
-    owner: "{{ target_user }}" 
-    group: "{{ target_user }}" 
-    mode: '0766'
-  tags: 
+    owner: "{{ target_user }}"
+    group: "{{ target_user }}"
+    # no mode here: unarchive applies mode to dest too, which would change $HOME's permissions
+  tags:
     - vim
     - editor
   become: true

@@ -82,6 +82,10 @@ function Kickoff {
   wsl -d $Distro_Name -u root sh -c "command -v bash >/dev/null 2>&1 || apk add --no-cache bash"
   
   (wsl -d $Distro_Name -u root bash $basedir_unixpath/prep-install.sh $Profile_Path_unix $basedir_unixpath $Target_User) | Out-File  -Append  $LogFile
+  if ($LASTEXITCODE -ne 0) {
+    Write-Log( "`r`n##### Prerequisites failed for {0}. exit code: {1}" -f "$Distro_Name", $LASTEXITCODE)
+    exit $LASTEXITCODE
+  }
 
   
 

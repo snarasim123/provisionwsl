@@ -1,0 +1,14 @@
+#!/bin/bash
+ 
+pyenvact() {
+    eval "$(pyenv init -)"
+    eval "$(pyenv virtualenv-init -)"
+    echo "pyenv shims activated ($(pyenv version-name))"
+}
+
+pyenvdeact() {
+    unset PYENV_VERSION
+    export PATH=$(echo "$PATH" | tr ':' '\n' | grep -v '.pyenv/shims' | tr '\n' ':' | sed 's/:$//')
+    hash -r
+    echo "pyenv deactivated (system python: $(python3 --version 2>&1))"
+}

@@ -50,19 +50,19 @@
 - name: check if apt package manager is installed
   set_fact:
     is_apt:  true 
-  when: ansible_pkg_mgr == "apt"
+  when: ansible_facts['pkg_mgr'] == "apt"
   check_mode: no
 
 - name: check if dnf package manager is installed
   set_fact:
     is_dnf: true 
-  when: ansible_pkg_mgr == "dnf"
+  when: ansible_facts['pkg_mgr'] == "dnf"
   check_mode: no
 
 - name: check if apk package manager is installed
   set_fact:
     is_apk: true
-  when: ansible_pkg_mgr == "apk"
+  when: ansible_facts['pkg_mgr'] == "apk"
   check_mode: no
   
 - name: Set Distribution Ubuntu
@@ -125,13 +125,13 @@
 
 - name: Set user github keyname
   set_fact:
-    github_keyname: "{{ ansible_hostname }}-{{ target_user }}-{{ wsl_distro_name }}"
+    github_keyname: "{{ ansible_facts['hostname'] }}-{{ target_user }}-{{ wsl_distro_name }}"
   run_once: yes
   check_mode: no    
 
 - name: Set root github keyname
   set_fact:
-    root_github_keyname: "{{ ansible_hostname }}-{{ root_user }}-{{ wsl_distro_name }}"
+    root_github_keyname: "{{ ansible_facts['hostname'] }}-{{ root_user }}-{{ wsl_distro_name }}"
   run_once: yes    
   check_mode: no
 

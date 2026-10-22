@@ -35,7 +35,7 @@ packages_alpine:
   - build-base
   - ripgrep
   - xclip
-  - openjdk11
+  - "openjdk{{ alpine_java_major_version }}"
   - neovim
   - aws-cli
   # Pyenv build dependencies

@@ -138,7 +138,7 @@
   ansible.builtin.command:
     cmd: which gcloud
   environment:
-    PATH: "/usr/local/google-cloud-sdk/bin:{{ ansible_env.PATH }}"
+    PATH: "/usr/local/google-cloud-sdk/bin:{{ ansible_facts['env']['PATH'] }}"
   register: gcloud_location
   changed_when: false
   failed_when: false
@@ -159,7 +159,7 @@
   ansible.builtin.command:
     cmd: gcloud --version
   environment:
-    PATH: "/usr/local/google-cloud-sdk/bin:{{ ansible_env.PATH }}"
+    PATH: "/usr/local/google-cloud-sdk/bin:{{ ansible_facts['env']['PATH'] }}"
   register: gcloud_version
   changed_when: false
   failed_when: false
@@ -188,7 +188,7 @@
   ansible.builtin.command:
     cmd: /usr/local/google-cloud-sdk/bin/gcloud components install gke-gcloud-auth-plugin --quiet
   environment:
-    PATH: "/usr/local/google-cloud-sdk/bin:{{ ansible_env.PATH }}"
+    PATH: "/usr/local/google-cloud-sdk/bin:{{ ansible_facts['env']['PATH'] }}"
   become: true
   when: gcloud_version.rc == 0
   register: gke_plugin_install

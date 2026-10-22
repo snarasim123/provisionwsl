@@ -1,0 +1,3 @@
+
+export ps_distro_id=ubuntu2204
+export skipsteps=gui

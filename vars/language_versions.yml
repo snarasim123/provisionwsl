@@ -29,3 +29,7 @@ java_versions:
   - "17.0.9-tem"
   - "21.0.1-tem"
 java_default_version: "11.0.21-tem"
+
+# Alpine uses APK-managed Java instead of SDKMAN
+alpine_java_major_version: "11"
+alpine_java_home: "/usr/lib/jvm/java-{{ alpine_java_major_version }}-openjdk"
