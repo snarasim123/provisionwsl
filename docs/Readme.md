@@ -248,13 +248,21 @@ The playbook runs these roles in order (defined in `playbook.yaml`):
 | `post_run` | `post_run` | Adds pyenv to `.bashrc_custom`, configures cloud/K8s PATH integration, creates kube config switcher scripts, sets default `.kube` symlink |
 
 Java setup in the `dev` role uses SDKMAN and the configured Java versions on
-Ubuntu/Fedora. Alpine instead uses one APK-managed JDK selected by
-`alpine_java_major_version` in `vars/language_versions.yml` (default: `"11"`).
-The package name and `alpine_java_home` derive from that major version; patch
-updates follow the Alpine repository. Choose a major available in the configured
-Alpine repositories. Alpine does not use the SDKMAN Java version pins.
+Ubuntu/Fedora. Alpine instead installs APK-managed JDKs using
+`alpine_java_versions` in `vars/language_versions.yml` (defaults: `"11"`, `"17"`,
+`"21"`), with `alpine_java_default_version: "11"` selected in new Bash sessions.
+The default must be in the configured list. Patch updates follow the Alpine
+repository; choose majors available there. Alpine does not use the SDKMAN pins.
 On an Alpine rerun, the role removes SDKMAN Bash initialization left by earlier
 provisioning, but retains downloaded SDKMAN files. Open a fresh shell afterward.
+
+Switch JDKs in the current Bash session with `java-use 11`, `java-use 17`, or
+`java-use 21`. The helper checks both `java` and `javac` before updating
+`JAVA_HOME` and `PATH`, and removes previous JDK path entries. A failed selection
+leaves the current environment unchanged. New shells return to the configured
+default. After rerunning Java tasks, source `~/.bashrc_custom` or open a new shell
+to load the helper. JDK package installation belongs to the Alpine Java tasks
+(`java`, `jdk`, or `dev` tags), not the generic packages role.
 
 > **Note:** The `tools`, `terminal`, and `db` role directories exist but are **not active** in `playbook.yaml`. Their tasks are either commented out or have no `main.yml`.
 
@@ -287,10 +295,46 @@ Cloud images are defined in `data/urls.csv`. When a profile sets `ps_distro_id`,
 |----|------|-------------|
 | `ubuntu2204` | Ubuntu | Ubuntu 22.04 LTS (Jammy) WSL cloud image |
 | `ubuntu2404` | Ubuntu | Ubuntu 24.04 LTS (Noble) WSL cloud image |
+| `ubuntu2604` | Ubuntu | Ubuntu 26.04 LTS (Resolute) amd64 cloud rootfs (.tar.xz); provisioning candidate |
 | `ubuntu1604` | Ubuntu | Ubuntu 16.04 (Xenial) cloud image (has MD5 checksum) |
 | `alpine320` | Alpine | Alpine 3.20 minirootfs |
+| `alpine321` | Alpine | Alpine 3.21.9 x86_64 minirootfs; provisioning candidate |
+| `alpine322` | Alpine | Alpine 3.22.7 x86_64 minirootfs; provisioning candidate |
+| `alpine323` | Alpine | Alpine 3.23.7 x86_64 minirootfs; provisioning candidate |
+| `alpine324` | Alpine | Alpine 3.24.3 x86_64 minirootfs; provisioning candidate |
 | `alpine318` | Alpine | Alpine 3.18 minirootfs |
 | `fedora37` | Fedora | Fedora 37 cloud image (.tar.xz) |
+
+The registry is an image catalogue, not a guarantee of upstream maintenance or
+successful end-to-end provisioning. Older entries are retained for existing
+profiles; Ubuntu 16.04, Alpine 3.18/3.20, and Fedora 37 are legacy choices rather
+than recommended current releases.
+
+The newer candidates above were checked against official download metadata on
+2026-10-22. Their formats match the gzip/xz rootfs importer and existing distro
+dispatch, but full WSL provisioning has not been tested. In particular, newer
+Python versions, package availability, and Fedora's evolving DNF implementation
+require separate validation before claiming support. Ubuntu 26.04 uses a generic
+cloud rootfs, not the older WSL-specific image naming scheme.
+
+Sources: [Ubuntu 26.04 images](https://cloud-images.ubuntu.com/releases/resolute/release/)
+and Alpine's release metadata for
+[3.21](https://dl-cdn.alpinelinux.org/alpine/v3.21/releases/x86_64/latest-releases.yaml),
+[3.22](https://dl-cdn.alpinelinux.org/alpine/v3.22/releases/x86_64/latest-releases.yaml),
+[3.23](https://dl-cdn.alpinelinux.org/alpine/v3.23/releases/x86_64/latest-releases.yaml),
+and [3.24](https://dl-cdn.alpinelinux.org/alpine/v3.24/releases/x86_64/latest-releases.yaml).
+Alpine URLs pin a patch release and include its published SHA256 as metadata.
+The current download path does not enforce that SHA256 field. Ubuntu's
+`release` URL is rolling, so its checksum is intentionally not pinned here.
+
+Newer Fedora images were reviewed but not added:
+[Fedora 43](https://dl.fedoraproject.org/pub/fedora/linux/releases/43/Container/x86_64/images/)
+and [44](https://dl.fedoraproject.org/pub/fedora/linux/releases/44/Container/x86_64/images/)
+provide `.wsl` images, which the current filename-based importer rejects.
+Their `.oci.tar.xz` images are OCI bundles, not directly importable rootfs tars.
+Adding those URLs alone would not work; importing their format needs a separate
+change. The existing Fedora 37 GitHub `/blob/` URL is also a legacy HTML-view URL,
+not a verified direct-image download. No Fedora entry is newly certified here.
 
 To add a new cloud image, append a row to `data/urls.csv`:
 
@@ -480,7 +524,7 @@ The message can report a missing `libjvm.so` even when the file exists, because
 its native dependencies cannot be resolved. Do not work around this by adding
 library search paths or assuming a libc compatibility package is sufficient.
 The Alpine Java tasks now install and verify APK's native OpenJDK instead,
-using `alpine_java_major_version` (default: `"11"`).
+using `alpine_java_versions` and `alpine_java_default_version`.
 Copy updated provisioning files into an existing failed instance's checkout
 before rerunning Ansible there; a fresh shell picks up the corrected Java path.
 

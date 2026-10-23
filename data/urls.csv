@@ -1,7 +1,12 @@
 ID,PLATFORM,TYPE,URL,MD5,SHA512,SHA256
 ubuntu2204,wsl,ubuntu,https://cloud-images.ubuntu.com/wsl/releases/22.04/current/ubuntu-jammy-wsl-amd64-wsl.rootfs.tar.gz,,,
 ubuntu2404,wsl,ubuntu,https://cloud-images.ubuntu.com/wsl/releases/24.04/current/ubuntu-noble-wsl-amd64-24.04lts.rootfs.tar.gz,,,
+ubuntu2604,wsl,ubuntu,https://cloud-images.ubuntu.com/releases/resolute/release/ubuntu-26.04-server-cloudimg-amd64-root.tar.xz,,,
 ubuntu1604,wsl,ubuntu,http://cloud-images.ubuntu.com/releases/xenial/release/ubuntu-16.04-server-cloudimg-amd64-wsl.rootfs.tar.gz,913d522e612424350b80c3c5651047af,,
 alpine320,wsl,alpine,https://dl-cdn.alpinelinux.org/alpine/v3.20/releases/x86_64/alpine-minirootfs-3.20.0-x86_64.tar.gz,,,
+alpine321,wsl,alpine,https://dl-cdn.alpinelinux.org/alpine/v3.21/releases/x86_64/alpine-minirootfs-3.21.9-x86_64.tar.gz,,,3d5912d47e004ac77746d63ab848abd9e37164465cf1c866eb574bc526135012
+alpine322,wsl,alpine,https://dl-cdn.alpinelinux.org/alpine/v3.22/releases/x86_64/alpine-minirootfs-3.22.7-x86_64.tar.gz,,,57e364a241bab0699cd8a760c0fd7b270e9cbcbd3cee822cb2b07ca6d925c16c
+alpine323,wsl,alpine,https://dl-cdn.alpinelinux.org/alpine/v3.23/releases/x86_64/alpine-minirootfs-3.23.7-x86_64.tar.gz,,,7f483b63722c9da91206a648175fdbbbf1cf0f5dc1868364a66007204618c961
+alpine324,wsl,alpine,https://dl-cdn.alpinelinux.org/alpine/v3.24/releases/x86_64/alpine-minirootfs-3.24.3-x86_64.tar.gz,,,f8e1cafba9b1b283b5d30d06f9885c8d2bc161ffe9083ade8e2e157813a53407
 alpine318,wsl,alpine,https://dl-cdn.alpinelinux.org/alpine/v3.18/releases/x86_64/alpine-minirootfs-3.18.0-x86_64.tar.gz,,,
 fedora37,wsl,fedora,https://github.com/fedora-cloud/docker-brew-fedora/blob/37/x86_64/fedora-37-x86_64.tar.xz,,,

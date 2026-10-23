@@ -5,9 +5,17 @@
     - java
     - dev
   block:
-    - name: Install Alpine OpenJDK {{ alpine_java_major_version }}
+    - name: Validate Alpine JDK selection
+      ansible.builtin.assert:
+        that:
+          - alpine_java_versions | length > 0
+          - alpine_java_versions | map('string') | select('match', '^[0-9]+$') | list | length == alpine_java_versions | length
+          - alpine_java_default_version | string in (alpine_java_versions | map('string') | list)
+        fail_msg: Alpine JDK versions must be numeric majors and include the default version.
+
+    - name: Install Alpine OpenJDK versions
       community.general.apk:
-        name: "openjdk{{ alpine_java_major_version }}"
+        name: "{{ alpine_java_versions | map('regex_replace', '^', 'openjdk') | map('regex_replace', '$', '-jdk') | list }}"
         state: present
       become: true
 
@@ -27,28 +35,41 @@
       become: true
       become_user: "{{ target_user }}"
 
+    - name: Install Alpine Java shell switcher
+      ansible.builtin.copy:
+        src: java-functions.sh
+        dest: "{{ user_home }}/.java_funcs"
+        owner: "{{ target_user }}"
+        group: "{{ target_user }}"
+        mode: '0644'
+      become: true
+
     - name: Set Alpine OpenJDK as the user default
       ansible.builtin.blockinfile:
         path: "{{ user_home }}/.bashrc_custom"
         marker: "# {mark} ANSIBLE MANAGED BLOCK - alpine-java"
         block: |
-          export JAVA_HOME="{{ alpine_java_home }}"
-          export PATH="$JAVA_HOME/bin:$PATH"
+          source "{{ user_home }}/.java_funcs"
+          java-use "{{ alpine_java_default_version }}" >/dev/null
       become: true
       become_user: "{{ target_user }}"
 
-    - name: Verify Alpine JDK runtime and compiler
+    - name: Verify Alpine JDK runtimes and compilers
       ansible.builtin.shell: |
         set -e
         "$JAVA_HOME/bin/java" -version 2>&1
         "$JAVA_HOME/bin/javac" -version 2>&1
       environment:
-        JAVA_HOME: "{{ alpine_java_home }}"
+        JAVA_HOME: "/usr/lib/jvm/java-{{ item }}-openjdk"
+      loop: "{{ alpine_java_versions }}"
       become: true
       become_user: "{{ target_user }}"
       register: alpine_java_version
       changed_when: false
 
-    - name: Display Alpine JDK version
+    - name: Display Alpine JDK versions
       ansible.builtin.debug:
-        msg: "{{ alpine_java_version.stdout_lines }}"
+        msg: "{{ item.stdout_lines }}"
+      loop: "{{ alpine_java_version.results }}"
+      loop_control:
+        label: "{{ item.item }}"
