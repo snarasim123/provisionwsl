@@ -38,6 +38,7 @@
   register: mate_system_python
   changed_when: false
   check_mode: false
+  when: python_bootstrap_mode | default('safe') == 'legacy'
   tags:
     - gui
     - mate-desktop
@@ -49,6 +50,7 @@
     path: "/usr/bin/{{ mate_system_python.stdout | trim }}"
     link: /usr/bin/python3
     priority: 100
+  when: python_bootstrap_mode | default('safe') == 'legacy'
   tags:
     - gui
     - mate-desktop

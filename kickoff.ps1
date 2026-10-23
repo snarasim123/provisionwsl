@@ -68,20 +68,24 @@ function Kickoff {
 
   Display-SpinupParams  $Distro_Name $Distro_Source $distro_lookupid $Install_Dir $LogFile
 
-  (mkdir $Install_Dir  -ea 0) | Out-File  $LogFile
-  (wsl --import $Distro_Name $Install_Dir $Distro_Source) | Out-File  -Append  $LogFile
-  (wsl --terminate $Distro_Name) | Out-File  -Append  $LogFile
+  (mkdir $Install_Dir -ea 0) | Out-File -Append $LogFile
+  wsl --import $Distro_Name $Install_Dir $Distro_Source 2>&1 | ForEach-Object { $_.ToString() } | Tee-Object -Append -FilePath $LogFile
+  if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+  wsl --terminate $Distro_Name 2>&1 | ForEach-Object { $_.ToString() } | Tee-Object -Append -FilePath $LogFile
+  if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
   $Profile_Path_unix = ConvertTo-WslPath -WindowsPath $Profile_Path
   $basedir_unixpath = ConvertTo-WslPath -WindowsPath $PSScriptRoot
 
   Write-Log( "`r`n##### Installing Prerequisites for the {0} instance ... " -f "$Distro_Name")
-  wsl -d $Distro_Name ls /
+  wsl -d $Distro_Name ls / 2>&1 | ForEach-Object { $_.ToString() } | Tee-Object -Append -FilePath $LogFile
+  if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
   
   # Install bash first for Alpine (uses sh/ash by default)
-  wsl -d $Distro_Name -u root sh -c "command -v bash >/dev/null 2>&1 || apk add --no-cache bash"
+  wsl -d $Distro_Name -u root sh -c "command -v bash >/dev/null 2>&1 || apk add --no-cache bash" 2>&1 | ForEach-Object { $_.ToString() } | Tee-Object -Append -FilePath $LogFile
+  if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
   
-  (wsl -d $Distro_Name -u root bash $basedir_unixpath/prep-install.sh $Profile_Path_unix $basedir_unixpath $Target_User) | Out-File  -Append  $LogFile
+  wsl -d $Distro_Name -u root -- bash $basedir_unixpath/prep-install.sh $Profile_Path_unix $basedir_unixpath $Target_User 2>&1 | ForEach-Object { $_.ToString() } | Tee-Object -Append -FilePath $LogFile
   if ($LASTEXITCODE -ne 0) {
     Write-Log( "`r`n##### Prerequisites failed for {0}. exit code: {1}" -f "$Distro_Name", $LASTEXITCODE)
     exit $LASTEXITCODE
@@ -90,16 +94,18 @@ function Kickoff {
   
 
   Write-Log( "\`r\`n##### Configuring  {0} instance... " -f "$Distro_Name")
-  wsl -d $Distro_Name -u root -- bash $basedir_unixpath/install.sh $Profile_Path_unix $basedir_unixpath $Target_User 2>&1 | Tee-Object -Append -FilePath $LogFile
+  wsl -d $Distro_Name -u root -- bash $basedir_unixpath/install.sh $Profile_Path_unix $basedir_unixpath $Target_User 2>&1 | ForEach-Object { $_.ToString() } | Tee-Object -Append -FilePath $LogFile
   if ($LASTEXITCODE -ne 0) {
     Write-Log( "`r`n##### Configuration failed for {0}. exit code: {1}" -f "$Distro_Name", $LASTEXITCODE)
     exit $LASTEXITCODE
   }
 
   Write-Log( "`r`n##### Restarting {0} instance... " -f "$Distro_Name")
-  wsl --terminate $Distro_Name
+  wsl --terminate $Distro_Name 2>&1 | ForEach-Object { $_.ToString() } | Tee-Object -Append -FilePath $LogFile
+  if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
-  $dummyoutput=(wsl -d $Distro_Name ls /)
+  wsl -d $Distro_Name ls / 2>&1 | ForEach-Object { $_.ToString() } | Tee-Object -Append -FilePath $LogFile
+  if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
   Write-Log( "`r`n##### Instance  {0} ready. " -f "$Distro_Name")
 }
 

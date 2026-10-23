@@ -1,6 +1,6 @@
 ---
-gcp_cli_python_min_version: "3.9"
-gcp_cli_python_max_version: "3.14"
+gcp_cli_python_min_version: "3.10"
+gcp_cli_python_max_version: "3.15"
 gcp_cli_archive_name_x86_64: "google-cloud-cli-linux-x86_64.tar.gz"
 python311_version: "3.11.9"
 python312_version: "3.12.4"

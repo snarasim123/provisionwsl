@@ -1,3 +1,11 @@
+#!/usr/bin/env bash
+set -eo pipefail
+trap 'echo "ERROR: Python preparation failed (mode: ${PYTHON_BOOTSTRAP_MODE:-unvalidated}). Inspect the error above; no automatic legacy fallback was attempted." >&2' ERR
+
+scriptroot_path=${2:?Usage: prep-install.sh PROFILE REPOSITORY_ROOT [USER]}
+source "$scriptroot_path/scripts/bash/python-bootstrap.sh"
+read_python_bootstrap_mode "$scriptroot_path"
+
 ##############################################################################
 # Python Version Configuration
 # Change these variables to install a different Python version
@@ -7,7 +15,7 @@ PYTHON_CMD="python${PYTHON_VERSION}"                     # e.g., python3.11
 PYTHON_BIN="/usr/bin/${PYTHON_CMD}"                      # e.g., /usr/bin/python3.11
 PYTHON_DEV_PKG="${PYTHON_CMD}-dev"                       # e.g., python3.11-dev
 PYTHON_VENV_PKG="${PYTHON_CMD}-venv"                     # e.g., python3.11-venv
-PYTHON_DISTUTILS_PKG="${PYTHON_CMD}-distutils"           # e.g., python3.11-distutils
+select_python_distutils_package
 
 # Pip version-specific paths
 PIP_CMD="pip${PYTHON_VERSION}"                           # e.g., pip3.11
@@ -15,7 +23,7 @@ PIP_LOCAL_BIN="/usr/local/bin/${PIP_CMD}"                # e.g., /usr/local/bin/
 ##############################################################################
 
 # Get script directory for sourcing other scripts
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+SCRIPT_DIR="$scriptroot_path"
 
 # Source utility and distro-specific functions
 source "${SCRIPT_DIR}/csv-utils.sh"
@@ -40,8 +48,6 @@ upgrade() {
             sudo ${PYTHON_CMD} -m pip install ansible
         fi
         sudo apt install aptitude -y
-        ansible-galaxy collection install community.general
-        ansible-galaxy collection install kubernetes.core
     elif [[ "$distro_type" == "fedora" ]] ; then
         disable_problematic_fedora_repos
 
@@ -53,8 +59,6 @@ upgrade() {
         
         # Install Ansible via pip (ensures it uses configured Python version)
         sudo ${PYTHON_CMD} -m pip install ansible
-        ansible-galaxy collection install community.general
-        ansible-galaxy collection install kubernetes.core
     elif [[ "$distro_type" == "alpine" ]] ; then
         # Alpine upgrade and setup
         apk add sudo
@@ -69,14 +73,12 @@ upgrade() {
         # Install Ansible via apk (Alpine package manager)
         sudo apk add ansible
 
-        ansible-galaxy collection install community.general
     fi
 }
 
-profile_path=$1
-scriptroot_path=$2
+profile_path=${1:?Usage: prep-install.sh PROFILE REPOSITORY_ROOT [USER]}
 distro_name=$(basename "$profile_path")
-source $profile_path
+source "$profile_path"
 
 # Accept default_user from 3rd arg (passed from kickoff.ps1, sourced from Ansible vars)
 if [[ -n "$3" ]]; then
@@ -95,7 +97,8 @@ if [[ -n "$ps_distro_id" ]]; then
         echo "##### Distro Type: $distro_type"
         echo "##### Distro URL: $download_url"                        
     else
-        echo "##### WARNING: Could not load CSV record for $ps_distro_id"
+        echo "ERROR: Could not load CSV record for $ps_distro_id" >&2
+        exit 1
     fi
 else
     echo "##### DEBUG: ps_distro_id is empty or not set, skipping CSV lookup"
@@ -103,20 +106,24 @@ fi
 
 # read -p "*** Prelim installs for $distro_type, Press to continue.. " -n 1 -r
 # if [[ "$upgrade" == "true" ]] ; then
-upgrade
-if [[ "$distro_type" == "ubuntu" ]] ; then
+rm -f "$PYTHON_BOOTSTRAP_STATE"
+if [[ "$PYTHON_BOOTSTRAP_MODE" == safe ]]; then
+    configure_ansible_runtime
+    prepare_safe_python
+else
+    upgrade
+    configure_ansible_runtime
+fi
+install_ansible_collections
+if [[ "$PYTHON_BOOTSTRAP_MODE" == legacy && "$distro_type" == "ubuntu" ]] ; then
     verify_python_ubuntu
-elif [[ "$distro_type" == "fedora" ]] ; then
+elif [[ "$PYTHON_BOOTSTRAP_MODE" == legacy && "$distro_type" == "fedora" ]] ; then
     verify_python_fedora
-elif [[ "$distro_type" == "alpine" ]] ; then
+elif [[ "$PYTHON_BOOTSTRAP_MODE" == legacy && "$distro_type" == "alpine" ]] ; then
     verify_python_alpine
 fi
 # fi
 
-if ! command -v ansible-playbook >/dev/null 2>&1; then
-    echo "##### ERROR: ansible-playbook not found after prep-install. Check python/pip install errors above." >&2
-    exit 1
-fi
-
-exit
+validate_ansible_runtime
+record_prepared_python_mode
 

@@ -418,6 +418,78 @@ Running `.\kickoff.ps1 .\profiles\aa-ubu2204-sample` performs the following:
 
 The WSL instance name is derived from the profile filename (e.g., `aa-ubu2204-sample`).
 
+### Temporary Python Bootstrap Rollout
+
+The repository-root `python-bootstrap-mode.conf` contains one value, `safe`, by
+default. To compare the old bootstrap, explicitly change it to `legacy` before
+starting `kickoff.ps1`; the PowerShell invocation is unchanged. Restore `safe`
+after comparison. The setting applies to every profile using the checkout. Do
+not edit it during a run or run different modes concurrently from one checkout.
+Missing, unreadable, empty, or malformed configuration fails before provisioning
+mutations. LF, CRLF, and a single value without a final newline are accepted.
+
+Safe mode separates three Python owners:
+
+- Ubuntu and Fedora keep `/usr/bin/python3` and its package-manager bindings.
+   Ubuntu refuses a replaced system-Python link instead of claiming to repair it.
+   No safe bootstrap removes Python, redirects Python/pip links, builds a custom
+   python-apt, or bypasses PEP 668.
+- Ansible on Ubuntu/Fedora lives in root's
+   `~/.local/share/provisionwsl/ansible`. Native Python 3.12–3.14 uses ansible-core
+   2.20; Python 3.11 uses 2.19. Older Ubuntu installs the configured controller
+   (currently Python 3.11) alongside its system interpreter via deadsnakes. Its
+   availability is checked; failure stops the run. Core 2.19 reaches upstream EOL
+   in November 2026, so this compatibility branch needs review before then.
+   Managed-host modules explicitly use `/usr/bin/python3`, not the controller.
+- Alpine keeps Python, pip, cryptography, passlib, and Ansible APK-managed. It
+   does not self-upgrade system pip. Collections are installed using the selected
+   `ansible-galaxy`; older APK Ansible (core 2.16/2.17) uses compatible collection
+   ranges. Safe collections live in `~/.local/share/provisionwsl/collections`,
+   separate from global Ansible installations. Pyenv remains exclusively for
+   development Python 3.11.9 and 3.12.4, with 3.12.4 global.
+
+Preparation records successful validation in root's
+`~/.local/state/provisionwsl/python-bootstrap-mode`. Installation checks this
+record against the requested mode before copying the repository or launching
+Ansible, including check mode. Missing or mismatched state requires preparation
+again; editing the shared setting alone cannot switch an existing installation.
+Failures stop with no automatic legacy fallback, even if a global Ansible exists.
+
+Legacy mode retains the distro-specific bootstrap and warns about replacing
+Ubuntu Python/pip links and overriding package-managed pip packages. Fedora now
+fails explicitly if its requested interpreter cannot be installed rather than
+pretending to fall back. Python 3.12+ does not request removed distutils packages.
+The corrected MATE native-version alternative task runs only in legacy mode.
+Neither mode is a transactional rollback or an implicit repair operation.
+
+Kickoff refuses existing distro names. For approved disposable comparisons, copy
+an appropriate profile to a new unused profile name and select the mode before
+running kickoff. Do not unregister an existing distro to retry. To deliberately
+resume stages in an existing instance, first inspect its interpreter ownership
+and use the current Windows checkout as the explicit repository root:
+
+```bash
+# Run as root inside the intended instance; replace these example paths.
+repo=/mnt/c/path/to/provisionwsl
+profile="$repo/profiles/my-test-profile"
+bash "$repo/prep-install.sh" "$profile" "$repo"
+bash "$repo/install.sh" "$profile" "$repo"
+```
+
+Preparation installs packages and legacy preparation can replace system links;
+only rerun it deliberately. `install.sh` copies the explicit checkout into
+`/root/code/provisionwsl` before normal/check-mode Ansible execution. Do not
+recover by running a stale copied script or a global `ansible-playbook`.
+Changing modes requires preparation again and does not undo partial changes.
+
+Keep this temporary mode flag and legacy implementation until both paths pass
+the approved Ubuntu 22.04/24.04, Fedora, and Alpine integration matrix, runtime
+and repeat-run checks pass, and testing completion is explicitly confirmed.
+The current registry's Fedora entry is Fedora 37, not a validated newer Fedora
+image. Mock and syntax checks do not establish that an image provisions fully.
+After sign-off, remove the flag, reader, prepared-mode record, legacy-only
+mutations and tests, and this rollout documentation; retain safe regression tests.
+
 ---
 
 ## Testing
@@ -444,6 +516,26 @@ Tests include:
 - GitHub known_hosts entry
 
 The test harness respects the `skipsteps` from the profile — skipped roles are not tested.
+
+Non-destructive Python compatibility regression checks:
+
+```powershell
+.\scripts\PythonProvisioningTest.ps1
+```
+
+```bash
+bash scripts/bash/PythonProvisioningTest.sh
+# Requires existing Python/PyYAML, Ansible, and the relevant collections:
+bash scripts/bash/PythonProvisioningTest.sh --ansible
+```
+
+These checks use temporary state, mocked package failures, and mock Google Cloud
+executables, including rejected runtimes and failed GKE plugins. They do not
+install/remove packages, recreate WSL instances, or replace full provisioning
+tests. The instance harness checks system Python, Ansible's prepared runtime,
+and configured pyenv versions independently, with exit-code checks; a legacy
+instance with redirected system Python can intentionally fail the preservation
+check. Required pyenv setup must be provisioned before its instance test passes.
 
 ---
 
@@ -549,8 +641,10 @@ Ansible there. Do not unregister the instance or rerun kickoff to recover it.
 for Ansible and versions managed by pyenv are separate from Ubuntu's system
 Python.
 
-**Solution:** The role now reads Ubuntu's default Python from
-`/usr/share/python3/debian_defaults` before configuring the `python3` alternative.
+**Solution:** Safe mode leaves Ubuntu's system Python untouched and does not
+configure a Python alternative during MATE installation. Legacy mode reads
+Ubuntu's default Python from `/usr/share/python3/debian_defaults` before
+configuring the `python3` alternative.
 There is no need to install Python 3.12 to work around this error.
 For an existing failed instance, copy the updated
 `roles/mate-desktop/tasks/prerequisites.yml` into the instance's provisioning
@@ -666,11 +760,22 @@ wsl -d <distro-name>
 
 #### 10. Python version issues with GCP CLI
 ```
-Google Cloud CLI requires Python 3.9 to 3.14
+Google Cloud CLI requires Python 3.10 to 3.15
 ```
-**Cause:** System Python version incompatible with GCP CLI.
+**Cause:** The runtime selected by Google Cloud CLI is incompatible or cannot
+execute on the platform. System Python is not necessarily the selected runtime.
 
-**Solution:** The GCP CLI tarball includes a bundled Python interpreter. Ensure you're using the tarball installation method (which is default for Ubuntu/Debian and Alpine). For Fedora, the DNF package handles dependencies automatically.
+**Solution:** Inspect `gcloud info --format=json`, especially
+`basic.python_location` and `basic.python_version`. Tasks verify that selected
+runtime, `gcloud --version`, and the GKE plugin before reporting success.
+Explicit `CLOUDSDK_PYTHON` is respected; alternatively set `gcp_cloudsdk_python`
+in Ansible variables. The selection is persisted in `/etc/profile.d` and
+`/etc/environment` for user sessions and passed to install and plugin commands.
+Alpine defaults to `/usr/bin/python3` (musl), with no bundled-Python installation.
+Even then a native GKE binary may require glibc: a tarball or compatibility
+package is not proof it runs. Runtime failures stop provisioning; do not replace
+system Python to work around them. The range above reflects Google's installation
+documentation checked on 2026-10-23 and must track future CLI requirements.
 
 ### Debugging Tips
 

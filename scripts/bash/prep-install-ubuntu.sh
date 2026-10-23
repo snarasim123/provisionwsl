@@ -34,7 +34,7 @@ check_deadsnakes_availability() {
     local ppa_url="https://ppa.launchpadcontent.net/deadsnakes/ppa/ubuntu/dists/${ubuntu_codename}/main/binary-amd64/Packages.gz"
     
     # Check if the package exists in the PPA
-    if curl -sf "${ppa_url}" 2>/dev/null | gunzip 2>/dev/null | grep -q "^Package: python${PYTHON_VERSION}$"; then
+    if curl -sf "${ppa_url}" 2>/dev/null | gunzip 2>/dev/null | grep "^Package: python${PYTHON_VERSION}$" >/dev/null; then
         echo "SUCCESS: python${PYTHON_VERSION} is available in deadsnakes PPA for Ubuntu ${ubuntu_codename}"
         return 0
     else

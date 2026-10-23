@@ -1,6 +1,5 @@
 ---
-# system python is upgraded as part of prep for the ansible playbook run,
-# so, this role installs additional python packages needed
+# GUI bindings belong to the distro Python, not the Ansible controller or pyenv.
 
 # Python packages for git-cola and GUI development tools
 # Installs distro-specific PyQt5 and related packages

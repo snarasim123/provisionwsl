@@ -3,6 +3,16 @@
 # Installs pyenv from git and configures Python versions
 # Idempotent: skips clone if already installed, updates if present
 
+- name: Validate configured pyenv global version
+  ansible.builtin.assert:
+    that:
+      - pyenv_global_version in pyenv_python_versions
+    fail_msg: The pyenv global version must be included in pyenv_python_versions.
+  tags:
+    - python
+    - pyenv
+    - dev
+
 - name: Check if pyenv is already installed
   stat:
     path: "{{ pyenv_root }}/bin/pyenv"

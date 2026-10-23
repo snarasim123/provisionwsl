@@ -45,13 +45,11 @@ install_python_fedora() {
     # Try to install the specific version
     # Fedora package naming: python3.11, python3.12, etc.
     sudo dnf install -y ${PYTHON_CMD} ${PYTHON_CMD}-devel ${PYTHON_CMD}-pip 2>/dev/null || {
-        # If specific version not available, try alternate package names
-        echo "Trying alternate package names..."
-        sudo dnf install -y python${PYTHON_VERSION} python${PYTHON_VERSION}-devel python${PYTHON_VERSION}-pip 2>/dev/null || {
-            echo "WARNING: Python ${PYTHON_VERSION} not found in repos. Using system Python."
-            return 1
-        }
+        echo "ERROR: Cannot install ${PYTHON_CMD} and its packaging prerequisites. Legacy preparation stopped; use a supported image or explicitly select safe mode and rerun preparation." >&2
+        return 1
     }
+    command -v "$PYTHON_CMD" >/dev/null || return 1
+    "$PYTHON_CMD" --version || return 1
     
     # Install pip for the configured Python version if not already installed
     ${PYTHON_CMD} -m ensurepip --upgrade 2>/dev/null || \

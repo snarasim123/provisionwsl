@@ -1,0 +1,42 @@
+---
+- name: Verify the runtime actually selected by Google Cloud
+  when: not ansible_check_mode
+  environment: "{{ gcp_runtime_environment }}"
+  block:
+    - name: Read Google Cloud runtime information
+      ansible.builtin.command: "{{ gcp_binary_dir }}/gcloud info --format=json"
+      register: gcloud_runtime_output
+      changed_when: false
+
+    - name: Decode Google Cloud runtime information
+      ansible.builtin.set_fact:
+        gcloud_runtime_info: "{{ gcloud_runtime_output.stdout | from_json }}"
+
+    - name: Validate selected Python against Google Cloud requirements
+      ansible.builtin.assert:
+        that:
+          - gcloud_runtime_info.basic.python_location | length > 0
+          - (gcloud_runtime_info.basic.python_version | regex_search('^[0-9]+[.][0-9]+')) is version(gcp_cli_python_min_version, '>=')
+          - (gcloud_runtime_info.basic.python_version | regex_search('^[0-9]+[.][0-9]+')) is version(gcp_cli_python_max_version, '<=')
+        fail_msg: "Google Cloud selected {{ gcloud_runtime_info.basic }}; required Python range is {{ gcp_cli_python_min_version }} through {{ gcp_cli_python_max_version }}. Set gcp_cloudsdk_python to a compatible runtime; do not replace system Python."
+
+    - name: Report selected Google Cloud Python
+      ansible.builtin.debug:
+        msg: "Google Cloud Python: {{ gcloud_runtime_info.basic.python_location }} ({{ gcloud_runtime_info.basic.python_version }})"
+
+    - name: Verify Google Cloud executable
+      ansible.builtin.command: "{{ gcp_binary_dir }}/gcloud --version"
+      changed_when: false
+
+    - name: Verify GKE authentication plugin executable
+      ansible.builtin.command: "{{ gcp_binary_dir }}/gke-gcloud-auth-plugin --version"
+      changed_when: false
+      tags: [gke]
+
+    - name: Record verified Google Cloud installation
+      ansible.builtin.set_fact:
+        gcp_cli_installed: true
+  rescue:
+    - name: Report incompatible Google Cloud runtime
+      ansible.builtin.fail:
+        msg: "Google Cloud or its GKE plugin failed with runtime {{ gcp_selected_python | default('SDK-selected', true) }}. On Alpine, archive binaries can require glibc even with system Python selected. Inspect the failed command; no Python replacement or fallback was attempted. {{ ansible_failed_result.msg | default('Runtime validation failed') }}"
