@@ -24,37 +24,6 @@
     - gui
     - mate-desktop
 
-- name: Read Ubuntu system Python version
-  command:
-    argv:
-      - /usr/bin/python3
-      - -c
-      - |
-        import configparser
-        defaults = configparser.ConfigParser()
-        with open('/usr/share/python3/debian_defaults') as source:
-            defaults.read_file(source)
-        print(defaults['DEFAULT']['default-version'])
-  register: mate_system_python
-  changed_when: false
-  check_mode: false
-  when: python_bootstrap_mode | default('safe') == 'legacy'
-  tags:
-    - gui
-    - mate-desktop
-
-- name: Ensure python3 points to Ubuntu system Python
-  become: true
-  alternatives:
-    name: python3
-    path: "/usr/bin/{{ mate_system_python.stdout | trim }}"
-    link: /usr/bin/python3
-    priority: 100
-  when: python_bootstrap_mode | default('safe') == 'legacy'
-  tags:
-    - gui
-    - mate-desktop
-
 # todo - dup of roles/packages/tasks/main.yml - Update apt cache 2 - rename this
 - name: Update apt cache
   become: true

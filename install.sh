@@ -3,8 +3,6 @@ set -eo pipefail
 
 scriptroot_path=${2:?Usage: install.sh PROFILE REPOSITORY_ROOT [USER]}
 source "$scriptroot_path/scripts/bash/python-bootstrap.sh"
-read_python_bootstrap_mode "$scriptroot_path"
-require_prepared_python_mode
 
 get_script_info() {
     echo "#### get_script_info."
@@ -76,7 +74,6 @@ run-ansible(){
     printf ' %q' "${ansible_args[@]}"
     printf '\n'
     "$ANSIBLE_PLAYBOOK" $secrets_args "${ansible_args[@]}" \
-        -e "python_bootstrap_mode=$PYTHON_BOOTSTRAP_MODE" \
         -e "ansible_python_interpreter=$MANAGED_PYTHON"
 }
 run-ansible-check(){
@@ -94,6 +91,10 @@ case "$distro_type" in
     ubuntu|fedora|alpine) ;;
     *) echo "ERROR: Profile must select a supported distro_type or ps_distro_id." >&2; exit 1 ;;
 esac
+assert_supported_python_distro
+if [[ "$distro_type" == ubuntu ]]; then
+    assert_native_ubuntu_python
+fi
 configure_ansible_runtime
 validate_ansible_runtime
 

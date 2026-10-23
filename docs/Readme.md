@@ -296,19 +296,19 @@ Cloud images are defined in `data/urls.csv`. When a profile sets `ps_distro_id`,
 | `ubuntu2204` | Ubuntu | Ubuntu 22.04 LTS (Jammy) WSL cloud image |
 | `ubuntu2404` | Ubuntu | Ubuntu 24.04 LTS (Noble) WSL cloud image |
 | `ubuntu2604` | Ubuntu | Ubuntu 26.04 LTS (Resolute) amd64 cloud rootfs (.tar.xz); provisioning candidate |
-| `ubuntu1604` | Ubuntu | Ubuntu 16.04 (Xenial) cloud image (has MD5 checksum) |
-| `alpine320` | Alpine | Alpine 3.20 minirootfs |
+| `alpine320` | Alpine | Alpine 3.20.0 x86_64 minirootfs; compatibility restored for testing |
 | `alpine321` | Alpine | Alpine 3.21.9 x86_64 minirootfs; provisioning candidate |
 | `alpine322` | Alpine | Alpine 3.22.7 x86_64 minirootfs; provisioning candidate |
 | `alpine323` | Alpine | Alpine 3.23.7 x86_64 minirootfs; provisioning candidate |
 | `alpine324` | Alpine | Alpine 3.24.3 x86_64 minirootfs; provisioning candidate |
-| `alpine318` | Alpine | Alpine 3.18 minirootfs |
-| `fedora37` | Fedora | Fedora 37 cloud image (.tar.xz) |
+| `fedora37` | Fedora | Historical Fedora 37 entry; upstream URL unavailable, use a local rootfs |
 
 The registry is an image catalogue, not a guarantee of upstream maintenance or
-successful end-to-end provisioning. Older entries are retained for existing
-profiles; Ubuntu 16.04, Alpine 3.18/3.20, and Fedora 37 are legacy choices rather
-than recommended current releases.
+successful end-to-end provisioning. Python bootstrap requires Ubuntu 22.04+,
+Fedora 37+, or Alpine 3.20+ and rejects older releases before installing packages.
+Obsolete registry entries have been removed. Historical profiles remain for
+reference but must select a supported image before use; existing WSL instances
+are not migrated or deleted.
 
 The newer candidates above were checked against official download metadata on
 2026-10-22. Their formats match the gzip/xz rootfs importer and existing distro
@@ -323,7 +323,8 @@ and Alpine's release metadata for
 [3.22](https://dl-cdn.alpinelinux.org/alpine/v3.22/releases/x86_64/latest-releases.yaml),
 [3.23](https://dl-cdn.alpinelinux.org/alpine/v3.23/releases/x86_64/latest-releases.yaml),
 and [3.24](https://dl-cdn.alpinelinux.org/alpine/v3.24/releases/x86_64/latest-releases.yaml).
-Alpine URLs pin a patch release and include its published SHA256 as metadata.
+Alpine URLs pin a patch release. The newer entries include published SHA256
+metadata; the restored Alpine 3.20 entry retains its original URL without a hash.
 The current download path does not enforce that SHA256 field. Ubuntu's
 `release` URL is rolling, so its checksum is intentionally not pinned here.
 
@@ -333,8 +334,11 @@ and [44](https://dl.fedoraproject.org/pub/fedora/linux/releases/44/Container/x86
 provide `.wsl` images, which the current filename-based importer rejects.
 Their `.oci.tar.xz` images are OCI bundles, not directly importable rootfs tars.
 Adding those URLs alone would not work; importing their format needs a separate
-change. The existing Fedora 37 GitHub `/blob/` URL is also a legacy HTML-view URL,
-not a verified direct-image download. No Fedora entry is newly certified here.
+change. The original Fedora 37 registry entry is retained for existing profiles,
+but its historical GitHub `/blob/` URL is not a direct-image download and the
+upstream `37` reference is currently unavailable. Use a suitable local Fedora
+37+ rootfs tar until a working direct-image URL is verified;
+neither a newer Fedora import nor full provisioning is certified here.
 
 To add a new cloud image, append a row to `data/urls.csv`:
 
@@ -368,7 +372,7 @@ Ensure `vars/user_environment.yml` has your user settings, then run:
 
 ```bash
 # profiles/alpine-test
-export ps_distro_id=alpine320
+export ps_distro_id=alpine324
 export skipsteps=cloud,container,gui,editor,git
 ```
 
@@ -395,7 +399,7 @@ Run:
 ```bash
 # profiles/my-local-fedora
 export distro_type=fedora
-export ps_distro_source=C:\soft\wsl\fedora_3704.tar
+export ps_distro_source=C:\soft\wsl\fedora_43_rootfs.tar
 export skipsteps=github,gui
 ```
 
@@ -418,53 +422,51 @@ Running `.\kickoff.ps1 .\profiles\aa-ubu2204-sample` performs the following:
 
 The WSL instance name is derived from the profile filename (e.g., `aa-ubu2204-sample`).
 
-### Temporary Python Bootstrap Rollout
+### Python Runtime Ownership
 
-The repository-root `python-bootstrap-mode.conf` contains one value, `safe`, by
-default. To compare the old bootstrap, explicitly change it to `legacy` before
-starting `kickoff.ps1`; the PowerShell invocation is unchanged. Restore `safe`
-after comparison. The setting applies to every profile using the checkout. Do
-not edit it during a run or run different modes concurrently from one checkout.
-Missing, unreadable, empty, or malformed configuration fails before provisioning
-mutations. LF, CRLF, and a single value without a final newline are accepted.
-
-Safe mode separates three Python owners:
+There is one bootstrap path, with no mode flag or prepared-mode state file.
+Ubuntu 22.04+, Fedora 37+, and Alpine 3.20+ are the retained release families;
+the installed release must also match the profile's distro type. These floors
+do not guarantee every future Python version or distro image is compatible.
+Fedora 37 is allowed for compatibility following a successful user-reported
+system-Python-preserving run. It is end-of-life and receives no security updates;
+bootstrap warns without blocking it, and package repositories may be unavailable.
+Python, Ansible, and DNF binding checks still apply.
+Alpine 3.20 compatibility is restored for user testing, not yet verified by a
+complete provisioning run. Older distro/Ansible packages can be end-of-life;
+allowing them does not imply ongoing upstream security maintenance.
+Bootstrap separates three Python owners:
 
 - Ubuntu and Fedora keep `/usr/bin/python3` and its package-manager bindings.
    Ubuntu refuses a replaced system-Python link instead of claiming to repair it.
-   No safe bootstrap removes Python, redirects Python/pip links, builds a custom
-   python-apt, or bypasses PEP 668.
+   Bootstrap never removes Python, redirects Python/pip links, builds a custom
+   python-apt, or bypasses PEP 668. Package managers can still apply their own
+   updates to distro-owned Python packages.
 - Ansible on Ubuntu/Fedora lives in root's
    `~/.local/share/provisionwsl/ansible`. Native Python 3.12–3.14 uses ansible-core
-   2.20; Python 3.11 uses 2.19. Older Ubuntu installs the configured controller
+   2.20; Python 3.11 uses 2.19. Ubuntu 22.04 installs the configured controller
    (currently Python 3.11) alongside its system interpreter via deadsnakes. Its
    availability is checked; failure stops the run. Core 2.19 reaches upstream EOL
    in November 2026, so this compatibility branch needs review before then.
    Managed-host modules explicitly use `/usr/bin/python3`, not the controller.
 - Alpine keeps Python, pip, cryptography, passlib, and Ansible APK-managed. It
    does not self-upgrade system pip. Collections are installed using the selected
-   `ansible-galaxy`; older APK Ansible (core 2.16/2.17) uses compatible collection
-   ranges. Safe collections live in `~/.local/share/provisionwsl/collections`,
+   `ansible-galaxy`, requiring core 2.17 or newer. Core 2.17 uses compatible ranges:
+   community.general 8.x, kubernetes.core 3.x, and ansible.posix 1.x (at least 1.5).
+   Core 2.18+ keeps the normal collection selection. Collections live in
+   `~/.local/share/provisionwsl/collections`,
    separate from global Ansible installations. Pyenv remains exclusively for
    development Python 3.11.9 and 3.12.4, with 3.12.4 global.
 
-Preparation records successful validation in root's
-`~/.local/state/provisionwsl/python-bootstrap-mode`. Installation checks this
-record against the requested mode before copying the repository or launching
-Ansible, including check mode. Missing or mismatched state requires preparation
-again; editing the shared setting alone cannot switch an existing installation.
-Failures stop with no automatic legacy fallback, even if a global Ansible exists.
+Preparation and installation validate the explicit Ansible executables and a
+local ping using `/usr/bin/python3`. Missing runtime files or failed validation
+stop the run, even if a global Ansible exists. Normal and check-mode playbooks
+use the same explicit runtime. Old prepared-mode records are unused.
+MATE installation never configures a Python alternative.
 
-Legacy mode retains the distro-specific bootstrap and warns about replacing
-Ubuntu Python/pip links and overriding package-managed pip packages. Fedora now
-fails explicitly if its requested interpreter cannot be installed rather than
-pretending to fall back. Python 3.12+ does not request removed distutils packages.
-The corrected MATE native-version alternative task runs only in legacy mode.
-Neither mode is a transactional rollback or an implicit repair operation.
-
-Kickoff refuses existing distro names. For approved disposable comparisons, copy
-an appropriate profile to a new unused profile name and select the mode before
-running kickoff. Do not unregister an existing distro to retry. To deliberately
+Kickoff refuses existing distro names. For approved disposable integration
+tests, copy a supported profile to a new unused profile name. Do not unregister
+an existing distro to retry. To deliberately
 resume stages in an existing instance, first inspect its interpreter ownership
 and use the current Windows checkout as the explicit repository root:
 
@@ -476,19 +478,14 @@ bash "$repo/prep-install.sh" "$profile" "$repo"
 bash "$repo/install.sh" "$profile" "$repo"
 ```
 
-Preparation installs packages and legacy preparation can replace system links;
-only rerun it deliberately. `install.sh` copies the explicit checkout into
+Preparation installs packages; only rerun it deliberately. Previously redirected
+system Python requires explicit distro-specific repair or a fresh approved
+instance, not a bootstrap rerun that claims to repair it.
+`install.sh` copies the explicit checkout into
 `/root/code/provisionwsl` before normal/check-mode Ansible execution. Do not
 recover by running a stale copied script or a global `ansible-playbook`.
-Changing modes requires preparation again and does not undo partial changes.
-
-Keep this temporary mode flag and legacy implementation until both paths pass
-the approved Ubuntu 22.04/24.04, Fedora, and Alpine integration matrix, runtime
-and repeat-run checks pass, and testing completion is explicitly confirmed.
-The current registry's Fedora entry is Fedora 37, not a validated newer Fedora
-image. Mock and syntax checks do not establish that an image provisions fully.
-After sign-off, remove the flag, reader, prepared-mode record, legacy-only
-mutations and tests, and this rollout documentation; retain safe regression tests.
+Mock and syntax checks do not establish that each retained image provisions
+fully or that repeated provisioning is idempotent.
 
 ---
 
@@ -505,6 +502,7 @@ Tests include:
 - Bash initialization scripts (compares source files to installed copies)
 - Git installation and configuration
 - Python version and pyenv setup
+- Non-destructive Python bootstrap regression checks
 - Cloud CLI availability (AWS/GCP)
 - Kubernetes directories and kube config switchers
 - `~/bin` helper scripts
@@ -517,7 +515,9 @@ Tests include:
 
 The test harness respects the `skipsteps` from the profile — skipped roles are not tested.
 
-Non-destructive Python compatibility regression checks:
+The normal suite invokes the non-destructive Bash bootstrap regressions.
+For focused development checks, run the same helper directly; the PowerShell
+helper checks the instance harness's success-marker and exit-code handling:
 
 ```powershell
 .\scripts\PythonProvisioningTest.ps1
@@ -533,7 +533,7 @@ These checks use temporary state, mocked package failures, and mock Google Cloud
 executables, including rejected runtimes and failed GKE plugins. They do not
 install/remove packages, recreate WSL instances, or replace full provisioning
 tests. The instance harness checks system Python, Ansible's prepared runtime,
-and configured pyenv versions independently, with exit-code checks; a legacy
+and configured pyenv versions independently, with exit-code checks; an older
 instance with redirected system Python can intentionally fail the preservation
 check. Required pyenv setup must be provisioned before its instance test passes.
 
@@ -641,10 +641,9 @@ Ansible there. Do not unregister the instance or rerun kickoff to recover it.
 for Ansible and versions managed by pyenv are separate from Ubuntu's system
 Python.
 
-**Solution:** Safe mode leaves Ubuntu's system Python untouched and does not
-configure a Python alternative during MATE installation. Legacy mode reads
-Ubuntu's default Python from `/usr/share/python3/debian_defaults` before
-configuring the `python3` alternative.
+**Solution:** Bootstrap leaves Ubuntu's system Python untouched, and MATE
+installation does not configure a Python alternative. Previously redirected
+system Python must be repaired explicitly before running provisioning again.
 There is no need to install Python 3.12 to work around this error.
 For an existing failed instance, copy the updated
 `roles/mate-desktop/tasks/prerequisites.yml` into the instance's provisioning

@@ -287,10 +287,12 @@ function Test-AnsibleRuntime {
     $cmd = @'
 set -eo pipefail
 source '__REPOSITORY__/scripts/bash/python-bootstrap.sh'
-read_python_bootstrap_mode '__REPOSITORY__'
-require_prepared_python_mode
 source /etc/os-release
 distro_type=$ID
+assert_supported_python_distro
+if [[ "$distro_type" == ubuntu ]]; then
+    assert_native_ubuntu_python
+fi
 configure_ansible_runtime
 validate_ansible_runtime
 echo ANSIBLE_RUNTIME_OK
@@ -300,25 +302,29 @@ echo ANSIBLE_RUNTIME_OK
     Record-Result $testName $passed $out
 }
 
+function Test-PythonBootstrap {
+    param([string]$DistroName, [string]$User)
+    $testName = "Python bootstrap regression checks"
+    $root = Get-TestRepositoryPath $DistroName
+    $cmd = "bash '$root/scripts/bash/PythonProvisioningTest.sh'"
+    $out = Run-Test -DistroName $DistroName -User root -TestName $testName -Command $cmd
+    $passed = $script:LastTestExitCode -eq 0 -and $out -cmatch '(?m)^Python bootstrap regression checks passed: [0-9]+\r?$'
+    Record-Result $testName $passed $out
+}
+
 function Test-PyenvSetup {
     param([string]$DistroName, [string]$User)
     $testName = "Pyenv versions & virtualenv plugin"
     $root = Get-TestRepositoryPath $DistroName
     $configCmd = @'
 set -eo pipefail
-mode=$(cat "$HOME/.local/state/provisionwsl/python-bootstrap-mode")
 source /etc/os-release
-case "$mode:$ID" in
-    safe:alpine) controller=/usr/bin/python3 ;;
-    safe:*) controller="$HOME/.local/share/provisionwsl/ansible/bin/python" ;;
-    legacy:*)
-        IFS= read -r controller < "$(command -v ansible-playbook)"
-        controller=${controller#\#!}
-        ;;
+case "$ID" in
+    alpine) controller=/usr/bin/python3 ;;
+    ubuntu|fedora) controller="$HOME/.local/share/provisionwsl/ansible/bin/python" ;;
     *) exit 1 ;;
 esac
-read -r -a controller_command <<< "$controller"
-"${controller_command[@]}" -c 'import json, sys, yaml; config = yaml.safe_load(open(sys.argv[1])); print("PYENV_CONFIG=" + json.dumps({"versions": config["pyenv_python_versions"], "global": config["pyenv_global_version"]}))' '__REPOSITORY__/vars/language_versions.yml'
+"$controller" -c 'import json, sys, yaml; config = yaml.safe_load(open(sys.argv[1])); print("PYENV_CONFIG=" + json.dumps({"versions": config["pyenv_python_versions"], "global": config["pyenv_global_version"]}))' '__REPOSITORY__/vars/language_versions.yml'
 '@
     $configOut = Run-Test -DistroName $DistroName -User root -TestName "Read configured pyenv versions" -Command ($configCmd.Replace('__REPOSITORY__', $root))
     if ($script:LastTestExitCode -ne 0 -or $configOut -cnotmatch '(?m)^PYENV_CONFIG=(.+)\r?$') {
@@ -641,6 +647,7 @@ function Run-AllTests {
     Test-GitSetup               @tp
     Test-JavaSetup              @tp
     Test-PythonVersion          @tp
+    Test-PythonBootstrap        @tp
     Test-AnsibleRuntime         @tp
     Test-PyenvSetup             @tp
     Test-CloudCli               @tp

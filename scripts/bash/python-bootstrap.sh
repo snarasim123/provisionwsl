@@ -1,79 +1,62 @@
 #!/usr/bin/env bash
 
-read_python_bootstrap_mode() {
-    local mode_file="$1/python-bootstrap-mode.conf"
-    local values=()
-    if [[ ! -f "$mode_file" || ! -r "$mode_file" ]]; then
-        echo "ERROR: Cannot read $mode_file; create it with the sole value safe or legacy." >&2
-        return 1
-    fi
-    mapfile -t values < "$mode_file" || return 1
-    if [[ ${#values[@]} -ne 1 ]]; then
-        echo "ERROR: $mode_file must contain exactly one value: safe or legacy." >&2
-        return 1
-    fi
-    PYTHON_BOOTSTRAP_MODE="${values[0]%$'\r'}"
-    case "$PYTHON_BOOTSTRAP_MODE" in
-        safe|legacy) ;;
-        *) echo "ERROR: Invalid Python bootstrap mode in $mode_file; use safe or legacy." >&2; return 1 ;;
+assert_supported_python_distro() {
+    local release_file="${1:-/etc/os-release}"
+    local ID VERSION_ID installed_distro
+    source "$release_file" || return 1
+    installed_distro="$ID"
+    case "$installed_distro" in
+        fedoraremixforwsl) installed_distro=fedora ;;
     esac
-    PYTHON_BOOTSTRAP_STATE="$HOME/.local/state/provisionwsl/python-bootstrap-mode"
-    export PYTHON_BOOTSTRAP_MODE
-    echo "#### Python bootstrap mode: $PYTHON_BOOTSTRAP_MODE"
-    if [[ "$PYTHON_BOOTSTRAP_MODE" == legacy ]]; then
-        echo "WARNING: Legacy mode may replace Ubuntu Python/pip links and override distro-managed pip packages. It does not roll back previous changes." >&2
-    fi
-}
-
-require_prepared_python_mode() {
-    local prepared_mode
-    if [[ ! -r "$PYTHON_BOOTSTRAP_STATE" ]]; then
-        echo "ERROR: Missing prepared Python state. Rerun prep-install.sh for this instance before install.sh." >&2
+    if [[ "$installed_distro" != "$distro_type" ]]; then
+        echo "ERROR: Profile distro '$distro_type' does not match installed distro '$ID'." >&2
         return 1
     fi
-    prepared_mode=$(cat "$PYTHON_BOOTSTRAP_STATE") || return 1
-    if [[ "$prepared_mode" != "$PYTHON_BOOTSTRAP_MODE" ]]; then
-        echo "ERROR: Prepared Python mode '$prepared_mode' differs from requested '$PYTHON_BOOTSTRAP_MODE'. Restore the configuration or rerun prep-install.sh; mode changes are not rollback." >&2
-        return 1
-    fi
-}
-
-record_prepared_python_mode() {
-    mkdir -p "$(dirname "$PYTHON_BOOTSTRAP_STATE")" || return 1
-    printf '%s\n' "$PYTHON_BOOTSTRAP_MODE" > "$PYTHON_BOOTSTRAP_STATE"
-}
-
-select_python_distutils_package() {
-    [[ "$PYTHON_VERSION" =~ ^3\.[0-9]+$ ]] || {
-        echo "ERROR: PYTHON_VERSION must be a Python 3 major.minor value." >&2
-        return 1
-    }
-    PYTHON_DISTUTILS_PKG=""
-    if (( 10#${PYTHON_VERSION#3.} < 12 )); then
-        PYTHON_DISTUTILS_PKG="${PYTHON_CMD}-distutils"
-    fi
+    case "$installed_distro" in
+        ubuntu)
+            if [[ ! "$VERSION_ID" =~ ^([0-9]+)[.]([0-9]+)$ ]] ||
+                (( 10#${BASH_REMATCH[1]} < 22 || (10#${BASH_REMATCH[1]} == 22 && 10#${BASH_REMATCH[2]} < 4) )); then
+                echo "ERROR: Ubuntu $VERSION_ID is unsupported. Use Ubuntu 22.04 or newer." >&2
+                return 1
+            fi
+            ;;
+        fedora)
+            if [[ ! "$VERSION_ID" =~ ^[0-9]+$ ]] || (( 10#$VERSION_ID < 37 )); then
+                echo "ERROR: Fedora $VERSION_ID is unsupported. Use Fedora 37 or newer." >&2
+                return 1
+            fi
+            if (( 10#$VERSION_ID == 37 )); then
+                echo "WARNING: Fedora 37 is end-of-life and receives no security updates; package repositories may be unavailable." >&2
+            fi
+            ;;
+        alpine)
+            if [[ ! "$VERSION_ID" =~ ^([0-9]+)[.]([0-9]+)([.][0-9]+)?$ ]] ||
+                (( 10#${BASH_REMATCH[1]} < 3 || (10#${BASH_REMATCH[1]} == 3 && 10#${BASH_REMATCH[2]} < 20) )); then
+                echo "ERROR: Alpine $VERSION_ID is unsupported. Use Alpine 3.20 or newer." >&2
+                return 1
+            fi
+            ;;
+        *)
+            echo "ERROR: Unsupported distro: $ID. Use Ubuntu, Fedora, or Alpine." >&2
+            return 1
+            ;;
+    esac
 }
 
 configure_ansible_runtime() {
     MANAGED_PYTHON=/usr/bin/python3
     ANSIBLE_ENV="$HOME/.local/share/provisionwsl/ansible"
-    if [[ "$PYTHON_BOOTSTRAP_MODE" == safe ]]; then
-        export ANSIBLE_COLLECTIONS_PATH="$HOME/.local/share/provisionwsl/collections"
-        export ANSIBLE_COLLECTIONS_SCAN_SYS_PATH=false
-        if [[ "$distro_type" == alpine ]]; then
-            ANSIBLE_BIN=/usr/bin
-        else
-            ANSIBLE_BIN="$ANSIBLE_ENV/bin"
-        fi
-        export ANSIBLE_PYTHON_INTERPRETER="$MANAGED_PYTHON"
-        export PATH="$ANSIBLE_BIN:$PATH"
+    export ANSIBLE_COLLECTIONS_PATH="$HOME/.local/share/provisionwsl/collections"
+    export ANSIBLE_COLLECTIONS_SCAN_SYS_PATH=false
+    if [[ "$distro_type" == alpine ]]; then
+        ANSIBLE_BIN=/usr/bin
     else
-        ANSIBLE_BIN=$(dirname "$(command -v ansible-playbook)") || return 1
-        MANAGED_PYTHON=auto_silent
+        ANSIBLE_BIN="$ANSIBLE_ENV/bin"
     fi
+    export ANSIBLE_PYTHON_INTERPRETER="$MANAGED_PYTHON"
+    export PATH="$ANSIBLE_BIN:$PATH"
     ANSIBLE_PLAYBOOK="$ANSIBLE_BIN/ansible-playbook"
     ANSIBLE_GALAXY="$ANSIBLE_BIN/ansible-galaxy"
-    export PYTHON_BOOTSTRAP_MODE
     echo "#### Ansible executable: $ANSIBLE_PLAYBOOK; managed-host Python: $MANAGED_PYTHON"
 }
 
@@ -81,7 +64,7 @@ assert_native_ubuntu_python() {
     local native_version
     native_version=$(awk -F ' *= *' '$1 == "default-version" {print $2}' /usr/share/python3/debian_defaults) || return 1
     if [[ -z "$native_version" || "$(readlink /usr/bin/python3)" != "$native_version" ]]; then
-        echo "ERROR: Ubuntu system Python was replaced or cannot be identified. Safe mode does not repair links. Use a fresh disposable instance or explicitly repair the distro Python first." >&2
+        echo "ERROR: Ubuntu system Python was replaced or cannot be identified. Bootstrap does not repair links. Use a fresh disposable instance or explicitly repair the distro Python first." >&2
         return 1
     fi
 }
@@ -106,7 +89,31 @@ install_isolated_ansible() {
     "$ANSIBLE_ENV/bin/python" -c 'import ansible, cryptography, passlib'
 }
 
-prepare_safe_python() {
+check_deadsnakes_availability() {
+    local ID VERSION_CODENAME
+    source "${1:-/etc/os-release}" || return 1
+    if [[ "$ID" != ubuntu || -z "$VERSION_CODENAME" ]]; then
+        echo "ERROR: Cannot determine the Ubuntu codename for controller Python installation." >&2
+        return 1
+    fi
+    local ppa_url="https://ppa.launchpadcontent.net/deadsnakes/ppa/ubuntu/dists/${VERSION_CODENAME}/main/binary-amd64/Packages.gz"
+    if ! curl -fsS "$ppa_url" | gunzip | grep "^Package: python${CONTROLLER_PYTHON_VERSION}$" >/dev/null; then
+        echo "ERROR: Controller Python $CONTROLLER_PYTHON_VERSION is unavailable for Ubuntu $VERSION_CODENAME. Install a compatible interpreter alongside system Python before rerunning preparation." >&2
+        return 1
+    fi
+}
+
+disable_problematic_fedora_repos() {
+    local wslu_copr_repo="/etc/yum.repos.d/_copr:copr.fedorainfracloud.org:wslutilities:wslu.repo"
+    if [[ -f "$wslu_copr_repo" ]]; then
+        echo "Disabling broken Fedora COPR repo: $wslu_copr_repo"
+        sudo sed -i 's/^enabled=.*/enabled=0/' "$wslu_copr_repo"
+    fi
+}
+
+prepare_python() {
+    local controller_command="python${CONTROLLER_PYTHON_VERSION}"
+    local controller_binary="/usr/bin/$controller_command"
     case "$distro_type" in
         ubuntu)
             assert_native_ubuntu_python
@@ -114,17 +121,14 @@ prepare_safe_python() {
             sudo apt install -y unzip aptitude python3 python3-dev python3-venv python3-apt curl ca-certificates
             CONTROLLER_PYTHON=/usr/bin/python3
             if ! "$CONTROLLER_PYTHON" -c 'import sys; sys.exit(sys.version_info < (3, 11))'; then
-                if [[ ! -x "$PYTHON_BIN" ]]; then
-                    check_deadsnakes_availability || {
-                        echo "ERROR: No compatible Ansible controller available. Install Python 3.11+ alongside system Python, then rerun preparation." >&2
-                        return 1
-                    }
+                if [[ ! -x "$controller_binary" ]]; then
+                    check_deadsnakes_availability || return 1
                     sudo apt install -y software-properties-common
                     sudo add-apt-repository -y ppa:deadsnakes/ppa
                     sudo apt update -y
                 fi
-                sudo apt install -y "$PYTHON_CMD" "$PYTHON_VENV_PKG"
-                CONTROLLER_PYTHON="$PYTHON_BIN"
+                sudo apt install -y "$controller_command" "${controller_command}-venv"
+                CONTROLLER_PYTHON="$controller_binary"
             fi
             install_isolated_ansible
             /usr/bin/python3 -c 'import apt, apt_pkg'
@@ -155,9 +159,7 @@ validate_ansible_runtime() (
     }
     "$ANSIBLE_PLAYBOOK" --version
     "$ANSIBLE_GALAXY" --version
-    if [[ "$PYTHON_BOOTSTRAP_MODE" == safe ]]; then
-        "$ANSIBLE_BIN/ansible" localhost -i localhost, -c local -m ansible.builtin.ping -e "ansible_python_interpreter=$MANAGED_PYTHON"
-    fi
+    "$ANSIBLE_BIN/ansible" localhost -i localhost, -c local -m ansible.builtin.ping -e "ansible_python_interpreter=$MANAGED_PYTHON"
 )
 
 install_ansible_collections() (
@@ -166,18 +168,17 @@ install_ansible_collections() (
     cd "$HOME" || return 1
     local controller_python="$ANSIBLE_ENV/bin/python"
     local core_minor
-    if [[ "$ANSIBLE_BIN" == /usr/bin || "$PYTHON_BOOTSTRAP_MODE" == legacy ]]; then
-        controller_python=python3
+    if [[ "$distro_type" == alpine ]]; then
+        controller_python=/usr/bin/python3
     fi
-    if [[ "$PYTHON_BOOTSTRAP_MODE" == safe ]]; then
-        core_minor=$("$controller_python" -c 'import ansible; print(ansible.__version__.split(".")[1])') || return 1
-        if (( core_minor < 16 )); then
-            echo "ERROR: APK Ansible must provide ansible-core 2.16 or newer. Use a supported Alpine image." >&2
-            return 1
-        elif (( core_minor < 18 )); then
-            "$ANSIBLE_GALAXY" collection install 'community.general:>=8.0.0,<9.0.0' 'kubernetes.core:>=3.0.0,<4.0.0' 'ansible.posix:>=1.5.0,<2.0.0'
-            return
-        fi
+    core_minor=$("$controller_python" -c 'import ansible; print(ansible.__version__.split(".")[1])') || return 1
+    if (( core_minor < 17 )); then
+        echo "ERROR: Ansible core 2.17 or newer is required. Install the distro's supported Ansible package or rerun preparation." >&2
+        return 1
+    elif (( core_minor == 17 )); then
+        echo "#### Ansible core 2.17: using compatible collection ranges."
+        "$ANSIBLE_GALAXY" collection install 'community.general:>=8.0.0,<9.0.0' 'kubernetes.core:>=3.0.0,<4.0.0' 'ansible.posix:>=1.5.0,<2.0.0'
+        return
     fi
     "$ANSIBLE_GALAXY" collection install community.general kubernetes.core ansible.posix
 )

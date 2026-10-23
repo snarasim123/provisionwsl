@@ -1,80 +1,11 @@
 #!/usr/bin/env bash
 set -eo pipefail
-trap 'echo "ERROR: Python preparation failed (mode: ${PYTHON_BOOTSTRAP_MODE:-unvalidated}). Inspect the error above; no automatic legacy fallback was attempted." >&2' ERR
+trap 'echo "ERROR: Python preparation failed. Inspect the error above; system Python will not be replaced as a workaround." >&2' ERR
 
 scriptroot_path=${2:?Usage: prep-install.sh PROFILE REPOSITORY_ROOT [USER]}
 source "$scriptroot_path/scripts/bash/python-bootstrap.sh"
-read_python_bootstrap_mode "$scriptroot_path"
-
-##############################################################################
-# Python Version Configuration
-# Change these variables to install a different Python version
-##############################################################################
-PYTHON_VERSION="3.11"                                    # e.g., "3.11", "3.12", "3.13"
-PYTHON_CMD="python${PYTHON_VERSION}"                     # e.g., python3.11
-PYTHON_BIN="/usr/bin/${PYTHON_CMD}"                      # e.g., /usr/bin/python3.11
-PYTHON_DEV_PKG="${PYTHON_CMD}-dev"                       # e.g., python3.11-dev
-PYTHON_VENV_PKG="${PYTHON_CMD}-venv"                     # e.g., python3.11-venv
-select_python_distutils_package
-
-# Pip version-specific paths
-PIP_CMD="pip${PYTHON_VERSION}"                           # e.g., pip3.11
-PIP_LOCAL_BIN="/usr/local/bin/${PIP_CMD}"                # e.g., /usr/local/bin/pip3.11
-##############################################################################
-
-# Get script directory for sourcing other scripts
-SCRIPT_DIR="$scriptroot_path"
-
-# Source utility and distro-specific functions
-source "${SCRIPT_DIR}/csv-utils.sh"
-source "${SCRIPT_DIR}/scripts/bash/prep-install-ubuntu.sh"
-source "${SCRIPT_DIR}/scripts/bash/prep-install-fedora.sh"
-source "${SCRIPT_DIR}/scripts/bash/prep-install-alpine.sh"
-##############################################################################
-
-upgrade() {
-    if [[ "$distro_type" == "ubuntu" ]] ; then
-        sudo apt update -y
-        sudo apt upgrade -y
-        sudo apt install unzip -y
-        
-        remove_python_ubuntu
-        install_python_ubuntu
-        
-        # Install Ansible via pip (use system Python if deadsnakes not available)
-        if [ "$USE_SYSTEM_PYTHON" = true ]; then
-            sudo python3 -m pip install $SYSTEM_PIP_ARGS ansible
-        else
-            sudo ${PYTHON_CMD} -m pip install ansible
-        fi
-        sudo apt install aptitude -y
-    elif [[ "$distro_type" == "fedora" ]] ; then
-        disable_problematic_fedora_repos
-
-        sudo dnf update -y
-        sudo dnf install unzip -y
-        
-        remove_python_fedora
-        install_python_fedora
-        
-        # Install Ansible via pip (ensures it uses configured Python version)
-        sudo ${PYTHON_CMD} -m pip install ansible
-    elif [[ "$distro_type" == "alpine" ]] ; then
-        # Alpine upgrade and setup
-        apk add sudo
-        sudo apk update
-        sudo apk add bash              
-        sudo apk add lsb-release     
-        sudo apk add --no-cache openssh
-        
-        remove_python_alpine
-        install_python_alpine
-        
-        # Install Ansible via apk (Alpine package manager)
-        sudo apk add ansible
-
-    fi
-}
+CONTROLLER_PYTHON_VERSION="3.11"
+source "$scriptroot_path/csv-utils.sh"
 
 profile_path=${1:?Usage: prep-install.sh PROFILE REPOSITORY_ROOT [USER]}
 distro_name=$(basename "$profile_path")
@@ -104,26 +35,9 @@ else
     echo "##### DEBUG: ps_distro_id is empty or not set, skipping CSV lookup"
 fi
 
-# read -p "*** Prelim installs for $distro_type, Press to continue.. " -n 1 -r
-# if [[ "$upgrade" == "true" ]] ; then
-rm -f "$PYTHON_BOOTSTRAP_STATE"
-if [[ "$PYTHON_BOOTSTRAP_MODE" == safe ]]; then
-    configure_ansible_runtime
-    prepare_safe_python
-else
-    upgrade
-    configure_ansible_runtime
-fi
+assert_supported_python_distro
+configure_ansible_runtime
+prepare_python
 install_ansible_collections
-if [[ "$PYTHON_BOOTSTRAP_MODE" == legacy && "$distro_type" == "ubuntu" ]] ; then
-    verify_python_ubuntu
-elif [[ "$PYTHON_BOOTSTRAP_MODE" == legacy && "$distro_type" == "fedora" ]] ; then
-    verify_python_fedora
-elif [[ "$PYTHON_BOOTSTRAP_MODE" == legacy && "$distro_type" == "alpine" ]] ; then
-    verify_python_alpine
-fi
-# fi
-
 validate_ansible_runtime
-record_prepared_python_mode
 

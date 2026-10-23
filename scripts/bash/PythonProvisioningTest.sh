@@ -88,7 +88,6 @@ trap 'rm -rf "$sandbox"' EXIT
 export HOME="$sandbox/home"
 mkdir -p "$HOME" "$sandbox/checkout/scripts/bash"
 cp "$repository/scripts/bash/python-bootstrap.sh" "$sandbox/checkout/scripts/bash/"
-cp "$repository/scripts/bash/prep-install-"*.sh "$sandbox/checkout/scripts/bash/"
 cp "$repository/csv-utils.sh" "$sandbox/checkout/"
 checks=0
 
@@ -100,86 +99,67 @@ expect_failure() {
     checks=$((checks + 1))
 }
 
-for PYTHON_VERSION in 3.11 3.12 3.13; do
-    PYTHON_CMD="python$PYTHON_VERSION"
-    select_python_distutils_package
-    if [[ "$PYTHON_VERSION" == 3.11 ]]; then
-        [[ "$PYTHON_DISTUTILS_PKG" == python3.11-distutils ]]
-    else
-        [[ -z "$PYTHON_DISTUTILS_PKG" ]]
+for specification in ubuntu:16.04 ubuntu:18.04 ubuntu:20.04 ubuntu:invalid fedora:36 fedora:invalid alpine:3.18.0 alpine:3.19.9 alpine:invalid; do
+    distro_type=${specification%%:*}
+    version=${specification#*:}
+    expect_failure assert_supported_python_distro <(printf 'ID=%s\nVERSION_ID=%s\n' "$distro_type" "$version")
+done
+for specification in ubuntu:22.04 ubuntu:24.04 ubuntu:26.04 fedora:37 fedora:42 fedora:43 fedora:44 alpine:3.20.0 alpine:3.20.9 alpine:3.21.9 alpine:3.22.7 alpine:3.23.7 alpine:3.24.3; do
+    distro_type=${specification%%:*}
+    version=${specification#*:}
+    assert_supported_python_distro <(printf 'ID=%s\nVERSION_ID=%s\n' "$distro_type" "$version") 2> "$sandbox/release-warning"
+    if [[ "$specification" == fedora:37 ]]; then
+        grep -q 'WARNING: Fedora 37 is end-of-life' "$sandbox/release-warning"
     fi
     checks=$((checks + 1))
 done
-PYTHON_VERSION=malformed
-expect_failure select_python_distutils_package
-
-for value in safe legacy; do
-    for ending in '' '\n' '\r\n'; do
-        printf '%s%b' "$value" "$ending" > "$sandbox/checkout/python-bootstrap-mode.conf"
-        read_python_bootstrap_mode "$sandbox/checkout"
-        [[ "$PYTHON_BOOTSTRAP_MODE" == "$value" ]]
-        record_prepared_python_mode
-        require_prepared_python_mode
-        checks=$((checks + 1))
-    done
-done
-
-for invalid in '' 'SAFE' ' safe' 'safe ' 'safe\nlegacy' 'safe\n\n' '$(touch SHOULD_NOT_EXIST)' 'safe\r\r\n'; do
-    printf '%b' "$invalid" > "$sandbox/checkout/python-bootstrap-mode.conf"
-    expect_failure read_python_bootstrap_mode "$sandbox/checkout"
-done
-[[ ! -e SHOULD_NOT_EXIST ]]
-rm "$sandbox/checkout/python-bootstrap-mode.conf"
-expect_failure read_python_bootstrap_mode "$sandbox/checkout"
-printf 'safe\n' > "$sandbox/checkout/python-bootstrap-mode.conf"
-read_python_bootstrap_mode "$sandbox/checkout"
-expect_failure require_prepared_python_mode
-rm -f "$PYTHON_BOOTSTRAP_STATE"
-expect_failure require_prepared_python_mode
-record_prepared_python_mode
-require_prepared_python_mode
-
-for entry in prep-install.sh install.sh; do
-    printf 'invalid\n' > "$sandbox/checkout/python-bootstrap-mode.conf"
-    expect_failure bash "$repository/$entry" /missing-profile "$sandbox/checkout"
-    grep -q 'Invalid Python bootstrap mode' "$sandbox/error"
-    rm "$sandbox/checkout/python-bootstrap-mode.conf"
-    expect_failure bash "$repository/$entry" /missing-profile "$sandbox/checkout"
-    grep -q 'Cannot read' "$sandbox/error"
-done
-printf 'safe\n' > "$sandbox/checkout/python-bootstrap-mode.conf"
-read_python_bootstrap_mode "$sandbox/checkout"
-record_prepared_python_mode
-bash -c 'source "$1/scripts/bash/python-bootstrap.sh"; read_python_bootstrap_mode "$1"; require_prepared_python_mode' bash "$sandbox/checkout"
-printf 'legacy\n' > "$sandbox/checkout/python-bootstrap-mode.conf"
-expect_failure bash "$repository/install.sh" /missing-profile "$sandbox/checkout"
-grep -q 'differs from requested' "$sandbox/error"
-
-printf '%s\n' 'distro_type=ubuntu' 'ps_distro_id=' \
-    'configure_ansible_runtime() { :; }' \
-    'prepare_safe_python() { echo safe >> "$HOME/routes"; }' \
-    'upgrade() { echo legacy >> "$HOME/routes"; }' \
-    'install_ansible_collections() { :; }' \
-    'validate_ansible_runtime() { :; }' \
-    'verify_python_ubuntu() { :; }' > "$sandbox/profile"
-for value in safe legacy; do
-    printf '%s\n' "$value" > "$sandbox/checkout/python-bootstrap-mode.conf"
-    bash "$repository/prep-install.sh" "$sandbox/profile" "$sandbox/checkout" > "$sandbox/output" 2>&1
-    [[ $(cat "$PYTHON_BOOTSTRAP_STATE") == "$value" ]]
-    [[ $(tail -1 "$HOME/routes") == "$value" ]]
+for version in 37 44; do
+    distro_type=fedora
+    assert_supported_python_distro <(printf 'ID=fedoraremixforwsl\nID_LIKE=fedora\nVERSION_ID=%s\n' "$version") 2> "$sandbox/release-warning"
+    if [[ "$version" == 37 ]]; then
+        grep -q 'WARNING: Fedora 37 is end-of-life' "$sandbox/release-warning"
+    fi
     checks=$((checks + 1))
 done
-printf 'safe\n' > "$sandbox/checkout/python-bootstrap-mode.conf"
-printf '%s\n' 'prepare_safe_python() { echo failed-safe >> "$HOME/routes"; return 42; }' >> "$sandbox/profile"
-expect_failure bash "$repository/prep-install.sh" "$sandbox/profile" "$sandbox/checkout"
-[[ ! -e "$PYTHON_BOOTSTRAP_STATE" ]]
-[[ $(tail -1 "$HOME/routes") == failed-safe ]]
-grep -q 'no automatic legacy fallback was attempted' "$sandbox/error"
-printf '%s\n' 'prepare_safe_python() { :; }' 'validate_ansible_runtime() { return 43; }' >> "$sandbox/profile"
-expect_failure bash "$repository/prep-install.sh" "$sandbox/profile" "$sandbox/checkout"
-[[ ! -e "$PYTHON_BOOTSTRAP_STATE" ]]
+for version in 36 invalid; do
+    expect_failure assert_supported_python_distro <(printf 'ID=fedoraremixforwsl\nID_LIKE=fedora\nVERSION_ID=%s\n' "$version")
+    grep -q "ERROR: Fedora $version is unsupported." "$sandbox/error"
+done
+for distro_type in ubuntu alpine; do
+    expect_failure assert_supported_python_distro <(printf 'ID=fedoraremixforwsl\nID_LIKE=fedora\nVERSION_ID=37\n')
+done
+distro_type=fedora
+expect_failure assert_supported_python_distro <(printf 'ID=unrecognized\nID_LIKE=fedora\nVERSION_ID=44\n')
+distro_type=ubuntu
+expect_failure assert_supported_python_distro <(printf 'ID=fedora\nVERSION_ID=43\n')
+expect_failure assert_supported_python_distro /nonexistent-os-release
 
-PYTHON_BOOTSTRAP_MODE=safe
+printf '%s\n' 'distro_type=ubuntu' 'ps_distro_id=' \
+    'assert_supported_python_distro() { return 42; }' \
+    'configure_ansible_runtime() { touch "$HOME/unexpected-mutation"; }' > "$sandbox/profile"
+for entry in prep-install.sh install.sh; do
+    expect_failure bash "$repository/$entry" "$sandbox/profile" "$sandbox/checkout"
+    [[ ! -e "$HOME/unexpected-mutation" ]]
+done
+printf '%s\n' 'distro_type=ubuntu' 'ps_distro_id=' \
+    'assert_supported_python_distro() { :; }' \
+    'configure_ansible_runtime() { :; }' \
+    'prepare_python() { echo prepare >> "$HOME/routes"; }' \
+    'install_ansible_collections() { echo collections >> "$HOME/routes"; }' \
+    'validate_ansible_runtime() { echo validate >> "$HOME/routes"; }' > "$sandbox/profile"
+bash "$repository/prep-install.sh" "$sandbox/profile" "$sandbox/checkout" > "$sandbox/output" 2>&1
+[[ $(cat "$HOME/routes") == $'prepare\ncollections\nvalidate' ]]
+checks=$((checks + 1))
+rm "$HOME/routes"
+printf '%s\n' 'prepare_python() { echo failed-prepare >> "$HOME/routes"; return 42; }' >> "$sandbox/profile"
+expect_failure bash "$repository/prep-install.sh" "$sandbox/profile" "$sandbox/checkout"
+[[ $(cat "$HOME/routes") == failed-prepare ]]
+grep -q 'system Python will not be replaced' "$sandbox/error"
+rm "$HOME/routes"
+printf '%s\n' 'prepare_python() { :; }' 'install_ansible_collections() { return 43; }' >> "$sandbox/profile"
+expect_failure bash "$repository/prep-install.sh" "$sandbox/profile" "$sandbox/checkout"
+[[ ! -e "$HOME/routes" ]]
+
 for distro_type in ubuntu fedora alpine; do
     configure_ansible_runtime
     [[ "$MANAGED_PYTHON" == /usr/bin/python3 ]]
@@ -193,44 +173,61 @@ for distro_type in ubuntu fedora alpine; do
     checks=$((checks + 1))
 done
 
-PYTHON_BOOTSTRAP_MODE=legacy
-ansible-playbook() { :; }
-configure_ansible_runtime
-[[ "$MANAGED_PYTHON" == auto_silent ]]
-checks=$((checks + 1))
-unset -f ansible-playbook
-
-source "$repository/scripts/bash/prep-install-fedora.sh"
-PYTHON_VERSION=3.99
-PYTHON_CMD=python3.99
-sudo() {
-    printf '%s\n' "$*" >> "$sandbox/package-calls"
-    [[ "$*" != *python3.99* ]]
-}
-expect_failure install_python_fedora
-[[ $(grep -c python3.99 "$sandbox/package-calls") == 1 ]]
-! grep -q 'Using system Python' "$sandbox/error"
-
-source "$repository/scripts/bash/prep-install-ubuntu.sh"
-PYTHON_VERSION=3.11
-lsb_release() { echo jammy; }
+CONTROLLER_PYTHON_VERSION=3.11
+printf 'ID=ubuntu\nVERSION_CODENAME=jammy\n' > "$sandbox/os-release"
 curl() {
     printf 'Package: python3.11\n'
     printf 'Package: unrelated\n%.0s' {1..20000}
 }
 gunzip() { cat; }
-check_deadsnakes_availability > "$sandbox/output"
+check_deadsnakes_availability "$sandbox/os-release" > "$sandbox/output"
 checks=$((checks + 1))
 curl() { printf 'Package: unrelated\n'; }
-expect_failure check_deadsnakes_availability
-unset -f curl gunzip lsb_release
+expect_failure check_deadsnakes_availability "$sandbox/os-release"
+unset -f curl gunzip
 
 for distro_type in ubuntu fedora alpine; do
-    export distro_type
-    export -f prepare_safe_python
-    expect_failure bash -ec 'assert_native_ubuntu_python() { :; }; disable_problematic_fedora_repos() { :; }; sudo() { return 42; }; apk() { return 42; }; prepare_safe_python; echo UNEXPECTED_SUCCESS'
+    export distro_type CONTROLLER_PYTHON_VERSION
+    export -f prepare_python
+    expect_failure bash -ec 'assert_native_ubuntu_python() { :; }; disable_problematic_fedora_repos() { :; }; sudo() { return 42; }; apk() { return 42; }; prepare_python; echo UNEXPECTED_SUCCESS'
     ! grep -q UNEXPECTED_SUCCESS "$sandbox/error"
 done
 
-bash -n "$repository/prep-install.sh" "$repository/install.sh" "$repository/scripts/bash/"*.sh
+distro_type=ubuntu
+configure_ansible_runtime
+mkdir -p "$ANSIBLE_BIN"
+for executable in ansible-playbook ansible-galaxy ansible; do
+    printf '%s\n' '#!/usr/bin/env bash' 'printf "%s\n" "$PWD" >> "$HOME/ansible-directories"' \
+        'if [[ "${0##*/}" == ansible-galaxy && "${1:-}" == collection ]]; then printf "%s\n" "$@" >> "$HOME/galaxy-arguments"; fi' > "$ANSIBLE_BIN/$executable"
+    chmod +x "$ANSIBLE_BIN/$executable"
+done
+printf '%s\n' '#!/usr/bin/env bash' 'echo "${MOCK_CORE_MINOR:-20}"' > "$ANSIBLE_BIN/python"
+chmod +x "$ANSIBLE_BIN/python"
+original_directory=$PWD
+validate_ansible_runtime
+install_ansible_collections
+[[ "$PWD" == "$original_directory" ]]
+[[ $(wc -l < "$HOME/ansible-directories") == 4 ]]
+[[ $(sort -u "$HOME/ansible-directories") == "$HOME" ]]
+[[ $(cat "$HOME/galaxy-arguments") == $'collection\ninstall\ncommunity.general\nkubernetes.core\nansible.posix' ]]
+checks=$((checks + 1))
+for MOCK_CORE_MINOR in 17 18; do
+    export MOCK_CORE_MINOR
+    rm "$HOME/galaxy-arguments"
+    install_ansible_collections
+    if (( MOCK_CORE_MINOR == 17 )); then
+        [[ $(cat "$HOME/galaxy-arguments") == $'collection\ninstall\ncommunity.general:>=8.0.0,<9.0.0\nkubernetes.core:>=3.0.0,<4.0.0\nansible.posix:>=1.5.0,<2.0.0' ]]
+    else
+        [[ $(cat "$HOME/galaxy-arguments") == $'collection\ninstall\ncommunity.general\nkubernetes.core\nansible.posix' ]]
+    fi
+    checks=$((checks + 1))
+done
+export MOCK_CORE_MINOR=16
+expect_failure install_ansible_collections
+[[ $(wc -l < "$HOME/ansible-directories") == 6 ]]
+[[ "$PWD" == "$original_directory" ]]
+
+for script in "$repository/prep-install.sh" "$repository/install.sh" "$repository/scripts/bash/"*.sh; do
+    bash -n "$script"
+done
 echo "Python bootstrap regression checks passed: $checks"

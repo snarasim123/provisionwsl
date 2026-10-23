@@ -5,7 +5,7 @@ $parseErrors = $null
 $ast = [System.Management.Automation.Language.Parser]::ParseFile(
     "$PSScriptRoot\..\test.ps1", [ref]$null, [ref]$parseErrors)
 Assert (-not $parseErrors) ($parseErrors | Out-String)
-$testFunctions = @('Test-PythonVersion', 'Test-AnsibleRuntime', 'Test-PyenvSetup')
+$testFunctions = @('Test-PythonVersion', 'Test-AnsibleRuntime', 'Test-PythonBootstrap', 'Test-PyenvSetup')
 $ast.FindAll({
     param($node)
     $node -is [System.Management.Automation.Language.FunctionDefinitionAst] -and $node.Name -in $testFunctions
@@ -40,6 +40,7 @@ foreach ($testFunction in $testFunctions) {
 foreach ($pair in @(
     @('Test-PythonVersion', 'SYSTEM_PYTHON_OK'),
     @('Test-AnsibleRuntime', 'ANSIBLE_RUNTIME_OK'),
+    @('Test-PythonBootstrap', 'Python bootstrap regression checks passed: 38'),
     @('Test-PyenvSetup', 'PYENV_SETUP_OK')
 )) {
     foreach ($exitCode in @(0, 1)) {
