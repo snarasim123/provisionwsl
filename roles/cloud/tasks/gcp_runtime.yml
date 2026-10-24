@@ -1,0 +1,25 @@
+---
+- name: Select explicit or platform-default Google Cloud runtime
+  ansible.builtin.set_fact:
+    gcp_selected_python: "{{ gcp_cloudsdk_python | default(lookup('ansible.builtin.env', 'CLOUDSDK_PYTHON'), true) | default('/usr/bin/python3' if is_alpine | default(false) else '', true) }}"
+
+- name: Build Google Cloud command environment
+  ansible.builtin.set_fact:
+    gcp_runtime_environment: "{{ {'CLOUDSDK_PYTHON': gcp_selected_python} if gcp_selected_python else {} }}"
+
+- name: Persist selected Google Cloud runtime for login shells
+  ansible.builtin.copy:
+    dest: /etc/profile.d/provisionwsl-gcloud.sh
+    content: "export CLOUDSDK_PYTHON={{ gcp_selected_python | quote }}\n"
+    mode: '0644'
+  become: true
+  when: gcp_selected_python | length > 0
+
+- name: Persist selected Google Cloud runtime for environment consumers
+  ansible.builtin.lineinfile:
+    path: /etc/environment
+    regexp: '^CLOUDSDK_PYTHON='
+    line: "CLOUDSDK_PYTHON={{ gcp_selected_python | quote }}"
+    create: true
+  become: true
+  when: gcp_selected_python | length > 0

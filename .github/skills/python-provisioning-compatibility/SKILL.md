@@ -1,120 +1,53 @@
 ---
 name: python-provisioning-compatibility
-description: Resume the provisionwsl Python compatibility fixes discussed on 2026-10-22. Use when asked to implement the Python provisioning review, preserve distro system Python, isolate Ansible, fix Fedora Python fallback, or harden Alpine Python and Google Cloud CLI setup.
+description: Maintain provisionwsl Python compatibility. Use when asked to preserve distro system Python, isolate Ansible, clean up Python bootstrap, or harden Alpine Python and Google Cloud CLI setup.
 ---
 
 # Python provisioning compatibility
 
 ## Purpose and scope
 
-Implement the deferred Python compatibility improvements for this repository.
-This skill records a review and proposed approach, not completed implementation
-or authorization to recreate existing WSL distributions. Reinspect current files
-and working changes before acting; the repository may have evolved.
+Maintain the system-Python-preserving implementation. On 2026-10-23 the user
+explicitly authorized removing the old Python replacement path and retaining
+only newer distributions. The temporary rollout gate has been superseded;
+do not reintroduce mode flags, prepared-mode state, or Python replacement code.
+Reinspect current files and working changes before acting. This skill does not
+authorize recreating existing WSL distributions or claim full integration passed.
 
 Keep system Python, Ansible's execution environment, and user development Python
 separate. Preserve support for Ubuntu, Fedora, and Alpine without imposing one
 Python minor version on every distribution.
 
-## Temporary rollout flag (requested 2026-10-22)
+## Current contract
 
-Keep both the new safe path and the existing distro-specific bootstrap path
-until testing is completed. This section qualifies the implementation directions
-below: preservation requirements apply to the default safe path; the legacy path
-temporarily retains the existing behavior for explicit comparison and recovery.
-The mode file is a proposed interface, not implemented functionality. It replaces
-the earlier PowerShell-switch proposal at the user's request: keep mode selection
-in Bash and do not modify PowerShell scripts to add or propagate this setting.
-
-- Add one repository-root file named `python-bootstrap-mode.conf` containing
-  exactly `safe` by default. To opt into the existing behavior, the user changes
-  that value to `legacy` before starting a run. The setting persists until edited
-  again and applies to every profile using that checkout; it is not per-run.
-- Read this file from both `prep-install.sh` and `install.sh`, resolving its
-  location from the explicit repository/script-root argument already supplied by
-  kickoff. Do not depend on the current directory or a stale Linux checkout copy.
-  Pass the validated mode onward to affected Ansible tasks from Bash.
-- Use a small shared Bash reader/validator rather than duplicate parsing. Treat
-  the file as data, not executable shell: do not source or eval its contents.
-  Accept a final newline and Windows CRLF; require a single value of `safe` or
-  `legacy`. Missing, unreadable, empty, or malformed configuration must fail
-  explicitly before mutations, not silently select a path.
-- Capture the successfully prepared mode in a minimal per-instance state file.
-  Before Ansible execution, installation must compare the requested mode with
-  that record and reject missing or mismatched state with an actionable error.
-  Do not let editing the shared configuration midway through a run select a
-  different install path. Record success only after bootstrap validation passes.
-  Reuse existing state mechanisms if suitable; avoid a general configuration
-  framework. Do not rely on environment changes surviving WSL invocations.
-- Use one internal mode, `safe` or `legacy`, throughout the run. Reject invalid
-  values before making changes. Log the mode and selected controller/managed-host
-  interpreters prominently so test results identify which path ran.
-- Safe mode preserves system Python, isolates Ansible where appropriate, keeps
-  Alpine APK-managed, and implements the compatibility fixes described below.
-- Legacy mode retains the current distro-specific logic, not a new universal
-  Python-replacement algorithm. Ubuntu may replace Python/pip links; Fedora keeps
-  its existing custom-interpreter approach; Alpine keeps its existing APK setup
-  and system pip overrides. Warn explicitly about these legacy risks.
-- Preserve the already-completed MATE missing-path correction in legacy mode;
-  do not restore the hard-coded Python 3.12 failure. Gate the MATE alternative
-  mutation out of safe mode, except for a separately explicit repair operation.
-- Keep routing coherent across bootstrap, normal/check-mode Ansible launches,
-  ansible-galaxy, collection paths, interpreter choices, and mode-dependent roles.
-  Existing global Ansible executables must not silently mask safe-mode failure.
-- On safe-mode failure, stop with a nonzero exit code and actionable diagnostics.
-  Never automatically invoke legacy mode. The user can explicitly select the
-  legacy setting for a subsequent run after inspecting the error.
-- Selecting legacy mode is not transactional rollback: it cannot undo partial
-  provisioning. Likewise, safe mode must not claim to repair a distro whose
-  system Python was previously replaced. Detect and report that state or require
-  an explicit repair; compare paths using approved disposable instances.
-- Because kickoff refuses an existing distro, document how to select a new test
-  profile/distro or deliberately rerun the appropriate stages in an existing
-  instance. Never automatically unregister a distro to retry in legacy mode.
-- Keep the temporary branching localized and reuse genuinely shared operations.
-  Do not duplicate entire playbooks or maintain unrelated fixes in two copies.
-
-Intended usage after implementation:
-
-The repository-root `python-bootstrap-mode.conf` contains:
-
-```text
-safe
-```
-
-For an explicit legacy retry, edit its sole value to:
-
-```text
-legacy
-```
-
-The PowerShell invocation is unchanged in either case:
-
-```powershell
-.\kickoff.ps1 .\profiles\<profile-name>
-```
-
-Set the file back to `safe` for subsequent safe-mode tests. Do not edit it during
-an active run or concurrent runs sharing the checkout. Re-running preparation is
-required before installation can use a different mode; changing the config file
-alone must not bypass the prepared-mode check.
-
-### Testing and removal gate
-
-Test the shipped safe default and explicit legacy selection, invalid/missing
-configuration, CRLF handling, prepared-mode mismatches, mode propagation across
-WSL processes, and failures that must not trigger an
-automatic fallback. Exercise both branches on Ubuntu 22.04/24.04, Fedora, and
-Alpine using approved test instances. Distinguish known legacy failures from new
-regressions; preserving legacy is not a guarantee that existing bugs work.
-
-Keep the legacy branch until safe-mode validation passes for the agreed distro
-matrix, runtime checks and repeat-run behavior pass, and the user confirms the
-testing phase is complete. Then remove the mode configuration file, reader,
-temporary prepared-mode record, internal mode plumbing,
-legacy-only functions and mutations, transitional tests, and temporary usage
-documentation. Retain regression tests and the safe implementation. Do not
-leave the mode setting as permanent configurability after successful rollout.
+- Require Ubuntu 22.04+, Fedora 37+, or Alpine 3.20+ before package operations.
+  The installed distro must match the profile. Leave historical profiles and
+  existing instances alone; obsolete image registry entries are removed.
+- The user successfully provisioned Fedora 37 with the preserving path and
+  explicitly requested continued compatibility. Warn about Fedora 37 EOL rather
+  than rejecting it; runtime checks still apply. Do not impose a maintained-release
+  minimum as a substitute for actual compatibility requirements.
+- The user explicitly requested restoring Alpine 3.20 and will test provisioning.
+  Keep its registry entry and APK-managed Python/Ansible; do not claim full
+  integration passed or restore system-pip overrides to support it.
+- Keep `/usr/bin/python3` distro-owned. Never redirect Python/pip, bypass PEP 668,
+  remove system Python, or rebuild python-apt for a replacement interpreter.
+- Use root's `~/.local/share/provisionwsl/ansible` venv on Ubuntu/Fedora, and APK
+  Ansible on Alpine. Set explicit playbook/galaxy executables, isolated collection
+  paths, and `/usr/bin/python3` for managed-host execution in both entry points.
+- Ubuntu 22.04 can install controller Python 3.11 alongside native Python 3.10;
+  fail if that controller is unavailable. Native controller Python 3.11 uses
+  core 2.19; Python 3.12-3.14 uses core 2.20. Review core 2.19 before its November
+  2026 upstream EOL. Collection installation requires core 2.17+. Core 2.17 uses
+  community.general >=8,<9, kubernetes.core >=3,<4, and ansible.posix >=1.5,<2;
+  core 2.18+ keeps the normal collection selection.
+- Never fall back to global Ansible or silently repair a previously replaced
+  system interpreter. MATE must not configure a Python alternative.
+- Keep regression checks in the normal `test.ps1` suite. Its Bash helper uses
+  temporary fixtures and mocked package failures; `--ansible` adds explicit task
+  imports and mock Google Cloud runtime/check-mode checks with installed tooling.
+- Report full disposable-image provisioning and repeat-run validation separately
+  from mock and syntax checks. Newer Fedora `.wsl` imports remain a separate task.
 
 ## Discussion and existing fix
 
@@ -130,26 +63,29 @@ Python is 3.10. Bootstrap separately installed Python 3.11 for Ansible.
 Ansible returned exit code 2, which PowerShell correctly reported.
 
 [MATE prerequisites](../../../roles/mate-desktop/tasks/prerequisites.yml) were
-already changed to read `default-version` from
+initially changed to read `default-version` from
 `/usr/share/python3/debian_defaults` and select that Python alternative.
 [Troubleshooting documentation](../../../docs/Readme.md) was updated.
 Targeted Ansible syntax checks and check-mode runs passed on Ubuntu 22.04 and
 24.04. A complete provisioning rerun was not performed.
 
-That correction fixes the immediate failure, but the preferred long-term design
-is to stop replacing system Python during bootstrap. Reassess the MATE
-alternative-setting task once that change is implemented.
+The final implementation stops replacing system Python and removes the MATE
+alternative-setting tasks entirely. The old correction is historical context,
+not an instruction to restore alternatives.
 
 Earlier GitHub SSH host-key errors during Vim plugin installation were ignored
 and were not the fatal blocker. They are outside this skill's scope.
 
-## Findings to address
+## Historical Review Findings
+
+The following describes the original defects and the rationale for the current
+contract. References point to the retained owners, not deleted helper files.
 
 ### 1. Ubuntu bootstrap replaces package-managed system Python
 
 Relevant files:
 - [Bootstrap entry point](../../../prep-install.sh)
-- [Ubuntu bootstrap](../../../scripts/bash/prep-install-ubuntu.sh)
+- [Shared bootstrap](../../../scripts/bash/python-bootstrap.sh)
 - [Ansible launch and repository copy](../../../install.sh)
 - [PowerShell entry point](../../../kickoff.ps1)
 - [Inventory](../../../hosts)
@@ -184,7 +120,7 @@ Implementation direction:
 ### 2. Fedora fallback is not implemented
 
 Relevant files:
-- [Fedora bootstrap](../../../scripts/bash/prep-install-fedora.sh)
+- [Shared bootstrap](../../../scripts/bash/python-bootstrap.sh)
 - [Bootstrap caller](../../../prep-install.sh)
 
 The attempted alternative package names are identical to the initial names.
@@ -209,7 +145,7 @@ Implementation direction:
 
 Relevant files:
 - [Version-derived package configuration](../../../prep-install.sh)
-- [Ubuntu package installation](../../../scripts/bash/prep-install-ubuntu.sh)
+- [Ubuntu package installation](../../../scripts/bash/python-bootstrap.sh)
 
 `PYTHON_DISTUTILS_PKG="${PYTHON_CMD}-distutils"` is always included in the apt
 installation command. Python 3.12 removed standard-library distutils, so the
@@ -264,7 +200,7 @@ Implementation direction:
 ## Alpine-specific design
 
 Relevant files:
-- [Alpine bootstrap](../../../scripts/bash/prep-install-alpine.sh)
+- [Shared bootstrap](../../../scripts/bash/python-bootstrap.sh)
 - [Bootstrap distro branches](../../../prep-install.sh)
 - [Alpine Google Cloud tasks](../../../roles/cloud/tasks/gcp_alpine.yml)
 
@@ -316,18 +252,10 @@ Ansible controller and system runtimes.
 
 ## Acceptance checklist
 
-- [ ] The shipped mode file selects safe; legacy requires an explicit file edit.
-- [ ] PowerShell scripts need no changes for mode selection or propagation.
-- [ ] Bash validates mode data, including CRLF, without source/eval.
-- [ ] Missing/invalid config or absent/mismatched prepared state fails explicitly.
-- [ ] Both paths remain available until the testing/removal gate is satisfied.
-- [ ] Mode selection reaches every relevant stage without implicit WSL state.
-- [ ] Safe-mode failures stop and never automatically invoke legacy behavior.
-- [ ] Legacy risks, partial-run state, and existing-distro retry limits are clear.
-- [ ] Both paths are tested; legacy code is removed after successful sign-off.
-
-The following preservation checks apply to the safe path during rollout and
-to the sole remaining implementation after legacy cleanup:
+- [ ] Only the system-Python-preserving path remains, without mode plumbing.
+- [ ] Older releases fail before package operations; profile and distro match.
+- [ ] Required executables and local managed-host ping validate successfully.
+- [ ] Failures stop without global-Ansible or Python-replacement fallback.
 
 - [ ] Ubuntu 22.04 and 24.04 keep their native system Python and distro modules.
 - [ ] Configured custom Python does not redirect system Python or pip.

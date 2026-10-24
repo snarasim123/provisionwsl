@@ -1,0 +1,10 @@
+
+#tested
+export ps_distro_id=alpine324
+export ps_install_dir=C:\Users\snara\wsl
+export ps_tmp_dir=C:\Users\snara\tmp\
+export skipsteps=gui
+
+
+
+

@@ -3,16 +3,20 @@ function Get-Profile {
         [string]$ProfilePath,
         [ref]$DistroSource,
         [ref]$InstallDir,
-        [ref]$LookupId
+        [ref]$LookupId,
+        [ref]$tmp_dir
+
     )
-    
+    # -TmpDir = ([ref]$tmp_dir) 
     $file = get-content $ProfilePath
     $file | foreach {
         $items = $_.split("=")
         if ($items[0] -eq "export ps_distro_source"){$DistroSource.Value = $items[1]}
         if ($items[0] -eq "export ps_install_dir"){$InstallDir.Value = $items[1]}
         if ($items[0] -eq "export ps_distro_id"){$LookupId.Value = $items[1]}
+        if ($items[0] -eq "export ps_tmp_dir"){$tmp_dir.Value = $items[1]}
     }
+    
 }
 
 function Get-TargetUser {

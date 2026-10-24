@@ -1,9 +1,13 @@
 #!/usr/bin/env bash
+set -eo pipefail
+
+scriptroot_path=${2:?Usage: install.sh PROFILE REPOSITORY_ROOT [USER]}
+source "$scriptroot_path/scripts/bash/python-bootstrap.sh"
 
 get_script_info() {
     echo "#### get_script_info."
     # Get the directory where this script is located
-    local script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+    local script_dir="$scriptroot_path"
     
     # Get the script's parent folder name (just the folder name, not full path)
     local parent_folder_name="$(basename "$script_dir")"
@@ -69,7 +73,8 @@ run-ansible(){
     printf '#### Running: ansible-playbook'
     printf ' %q' "${ansible_args[@]}"
     printf '\n'
-    ansible-playbook $secrets_args "${ansible_args[@]}"
+    "$ANSIBLE_PLAYBOOK" $secrets_args "${ansible_args[@]}" \
+        -e "ansible_python_interpreter=$MANAGED_PYTHON"
 }
 run-ansible-check(){
     run-ansible --check
@@ -77,8 +82,21 @@ run-ansible-check(){
 
 # read -p "*** Press to continue.. " -n 1 -r
 profile_path=$1
-scriptroot_path=$2
 source "$profile_path"
+source "$scriptroot_path/csv-utils.sh"
+if [[ -n "${ps_distro_id:-}" ]]; then
+    get_csv_record "$ps_distro_id" "$scriptroot_path"
+fi
+case "$distro_type" in
+    ubuntu|fedora|alpine) ;;
+    *) echo "ERROR: Profile must select a supported distro_type or ps_distro_id." >&2; exit 1 ;;
+esac
+assert_supported_python_distro
+if [[ "$distro_type" == ubuntu ]]; then
+    assert_native_ubuntu_python
+fi
+configure_ansible_runtime
+validate_ansible_runtime
 
 # Accept default_user from 3rd arg (passed from kickoff.ps1, sourced from Ansible vars)
 if [[ -n "$3" ]]; then
@@ -96,4 +114,3 @@ if [[ "$debug_mode" == "check" ]] ; then
 else
     run-ansible
 fi
-exit

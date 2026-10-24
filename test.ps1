@@ -18,6 +18,7 @@ param(
 )
 
 $basedir = $PSScriptRoot
+. $basedir\scripts\Assert.ps1
 . $basedir\scripts\PathUtils.ps1
 . $basedir\scripts\Logs.ps1
 . $basedir\scripts\Wsl.ps1
@@ -52,6 +53,7 @@ function Run-Test {
     Write-Log ("=" * 50)
     Write-Log ("  TEST: $TestName")
     Write-Log ("=" * 50)
+    $script:LastTestExitCode = 1
     try {
         # change this to inmemory exec of command
         # Using -Raw, read the file in full, as a single, multi-line string.
@@ -66,7 +68,9 @@ function Run-Test {
         $lfCommand = ($pathPrefix + "`n" + $Command) -replace "`r`n", "`n"
         [System.IO.File]::WriteAllText($tmpFile, $lfCommand, $utf8NoBom)
         $tmpWslPath = (wsl -d $DistroName wslpath -u $tmpFile.Replace('\','\\')) -replace '\s',''
+        if ($LASTEXITCODE -ne 0) { throw "Cannot resolve temporary test script in WSL." }
         $output = wsl -d $DistroName -u $User -- bash -l $tmpWslPath 2>&1 | Out-String
+        $script:LastTestExitCode = $LASTEXITCODE
         Remove-Item $tmpFile -Force -ErrorAction SilentlyContinue
         Write-Log $output
         return $output
@@ -94,6 +98,46 @@ function Record-Result {
 }
 
 # --- Test Functions ---
+
+function Test-Logging {
+    $testName = "PowerShell stdout/stderr logging"
+    $ErrorActionPreference = 'Continue'
+    $sandbox = Join-Path ([System.IO.Path]::GetTempPath()) ("provisionwsl-logs-" + [guid]::NewGuid())
+    try {
+        $null = New-Item -ItemType Directory -Path $sandbox -ErrorAction Stop
+        $captureLog = Join-Path $sandbox 'combined output.log'
+        Init-LogFile -LogFile $captureLog
+        'LOG_HEADER' | Out-File -Append $captureLog
+
+        & $env:ComSpec /d /c 'echo STDOUT_MARKER& echo [WARNING]: STDERR_MARKER 1>&2& exit /b 7' 2>&1 | ForEach-Object { $_.ToString() } | Tee-Object -Append -FilePath $captureLog | Out-Null
+        $exitCode = $LASTEXITCODE
+        $content = Get-Content -Raw $captureLog
+        Assert ($exitCode -eq 7) 'Nonzero native exit code was not preserved.'
+        Assert ($content.Contains('STDOUT_MARKER')) 'stdout was not logged.'
+        Assert ($content.Contains('[WARNING]: STDERR_MARKER')) 'stderr was not logged.'
+        Assert ($content -notmatch 'NativeCommandError|CategoryInfo|FullyQualifiedErrorId') 'PowerShell error formatting leaked into the log.'
+        Assert ($content.Contains('LOG_HEADER')) 'Initial log content was overwritten.'
+
+        & $env:ComSpec /d /c 'echo [WARNING]: NONFATAL_WARNING 1>&2& exit /b 0' 2>&1 | ForEach-Object { $_.ToString() } | Tee-Object -Append -FilePath $captureLog | Out-Null
+        $exitCode = $LASTEXITCODE
+        Assert ($exitCode -eq 0) 'A diagnostic on stderr was treated as command failure.'
+        $content = Get-Content -Raw $captureLog
+        Assert ($content.Contains('STDOUT_MARKER') -and $content.Contains('NONFATAL_WARNING')) 'Log output was overwritten rather than appended.'
+
+        $longWarning = '[WARNING]: ' + ('diagnostic-' * 30)
+        & $env:ComSpec /d /c "echo $longWarning 1>&2& exit /b 0" 2>&1 | ForEach-Object { $_.ToString() } | Tee-Object -Append -FilePath $captureLog | Out-Null
+        Assert ((Get-Content -Raw $captureLog).Contains($longWarning)) 'A long diagnostic was wrapped or truncated in the log.'
+        Write-Log 'Logging regression checks passed: 8'
+        Record-Result $testName $true 'All eight logging regression checks passed.'
+    } catch {
+        Write-Log "ERROR: $($_.Exception.Message)"
+        Record-Result $testName $false $_.Exception.Message
+    } finally {
+        if (Test-Path $sandbox) {
+            Remove-Item -Path $sandbox -Recurse -Force -ErrorAction SilentlyContinue
+        }
+    }
+}
 
 function Test-UserSshProfileSymlinks {
     param([string]$DistroName, [string]$User, [string[]]$ProfileFiles, [string[]]$SshKeys)
@@ -207,38 +251,111 @@ echo \$JAVA_HOME 2>&1;
 function Test-PythonVersion {
     param([string]$DistroName, [string]$User)
     $testName = "Python version"
-    $cmd = @"
-echo '== system python3 version ==';
-/usr/bin/python3 --version 2>&1;
-echo '== system python3 binary ==';
-ls -la /usr/bin/python3 2>&1;
-echo '== system pip3 version ==';
-/usr/bin/pip3 --version 2>&1;
-echo '== system pip3 binary ==';
-ls -la /usr/bin/pip3 2>&1;
-"@
+    $cmd = @'
+set -eo pipefail
+/usr/bin/python3 --version
+/usr/bin/python3 -c 'import sys; assert sys.version_info.major == 3; assert sys.prefix == sys.base_prefix'
+source /etc/os-release
+case "$ID" in
+    ubuntu)
+        native_version=$(awk -F ' *= *' '$1 == "default-version" {print $2}' /usr/share/python3/debian_defaults)
+        [[ -n "$native_version" && "$(readlink /usr/bin/python3)" == "$native_version" ]]
+        /usr/bin/python3 -c 'import apt, apt_pkg'
+        ;;
+    fedora) /usr/bin/python3 -c 'import dnf' ;;
+    alpine) /usr/bin/python3 -c 'import cryptography, passlib' ;;
+    *) exit 1 ;;
+esac
+echo SYSTEM_PYTHON_OK
+'@
     $out = Run-Test -DistroName $DistroName -User $User -TestName $testName -Command $cmd
-    $pythonOk = $out -match "Python"
+    $pythonOk = $script:LastTestExitCode -eq 0 -and $out -cmatch '(?m)^SYSTEM_PYTHON_OK\r?$'
     Record-Result $testName $pythonOk $out
+}
+
+function Get-TestRepositoryPath {
+    param([string]$DistroName)
+    $root = wsl -d $DistroName -- wslpath -u $basedir.Replace('\','\\')
+    if ($LASTEXITCODE -ne 0) { throw "Cannot resolve repository path in WSL." }
+    return ($root | Out-String).Trim()
+}
+
+function Test-AnsibleRuntime {
+    param([string]$DistroName, [string]$User)
+    $testName = "Ansible controller and managed-host Python"
+    $root = Get-TestRepositoryPath $DistroName
+    $cmd = @'
+set -eo pipefail
+source '__REPOSITORY__/scripts/bash/python-bootstrap.sh'
+source /etc/os-release
+distro_type=$ID
+assert_supported_python_distro
+if [[ "$distro_type" == ubuntu ]]; then
+    assert_native_ubuntu_python
+fi
+configure_ansible_runtime
+validate_ansible_runtime
+echo ANSIBLE_RUNTIME_OK
+'@
+    $out = Run-Test -DistroName $DistroName -User root -TestName $testName -Command ($cmd.Replace('__REPOSITORY__', $root))
+    $passed = $script:LastTestExitCode -eq 0 -and $out -cmatch '(?m)^ANSIBLE_RUNTIME_OK\r?$'
+    Record-Result $testName $passed $out
+}
+
+function Test-PythonBootstrap {
+    param([string]$DistroName, [string]$User)
+    $testName = "Python bootstrap regression checks"
+    $root = Get-TestRepositoryPath $DistroName
+    $cmd = "bash '$root/scripts/bash/PythonProvisioningTest.sh'"
+    $out = Run-Test -DistroName $DistroName -User root -TestName $testName -Command $cmd
+    $passed = $script:LastTestExitCode -eq 0 -and $out -cmatch '(?m)^Python bootstrap regression checks passed: [0-9]+\r?$'
+    Record-Result $testName $passed $out
 }
 
 function Test-PyenvSetup {
     param([string]$DistroName, [string]$User)
     $testName = "Pyenv versions & virtualenv plugin"
-    $cmd = @"
-echo '== pyenv version ==';
-pyenv --version 2>&1;
-echo '== pyenv binary ==';
-which pyenv 2>&1;
-echo '== pyenv versions ==';
-pyenv versions 2>&1;
-echo '== pyenv virtualenv plugin ==';
-pyenv virtualenv --help 2>&1 | head -3;
-echo '== pyenv plugins dir ==';
-ls ~/.pyenv/plugins/ 2>&1;
-"@
+    $root = Get-TestRepositoryPath $DistroName
+    $configCmd = @'
+set -eo pipefail
+source /etc/os-release
+case "$ID" in
+    alpine) controller=/usr/bin/python3 ;;
+    ubuntu|fedora) controller="$HOME/.local/share/provisionwsl/ansible/bin/python" ;;
+    *) exit 1 ;;
+esac
+"$controller" -c 'import json, sys, yaml; config = yaml.safe_load(open(sys.argv[1])); print("PYENV_CONFIG=" + json.dumps({"versions": config["pyenv_python_versions"], "global": config["pyenv_global_version"]}))' '__REPOSITORY__/vars/language_versions.yml'
+'@
+    $configOut = Run-Test -DistroName $DistroName -User root -TestName "Read configured pyenv versions" -Command ($configCmd.Replace('__REPOSITORY__', $root))
+    if ($script:LastTestExitCode -ne 0 -or $configOut -cnotmatch '(?m)^PYENV_CONFIG=(.+)\r?$') {
+        Record-Result $testName $false $configOut
+        return
+    }
+    $expected = $Matches[1] | ConvertFrom-Json
+    if (@($expected.versions).Count -eq 0 -or $expected.global -notin $expected.versions -or
+        @($expected.versions | Where-Object { $_ -notmatch '^3\.[0-9]+\.[0-9]+$' }).Count -gt 0) {
+        Record-Result $testName $false "Invalid pyenv version configuration."
+        return
+    }
+    $cmd = @'
+set -eo pipefail
+export PYENV_ROOT="$HOME/.pyenv"
+export PATH="$PYENV_ROOT/bin:$PATH"
+unset PYENV_VERSION
+cd /
+pyenv --version
+pyenv virtualenv --help >/dev/null
+for version in __VERSIONS__; do
+    prefix=$(pyenv prefix "$version")
+    "$prefix/bin/python" -c 'import platform, sys; assert platform.python_version() == sys.argv[1]' "$version"
+done
+[[ "$(pyenv global)" == '__GLOBAL__' ]]
+pyenv exec python -c 'import platform; assert platform.python_version() == "__GLOBAL__"'
+echo PYENV_SETUP_OK
+'@
+    $cmd = $cmd.Replace('__VERSIONS__', ($expected.versions -join ' ')).Replace('__GLOBAL__', $expected.global)
     $out = Run-Test -DistroName $DistroName -User $User -TestName $testName -Command $cmd
-    $pyenvOk = $out -match "pyenv"
+    $pyenvOk = $script:LastTestExitCode -eq 0 -and $out -cmatch '(?m)^PYENV_SETUP_OK\r?$'
     Record-Result $testName $pyenvOk $out
 }
 
@@ -523,12 +640,15 @@ function Run-AllTests {
     $tp = @{ DistroName = $distro_name; User = $default_user }
 
     # Run all tests
+    Test-Logging
     Test-UserSshProfileSymlinks @tp -ProfileFiles $BashProfileFiles -SshKeys $SshKeyFiles
     $sourceDir = Join-Path $BaseDir $BashSourceSubDir
     Test-BashInitScripts        @tp -SourceDir $sourceDir -ProfileFiles $BashProfileFiles -SkipFiles $BashCompareSkip
     Test-GitSetup               @tp
     Test-JavaSetup              @tp
     Test-PythonVersion          @tp
+    Test-PythonBootstrap        @tp
+    Test-AnsibleRuntime         @tp
     Test-PyenvSetup             @tp
     Test-CloudCli               @tp
     Test-KubeDirectories        @tp -KubeDirs $KubeDirectories
@@ -575,3 +695,4 @@ function Run-AllTests {
 
 # Entry point
 Run-AllTests -ProfilePath $ProfilePath -LogSuffix $LogSuffix -BaseDir $basedir
+if ($script:fail_count -gt 0) { exit 1 }

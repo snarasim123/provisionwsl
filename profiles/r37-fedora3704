@@ -2,6 +2,7 @@ export distro_type=fedora
 # export distro_name=fedora-a2
 export ps_distro_source=d:\soft\wsl\fedora_3704.tar
 export ps_install_dir=C:\Users\snara\wsl
-export skipsteps=gui
+export ps_tmp_dir=C:\Users\snara\tmp\
+export skipsteps=gui,java,python,pyenv,golang
 
 
