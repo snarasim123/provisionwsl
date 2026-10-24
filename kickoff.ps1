@@ -37,8 +37,9 @@ function Kickoff {
       exit
   }
   Write-Log ( "\`r\`n##### Target user: {0}" -f $Target_User)
-  $Distro_Source = $null; $Install_Dir = $null; $distro_lookupid = $null
-  Get-Profile -ProfilePath $Profile_Path -DistroSource ([ref]$Distro_Source) -InstallDir ([ref]$Install_Dir) -LookupId ([ref]$distro_lookupid)
+  $Distro_Source = $null; $Install_Dir = $null; $distro_lookupid = $null; $tmp_dir  = $null;
+  Get-Profile -ProfilePath $Profile_Path -DistroSource ([ref]$Distro_Source) -InstallDir ([ref]$Install_Dir) -LookupId ([ref]$distro_lookupid) -TmpDir = ([ref]$tmp_dir) 
+  # Write-Log ("\`r\`n##### tmp_dir. {0} ##### " -f $tmp_dir)
 
   if ([string]::IsNullOrWhiteSpace($Install_Dir) -or [string]::IsNullOrEmpty($Install_Dir)) {
       $Install_Dir = $PSScriptRoot+"\install\"+$Distro_Name
@@ -52,6 +53,12 @@ function Kickoff {
     $install_method="local"
   }
 
+  if ([string]::IsNullOrWhiteSpace($tmp_dir) -or [string]::IsNullOrEmpty($tmp_dir)) {
+      $tmp_dir = $PSScriptRoot+"\tmp\"
+  } 
+
+  # Write-Log ("\`r\`n##### tmp_dir. {0} ##### " -f $tmp_dir)
+
   if (Test-DistroExists -DistroName $Distro_Name) {
     Write-Log "`r`n##### Distro name present in already installed distros list. cannot reinstall. exiting."
     exit
@@ -63,10 +70,11 @@ function Kickoff {
   }
 
   if($install_method -eq "cloud"){    
-    $Distro_Source = Prepare-CloudInstall -UrlsCsvPath $Urls_Csv_Path -DistroLookupId $distro_lookupid -BaseDir $basedir -LogFile $LogFile
+    $Distro_Source = Prepare-CloudInstall -UrlsCsvPath $Urls_Csv_Path -DistroLookupId $distro_lookupid -BaseDir $basedir -LogFile $LogFile  -TmpDir $tmp_dir
   }
 
-  Display-SpinupParams  $Distro_Name $Distro_Source $distro_lookupid $Install_Dir $LogFile
+  Display-SpinupParams  $Distro_Name $Distro_Source $distro_lookupid $Install_Dir $LogFile $tmp_dir
+  
 
   (mkdir $Install_Dir -ea 0) | Out-File -Append $LogFile
   wsl --import $Distro_Name $Install_Dir $Distro_Source 2>&1 | ForEach-Object { $_.ToString() } | Tee-Object -Append -FilePath $LogFile
