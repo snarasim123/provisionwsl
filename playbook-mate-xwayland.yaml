@@ -2,6 +2,7 @@
   gather_facts: true
   vars_files:
     - vars/user_environment.yml
+    - vars/display.yml
   roles:
     - facts
     - mate-desktop

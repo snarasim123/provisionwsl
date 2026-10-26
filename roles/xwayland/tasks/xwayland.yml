@@ -167,7 +167,7 @@
       autologin-user={{ target_user }}
       autologin-user-timeout=0
     marker: "# {mark} ANSIBLE MANAGED - autologin"
-  when: autologin_enabled | default(true)
+  when: autologin_enabled | default(false)
   tags:
     - gui
     - xwayland
@@ -198,22 +198,159 @@
     - gui
     - xwayland
 
-# ── 8. Helper script to start the desktop ────────────────────────────────────
+# ── 7b. Font scaling for the greeter and MATE (Xwayland defaults to 96 dpi) ──
+# The greeter here is unity-greeter (not lightdm-gtk-greeter); it reads its
+# font and DPI from the com.canonical.unity-greeter dconf schema.
 
-- name: Create start-desktop helper script
+- name: Ensure dconf system database directories exist
+  become: true
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: '0755'
+  loop:
+    - /etc/dconf/profile
+    - /etc/dconf/db/local.d
+  tags:
+    - gui
+    - xwayland
+
+- name: Enable dconf system database for users
   become: true
   copy:
     content: |
-      #!/bin/bash
-      ###############################################################
-      # start-desktop.sh - Start the MATE desktop via XWayland
-      # Usage: sudo ./start-desktop.sh
-      # To stop: sudo poweroff  (from GUI or terminal)
-      ###############################################################
-      set -e
-      echo "Starting graphical target..."
-      systemctl start graphical.target
-      echo "Desktop is running. Use 'sudo poweroff' to shut down cleanly."
+      user-db:user
+      system-db:local
+    dest: /etc/dconf/profile/user
+    owner: root
+    group: root
+    mode: '0644'
+    force: false
+  tags:
+    - gui
+    - xwayland
+
+- name: Set unity-greeter font and DPI (dconf)
+  become: true
+  copy:
+    content: |
+      [com/canonical/unity-greeter]
+      font-name='{{ greeter_font }}'
+      xft-dpi={{ desktop_dpi }}.0
+    dest: /etc/dconf/db/local.d/01-unity-greeter
+    owner: root
+    group: root
+    mode: '0644'
+  register: xwayland_dconf_greeter
+  tags:
+    - gui
+    - xwayland
+
+- name: Set MATE font DPI system-wide (dconf)
+  become: true
+  copy:
+    content: |
+      [org/mate/desktop/font-rendering]
+      dpi={{ desktop_dpi }}.0
+    dest: /etc/dconf/db/local.d/00-xwayland-dpi
+    owner: root
+    group: root
+    mode: '0644'
+  register: xwayland_dconf_dpi
+  tags:
+    - gui
+    - xwayland
+
+- name: Refresh dconf database
+  become: true
+  command: dconf update
+  when: xwayland_dconf_greeter is changed or xwayland_dconf_dpi is changed
+  failed_when: false
+  tags:
+    - gui
+    - xwayland
+
+# ── 7c. Window Maker / plain X sessions: Xft DPI and Window Maker UI fonts ───
+# MATE reads dconf; Window Maker and X11 apps read X resources. Window Maker's
+# own menu and title fonts use fixed pixel sizes, so they are set explicitly.
+
+- name: Set Xft.dpi for X sessions (merged by Xsession.d/30x11-common_xresources)
+  become: true
+  copy:
+    content: |
+      Xft.dpi: {{ desktop_dpi }}
+    dest: /etc/X11/Xresources/xwayland-dpi
+    owner: root
+    group: root
+    mode: '0644'
+  tags:
+    - gui
+    - xwayland
+
+- name: Check for Window Maker defaults file
+  stat:
+    path: "{{ user_home }}/GNUstep/Defaults/WindowMaker"
+  register: xwayland_wmaker_defaults
+  tags:
+    - gui
+    - xwayland
+
+- name: Set Window Maker font and icon/dock/clip/drawer sizes
+  lineinfile:
+    path: "{{ user_home }}/GNUstep/Defaults/WindowMaker"
+    regexp: '^\s*{{ item.key }}\s*='
+    line: '  {{ item.key }} = {{ item.value }};'
+  loop:
+    - { key: WindowTitleFont, value: '"sans serif:bold:pixelsize={{ wmaker_font_pixelsize }}"' }
+    - { key: MenuTitleFont, value: '"sans serif:bold:pixelsize={{ wmaker_font_pixelsize }}"' }
+    - { key: MenuTextFont, value: '"sans serif:bold:pixelsize={{ wmaker_font_pixelsize }}"' }
+    - { key: IconTitleFont, value: '"sans serif:bold:pixelsize={{ wmaker_font_pixelsize }}"' }
+    - { key: ClipTitleFont, value: '"sans serif:bold:pixelsize={{ wmaker_font_pixelsize }}"' }
+    - { key: LargeDisplayFont, value: '"sans serif:bold:pixelsize={{ wmaker_display_font_pixelsize }}"' }
+    - { key: IconSize, value: '{{ wmaker_icon_size }}' }
+  when: xwayland_wmaker_defaults.stat.exists
+  tags:
+    - gui
+    - xwayland
+
+# ── 8. Desktop session selection and start helper ────────────────────────────
+
+- name: Validate desktop_session
+  assert:
+    that: desktop_session in desktop_sessions_supported
+    fail_msg: "desktop_session must be one of {{ desktop_sessions_supported }}"
+  tags:
+    - gui
+    - xwayland
+
+- name: Ensure LightDM drop-in directory exists
+  become: true
+  file:
+    path: /etc/lightdm/lightdm.conf.d
+    state: directory
+    mode: '0755'
+  tags:
+    - gui
+    - xwayland
+
+- name: Set LightDM autologin session to {{ desktop_session }}
+  become: true
+  copy:
+    content: |
+      [Seat:*]
+      autologin-session={{ desktop_session }}
+    dest: /etc/lightdm/lightdm.conf.d/50-desktop-session.conf
+    owner: root
+    group: root
+    mode: '0644'
+  tags:
+    - gui
+    - xwayland
+
+- name: Install start-desktop helper script
+  become: true
+  copy:
+    src: start-desktop.sh
     dest: /usr/local/bin/start-desktop.sh
     owner: root
     group: root
@@ -225,8 +362,8 @@
 - name: Display post-install message
   debug:
     msg: >
-      XWayland MATE Desktop role complete.
-      To start the desktop run:  sudo systemctl start graphical.target
+      XWayland desktop role complete (session: {{ desktop_session }}).
+      To start the desktop run:  sudo start-desktop.sh [mate|wmaker|xfce|stop]
       To shut down cleanly:      sudo poweroff
       Then terminate WSL:        wsl.exe --terminate {{ wsl_distro_name_override }}
   tags:

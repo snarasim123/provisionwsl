@@ -1,12 +1,16 @@
 ---
-# Default resolution for the Xwayland virtual screen
-xwayland_resolution: "1920x1080"
-
-# Monitor refresh rate (used in monitors.xml)
-monitor_refresh_rate: "59.963"
+# Display settings (resolution, refresh rate, DPI, greeter font) live in vars/display.yml
 
 # Whether to enable automatic login
-autologin_enabled: true
+autologin_enabled: false
 
 # WSL distro instance name
 wsl_distro_name_override: "sample_ubuntu_2404"
+
+# Session LightDM autologs into (an /usr/share/xsessions/<name>.desktop entry).
+# Override at run time with: sudo start-desktop.sh <session>
+desktop_session: "mate"
+desktop_sessions_supported:
+  - mate
+  - wmaker
+  - xfce

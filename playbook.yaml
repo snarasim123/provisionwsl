@@ -18,6 +18,7 @@
     - vars/packages_alpine.yml
     - vars/tool_versions.yml
     - vars/user_environment.yml
+    - vars/display.yml
     - vars/vimvars.yml
   ### Comment out roles you don't need ###
   # Packages need to be installed before git, for building git #
