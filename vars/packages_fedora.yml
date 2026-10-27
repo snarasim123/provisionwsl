@@ -56,5 +56,8 @@ packages_fedora_gui:
   - pcmanfm
   - meld
   - firefox
-  - chromium
   - gitg
+  - vlc
+  - audacious
+  - rhythmbox
+  - clementine

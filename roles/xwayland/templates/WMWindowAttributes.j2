@@ -1,0 +1,8 @@
+{
+{% for app in wmaker_dock_apps if app.icon is defined %}
+  "{{ app.name }}" = {
+    Icon = "{{ app.icon }}";
+    AlwaysUserIcon = Yes;
+  };
+{% endfor %}
+}

@@ -237,6 +237,8 @@
       [com/canonical/unity-greeter]
       font-name='{{ greeter_font }}'
       xft-dpi={{ desktop_dpi }}.0
+      background='{{ greeter_background }}'
+      draw-user-backgrounds={{ greeter_draw_user_backgrounds | bool | lower }}
     dest: /etc/dconf/db/local.d/01-unity-greeter
     owner: root
     group: root
@@ -287,6 +289,42 @@
     - gui
     - xwayland
 
+# Window Maker normally creates these on its first start (/usr/bin/wmaker copies
+# any missing file from /etc/GNUstep/Defaults). Provisioning runs before that
+# first start, so seed them here the same way; existing files are never replaced.
+- name: Ensure Window Maker user Defaults directory exists
+  become: true
+  file:
+    path: "{{ user_home }}/GNUstep/Defaults"
+    state: directory
+    owner: "{{ target_user }}"
+    group: "{{ target_user }}"
+    mode: '0755'
+  tags:
+    - gui
+    - xwayland
+    - wmaker
+
+- name: Seed Window Maker defaults from /etc/GNUstep/Defaults
+  become: true
+  copy:
+    src: "/etc/GNUstep/Defaults/{{ item }}"
+    dest: "{{ user_home }}/GNUstep/Defaults/{{ item }}"
+    remote_src: true
+    force: false
+    owner: "{{ target_user }}"
+    group: "{{ target_user }}"
+    mode: '0644'
+  loop:
+    - WindowMaker
+    - WMRootMenu
+    - WMState
+  failed_when: false
+  tags:
+    - gui
+    - xwayland
+    - wmaker
+
 - name: Check for Window Maker defaults file
   stat:
     path: "{{ user_home }}/GNUstep/Defaults/WindowMaker"
@@ -294,6 +332,7 @@
   tags:
     - gui
     - xwayland
+    - wmaker
 
 - name: Set Window Maker font and icon/dock/clip/drawer sizes
   lineinfile:
@@ -312,6 +351,155 @@
   tags:
     - gui
     - xwayland
+    - wmaker
+
+# ── 7d. XFCE font, icon, panel and cursor sizes ──────────────────────────────
+# The user's xfconf files exist after the first XFCE login and override system
+# defaults, so values are written per user with xfconf-query (in a private D-Bus
+# session; XFCE reads them at the next login). Panel properties are only changed
+# when the panel exists. The XFCE packages come from packages_ubuntu_gui.
+
+- name: Check for xfconf-query
+  stat:
+    path: /usr/bin/xfconf-query
+  register: xwayland_xfconf
+  tags:
+    - gui
+    - xwayland
+
+- name: Set XFCE sizes with xfconf-query
+  become: true
+  become_user: "{{ target_user }}"
+  shell: |
+    cur=$(dbus-run-session -- xfconf-query -c {{ item.channel }} -p {{ item.prop }} 2>/dev/null) || cur=__unset__
+    if [ "{{ item.existing_only | default(false) | bool | lower }}" = true ] && [ "$cur" = __unset__ ]; then exit 0; fi
+    if [ "$cur" != "{{ item.value }}" ]; then
+      dbus-run-session -- xfconf-query -c {{ item.channel }} -p {{ item.prop }} -n -t {{ item.type }} -s "{{ item.value }}"
+      echo CHANGED
+    fi
+  args:
+    executable: /bin/bash
+  environment:
+    HOME: "{{ user_home }}"
+  loop:
+    # Fonts and DPI
+    - { channel: xsettings, prop: /Xft/DPI, type: int, value: "{{ desktop_dpi }}" }
+    - { channel: xsettings, prop: /Gtk/FontName, type: string, value: "Sans {{ xfce_font_size }}" }
+    - { channel: xsettings, prop: /Gtk/MonospaceFontName, type: string, value: "Monospace {{ xfce_font_size }}" }
+    - { channel: xsettings, prop: /Gtk/CursorThemeSize, type: int, value: "{{ xfce_cursor_size }}" }
+    - { channel: xfwm4, prop: /general/theme, type: string, value: "{{ xfce_wm_theme }}" }
+    - { channel: xfwm4, prop: /general/title_font, type: string, value: "Sans Bold {{ xfce_title_font_size }}" }
+    # Top panel and bottom dock
+    - { channel: xfce4-panel, prop: /panels/panel-1/size, type: uint, value: "{{ xfce_panel_size }}", existing_only: true }
+    - { channel: xfce4-panel, prop: /panels/panel-1/icon-size, type: uint, value: "{{ xfce_panel_icon_size }}", existing_only: true }
+    - { channel: xfce4-panel, prop: /panels/panel-2/size, type: uint, value: "{{ xfce_dock_size }}", existing_only: true }
+    # Desktop icons
+    - { channel: xfce4-desktop, prop: /desktop-icons/icon-size, type: uint, value: "{{ xfce_desktop_icon_size }}" }
+    - { channel: xfce4-desktop, prop: /desktop-icons/use-custom-font-size, type: bool, value: "true" }
+    - { channel: xfce4-desktop, prop: /desktop-icons/font-size, type: double, value: "{{ xfce_desktop_font_size }}" }
+  loop_control:
+    label: "{{ item.channel }}{{ item.prop }}"
+  register: xwayland_xfce_sizes
+  changed_when: "'CHANGED' in xwayland_xfce_sizes.stdout"
+  when: xwayland_xfconf.stat.exists
+  tags:
+    - gui
+    - xwayland
+
+# WINGs (the toolkit behind the Run dialog, alerts, input panels and WPrefs)
+# reads its fonts from the WMGLOBAL domain and scales those panels from the
+# system font size.
+- name: Set WINGs dialog font size (WMGLOBAL)
+  copy:
+    content: |
+      {
+        SystemFont = "sans serif:pixelsize={{ wmaker_dialog_font_pixelsize }}";
+        BoldSystemFont = "sans serif:bold:pixelsize={{ wmaker_dialog_font_pixelsize }}";
+        DefaultFontSize = {{ wmaker_dialog_font_pixelsize }};
+        AntialiasedText = YES;
+      }
+    dest: "{{ user_home }}/GNUstep/Defaults/WMGLOBAL"
+    owner: "{{ target_user }}"
+    group: "{{ target_user }}"
+    mode: '0644'
+  when: xwayland_wmaker_defaults.stat.exists
+  tags:
+    - gui
+    - xwayland
+    - wmaker_dialogs
+    - wmaker
+
+# ── 7d2. Window Maker dock launchers (Firefox, Chromium, ...) ─────────────────
+# Renders the whole dock from wmaker_dock_apps on every run, so dock changes made
+# in the GUI are replaced. Set wmaker_manage_dock: false to leave the dock alone.
+# Window Maker rewrites WMState when it exits, so run this while it is stopped.
+
+- name: Deploy Window Maker dock (WMState) and dock icons (WMWindowAttributes)
+  template:
+    src: "{{ item }}.j2"
+    dest: "{{ user_home }}/GNUstep/Defaults/{{ item }}"
+    owner: "{{ target_user }}"
+    group: "{{ target_user }}"
+    mode: '0644'
+    backup: yes
+  loop:
+    - WMState
+    - WMWindowAttributes
+  when:
+    - wmaker_manage_dock | bool
+    - xwayland_wmaker_defaults.stat.exists
+  tags:
+    - gui
+    - xwayland
+    - wmaker_dock
+    - wmaker
+
+# ── 7e. Audio: use the WSLg PulseAudio server, never a local daemon ──────────
+# WSLg exposes PulseAudio at /mnt/wslg/PulseServer, but LightDM sessions do not
+# inherit PULSE_SERVER, and the apt pulseaudio package starts its own daemon
+# (socket-activated) with no sound device. Point every client at WSLg through
+# client.conf and mask the local daemon.
+
+- name: Ensure pulse client.conf.d exists
+  become: true
+  file:
+    path: /etc/pulse/client.conf.d
+    state: directory
+    mode: '0755'
+  tags:
+    - gui
+    - xwayland
+    - audio
+
+- name: Point PulseAudio clients at the WSLg server
+  become: true
+  copy:
+    content: |
+      default-server = unix:/mnt/wslg/PulseServer
+      autospawn = no
+    dest: /etc/pulse/client.conf.d/00-wslg.conf
+    owner: root
+    group: root
+    mode: '0644'
+  tags:
+    - gui
+    - xwayland
+    - audio
+
+- name: Mask the local PulseAudio user units (WSLg provides the server)
+  become: true
+  file:
+    src: /dev/null
+    dest: "/etc/systemd/user/{{ item }}"
+    state: link
+    force: yes
+  loop:
+    - pulseaudio.service
+    - pulseaudio.socket
+  tags:
+    - gui
+    - xwayland
+    - audio
 
 # ── 8. Desktop session selection and start helper ────────────────────────────
 
@@ -339,6 +527,7 @@
     content: |
       [Seat:*]
       autologin-session={{ desktop_session }}
+      user-session={{ desktop_session }}
     dest: /etc/lightdm/lightdm.conf.d/50-desktop-session.conf
     owner: root
     group: root

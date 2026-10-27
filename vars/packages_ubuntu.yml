@@ -48,6 +48,9 @@ packages_ubuntu_gui:
   - pcmanfm
   - meld
   - firefox
-  - chromium-browser
   - git-cola
   - gitg
+  - vlc
+  - audacious
+  - rhythmbox
+  - clementine

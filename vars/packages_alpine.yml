@@ -57,5 +57,8 @@ packages_alpine_gui:
   - pcmanfm
   - meld
   - firefox
-  - chromium
   - gitg
+  - vlc
+  - audacious
+  - rhythmbox
+  - clementine

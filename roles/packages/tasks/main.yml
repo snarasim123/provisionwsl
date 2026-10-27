@@ -45,6 +45,54 @@
     - gui
   when: is_ubuntu and not (gui_skipped | default(false))
 
+# Google Chrome is not in the Ubuntu archive; install it from Google's apt repo (amd64 only).
+- name: Create apt keyrings directory
+  file:
+    path: /etc/apt/keyrings
+    state: directory
+    mode: '0755'
+  become: true
+  tags:
+    - packages
+    - gui
+    - chrome
+  when: is_ubuntu and ansible_architecture == 'x86_64' and not (gui_skipped | default(false))
+
+- name: Add Google Chrome apt signing key
+  get_url:
+    url: https://dl.google.com/linux/linux_signing_key.pub
+    dest: /etc/apt/keyrings/google-chrome.asc
+    mode: '0644'
+  become: true
+  tags:
+    - packages
+    - gui
+    - chrome
+  when: is_ubuntu and ansible_architecture == 'x86_64' and not (gui_skipped | default(false))
+
+- name: Add Google Chrome apt repository
+  apt_repository:
+    repo: "deb [arch=amd64 signed-by=/etc/apt/keyrings/google-chrome.asc] https://dl.google.com/linux/chrome/deb/ stable main"
+    filename: google-chrome
+    state: present
+  become: true
+  tags:
+    - packages
+    - gui
+    - chrome
+  when: is_ubuntu and ansible_architecture == 'x86_64' and not (gui_skipped | default(false))
+
+- name: Install Google Chrome
+  apt:
+    name: google-chrome-stable
+    state: present
+  become: true
+  tags:
+    - packages
+    - gui
+    - chrome
+  when: is_ubuntu and ansible_architecture == 'x86_64' and not (gui_skipped | default(false))
+
 # - name: Upgrade all fedora packages
 #   ansible.builtin.dnf:
 #     name: "*"

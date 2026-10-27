@@ -1,0 +1,49 @@
+{
+  Dock = {
+    Applications = (
+      {
+        Command = "/usr/bin/WPrefs";
+        Name = Logo.WMDock;
+        AutoLaunch = No;
+        Forced = No;
+        Position = "0,0";
+        Lock = Yes;
+      }{% for app in wmaker_dock_apps %},
+      {
+        Command = "{{ app.command }}";
+        Name = "{{ app.name }}";
+        AutoLaunch = No;
+        Forced = No;
+        Position = "0,{{ loop.index }}";
+      }{% endfor %}
+
+    );
+    {# Window Maker stores the dock position in absolute pixels and clamps it into
+       the screen: 0 is the left edge, and a value past the right edge snaps to it
+       whatever the screen width. A negative x is treated as the left edge. #}
+    Position = "{{ '99999' if wmaker_dock_side == 'right' else '0' }},0";
+    Lowered = No;
+  };
+  Clip = {
+    Command = "-";
+    Name = Logo.WMClip;
+    AutoLaunch = No;
+    StartHidden = No;
+    StartMiniaturized = No;
+    Forced = No;
+    Position = "0,0";
+    DropCommand = "wmsetbg -u -t %d";
+  };
+  Workspaces = (
+    {
+      Name = "Main";
+      Clip = {
+        Applications = ();
+        Lowered = Yes;
+        Collapsed = No;
+        AutoAttractIcons = No;
+        KeepAttracted = No;
+      };
+    }
+  );
+}
