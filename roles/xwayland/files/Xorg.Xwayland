@@ -39,7 +39,10 @@ done
 # Resolution is replaced by Ansible during deployment
 # No -fullscreen: it overrides -geometry with the monitor size (5120x2880 on a 5K
 # display), and every frame of that screen is copied to Windows, which makes GUI apps slow.
-command=("/usr/bin/Xwayland" ":${displayNumber}" "-geometry" "@@XWAYLAND_RESOLUTION@@" "$@")
+command=("/usr/bin/Xwayland" ":${displayNumber}" "-geometry" "@@XWAYLAND_RESOLUTION@@")
+# -decorate (Xwayland >= 23.1) adds a title bar with minimize/maximize/close buttons.
+/usr/bin/Xwayland -help 2>&1 | grep -q -- '-decorate' && command+=("-decorate")
+command+=("$@")
 
 systemd-cat -t /usr/bin/Xorg echo "Starting Xwayland:" "${command[@]}"
 

@@ -263,6 +263,10 @@
       # Keep the resolution set by xwayland-resolution.sh (see 01-unity-greeter)
       [org/mate/settings-daemon/plugins/xrandr]
       active=false
+
+      # Title-bar buttons drawn by libdecor for the rootful Xwayland window (-decorate)
+      [org/gnome/desktop/wm/preferences]
+      button-layout='appmenu:minimize,maximize,close'
     dest: /etc/dconf/db/local.d/00-xwayland-dpi
     owner: root
     group: root
