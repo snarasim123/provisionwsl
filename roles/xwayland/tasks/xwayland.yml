@@ -239,6 +239,11 @@
       xft-dpi={{ desktop_dpi }}.0
       background='{{ greeter_background }}'
       draw-user-backgrounds={{ greeter_draw_user_backgrounds | bool | lower }}
+
+      # The xrandr plugin resets the screen to the monitor size (5120x2880 on a 5K
+      # display) after xwayland-resolution.sh has set xwayland_resolution.
+      [com/canonical/unity/settings-daemon/plugins/xrandr]
+      active=false
     dest: /etc/dconf/db/local.d/01-unity-greeter
     owner: root
     group: root
@@ -254,6 +259,10 @@
     content: |
       [org/mate/desktop/font-rendering]
       dpi={{ desktop_dpi }}.0
+
+      # Keep the resolution set by xwayland-resolution.sh (see 01-unity-greeter)
+      [org/mate/settings-daemon/plugins/xrandr]
+      active=false
     dest: /etc/dconf/db/local.d/00-xwayland-dpi
     owner: root
     group: root
@@ -263,10 +272,35 @@
     - gui
     - xwayland
 
+# Locked because unity-greeter writes active=true into the lightdm user's own dconf db,
+# which would otherwise override the system value.
+- name: Lock the xrandr plugin settings (dconf)
+  become: true
+  block:
+    - name: Ensure dconf locks directory exists
+      file:
+        path: /etc/dconf/db/local.d/locks
+        state: directory
+        mode: '0755'
+
+    - name: Write dconf locks for the xrandr plugins
+      copy:
+        content: |
+          /com/canonical/unity/settings-daemon/plugins/xrandr/active
+          /org/mate/settings-daemon/plugins/xrandr/active
+        dest: /etc/dconf/db/local.d/locks/00-xwayland-xrandr
+        owner: root
+        group: root
+        mode: '0644'
+      register: xwayland_dconf_locks
+  tags:
+    - gui
+    - xwayland
+
 - name: Refresh dconf database
   become: true
   command: dconf update
-  when: xwayland_dconf_greeter is changed or xwayland_dconf_dpi is changed
+  when: xwayland_dconf_greeter is changed or xwayland_dconf_dpi is changed or xwayland_dconf_locks is changed
   failed_when: false
   tags:
     - gui
@@ -389,6 +423,7 @@
     - { channel: xsettings, prop: /Gtk/CursorThemeSize, type: int, value: "{{ xfce_cursor_size }}" }
     - { channel: xfwm4, prop: /general/theme, type: string, value: "{{ xfce_wm_theme }}" }
     - { channel: xfwm4, prop: /general/title_font, type: string, value: "Sans Bold {{ xfce_title_font_size }}" }
+    - { channel: xfwm4, prop: /general/use_compositing, type: bool, value: "{{ xfce_compositing | bool | lower }}" }
     # Top panel and bottom dock
     - { channel: xfce4-panel, prop: /panels/panel-1/size, type: uint, value: "{{ xfce_panel_size }}", existing_only: true }
     - { channel: xfce4-panel, prop: /panels/panel-1/icon-size, type: uint, value: "{{ xfce_panel_icon_size }}", existing_only: true }
@@ -501,6 +536,41 @@
     - xwayland
     - audio
 
+# VLC's PulseAudio output keeps losing sync with the WSLg RDP sink ("cannot synchronize
+# start", "flushing buffers"), and video stutters because VLC times it against audio.
+# ALSA output still reaches WSLg through the ALSA pulse plugin, without the sync errors.
+# Other video players that sync video to audio can stutter the same way; switch their
+# audio output to ALSA too, e.g. mpv: ao=alsa in ~/.config/mpv/mpv.conf; GStreamer
+# apps: set the audio sink to alsasink. Audio-only players (Clementine, Rhythmbox,
+# Audacious) have no video to stutter and are left on PulseAudio (untested); switch
+# them only if the audio drops out.
+- name: Ensure VLC config directory exists
+  become: true
+  become_user: "{{ target_user }}"
+  file:
+    path: "{{ user_home }}/.config/vlc"
+    state: directory
+    mode: '0755'
+  tags:
+    - gui
+    - xwayland
+    - audio
+
+- name: Use ALSA audio output in VLC
+  become: true
+  become_user: "{{ target_user }}"
+  community.general.ini_file:
+    path: "{{ user_home }}/.config/vlc/vlcrc"
+    section: core
+    option: aout
+    value: alsa
+    no_extra_spaces: true
+    mode: '0644'
+  tags:
+    - gui
+    - xwayland
+    - audio
+
 # ── 8. Desktop session selection and start helper ────────────────────────────
 
 - name: Validate desktop_session
@@ -529,6 +599,40 @@
       autologin-session={{ desktop_session }}
       user-session={{ desktop_session }}
     dest: /etc/lightdm/lightdm.conf.d/50-desktop-session.conf
+    owner: root
+    group: root
+    mode: '0644'
+  tags:
+    - gui
+    - xwayland
+
+# WSLg sizes the Xwayland window to the monitor (5120x2880 on a 5K display) whatever
+# -geometry says. LightDM runs this script after the X server starts, before the greeter.
+- name: Install Xwayland resolution setup script
+  become: true
+  copy:
+    content: |
+      #!/bin/sh
+      # LightDM display-setup-script: set the X screen to {{ xwayland_resolution }}
+      out=$(xrandr | awk '/ connected/ {print $1; exit}')
+      xrandr --output "$out" --mode {{ xwayland_resolution }} ||
+        systemd-cat -t xwayland-resolution echo "mode {{ xwayland_resolution }} not available on $out"
+      exit 0
+    dest: /usr/local/bin/xwayland-resolution.sh
+    owner: root
+    group: root
+    mode: '0755'
+  tags:
+    - gui
+    - xwayland
+
+- name: Run the resolution script when LightDM starts X
+  become: true
+  copy:
+    content: |
+      [Seat:*]
+      display-setup-script=/usr/local/bin/xwayland-resolution.sh
+    dest: /etc/lightdm/lightdm.conf.d/40-xwayland-resolution.conf
     owner: root
     group: root
     mode: '0644'

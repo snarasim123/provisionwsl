@@ -2,17 +2,18 @@
 # Global display settings used by the xwayland role (Xorg wrapper, monitors.xml,
 # LightDM greeter, MATE dconf).
 
-# Resolution of the Xwayland virtual screen (WIDTHxHEIGHT)
+# Resolution of the Xwayland desktop window (WIDTHxHEIGHT). The desktop opens as a
+# window of this size. Every frame is copied to Windows, so a larger size is slower.
 xwayland_resolution: "1920x1080"
 
 # Monitor refresh rate (used in monitors.xml)
 monitor_refresh_rate: "59.963"
 
-# Font scaling: 96 = Xwayland default (tiny on high-res displays); 120/144/192 scale up.
-desktop_dpi: 192
+# Font scaling: 96 is the standard for 1920x1080; 120/144/192 scale up.
+desktop_dpi: 96
 
 # Greeter font (unity-greeter, dconf font-name format: "Family Size")
-greeter_font: "Ubuntu 20"
+greeter_font: "Ubuntu 12"
 
 # Greeter background: an image path or a color (e.g. "#2C001E"). With
 # greeter_draw_user_backgrounds true the greeter shows the user's last desktop
@@ -21,29 +22,30 @@ greeter_background: "/usr/share/backgrounds/cosmos/galaxy-ngc3370.jpg"
 greeter_draw_user_backgrounds: false
 
 # Window Maker menu/title font pixel size (Window Maker ignores DPI; 12 is its default)
-wmaker_font_pixelsize: 36
+wmaker_font_pixelsize: 16
 
 # Window Maker move/resize popup font pixel size (default 24)
-wmaker_display_font_pixelsize: 48
+wmaker_display_font_pixelsize: 24
 
 # Window Maker dialog font pixel size (Run dialog, alerts, input panels, WPrefs; WINGs scales
 # these panels from it; default 12)
-wmaker_dialog_font_pixelsize: 32
+wmaker_dialog_font_pixelsize: 14
 
 # Window Maker IconSize in pixels (default 64). Also sets the size of the dock,
 # clip, drawers and app icons.
-wmaker_icon_size: 128
+wmaker_icon_size: 64
 
 # XFCE sizes (written with xfconf-query for the target user)
-xfce_font_size: 14            # GTK menu/app font size in points
-xfce_title_font_size: 18      # window title font in points; keep its pixel height (pt x desktop_dpi / 72 x ~1.2) below the theme title height or the bar grows past the theme images
-xfce_wm_theme: "Yaru-xhdpi"  # window frame theme; its images set the title bar and button size (title/button px: Default 29, Default-hdpi 43, Default-xhdpi 58, Yaru 36, Yaru-hdpi 54, Yaru-xhdpi 72)
-xfce_cursor_size: 48          # mouse cursor size in pixels
-xfce_panel_size: 56           # top panel height in pixels
-xfce_panel_icon_size: 40      # top panel icon size in pixels
-xfce_dock_size: 112            # bottom dock panel height in pixels
-xfce_desktop_icon_size: 112    # desktop icon size in pixels
-xfce_desktop_font_size: 18    # desktop icon label font size in points
+xfce_font_size: 10            # GTK menu/app font size in points
+xfce_title_font_size: 10      # window title font in points; keep its pixel height (pt x desktop_dpi / 72 x ~1.2) below the theme title height or the bar grows past the theme images
+xfce_wm_theme: "Yaru"         # window frame theme; its images set the title bar and button size (title/button px: Default 29, Default-hdpi 43, Default-xhdpi 58, Yaru 36, Yaru-hdpi 54, Yaru-xhdpi 72)
+xfce_cursor_size: 24          # mouse cursor size in pixels
+xfce_panel_size: 32           # top panel height in pixels
+xfce_panel_icon_size: 24      # top panel icon size in pixels
+xfce_dock_size: 56            # bottom dock panel height in pixels
+xfce_desktop_icon_size: 56    # desktop icon size in pixels
+xfce_desktop_font_size: 10    # desktop icon label font size in points
+xfce_compositing: false       # xfwm4 compositor (shadows, transparency); off because it redraws the whole screen and slows the desktop in WSL
 
 # Window Maker dock launchers, in order from the top (below the WPrefs logo).
 # name is the window's WM_INSTANCE.WM_CLASS (check with xprop); a wrong name still

@@ -37,7 +37,9 @@ done
 
 # Here you can change or add options to fit your needs
 # Resolution is replaced by Ansible during deployment
-command=("/usr/bin/Xwayland" ":${displayNumber}" "-geometry" "@@XWAYLAND_RESOLUTION@@" "-fullscreen" "$@")
+# No -fullscreen: it overrides -geometry with the monitor size (5120x2880 on a 5K
+# display), and every frame of that screen is copied to Windows, which makes GUI apps slow.
+command=("/usr/bin/Xwayland" ":${displayNumber}" "-geometry" "@@XWAYLAND_RESOLUTION@@" "$@")
 
 systemd-cat -t /usr/bin/Xorg echo "Starting Xwayland:" "${command[@]}"
 
