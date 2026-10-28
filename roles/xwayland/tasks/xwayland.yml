@@ -575,6 +575,67 @@
     - xwayland
     - audio
 
+# Video inside the rootful Xwayland desktop is drawn in software and copied again to
+# Windows: a 1080p60 clip had 162-449 of 600 frames late, versus 1 on WSLg directly.
+# This extra launcher opens VLC as its own Windows window on WSLg (:0). The gl output
+# crashed on WSLg and hardware decoding is unreliable across machines, so both are off.
+- name: Ensure ~/.local/bin and applications directories exist
+  become: true
+  become_user: "{{ target_user }}"
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: '0755'
+  loop:
+    - "{{ user_home }}/.local/bin"
+    - "{{ user_home }}/.local/share/applications"
+  tags:
+    - gui
+    - xwayland
+    - vlc
+
+- name: Install vlc-wslg wrapper
+  become: true
+  become_user: "{{ target_user }}"
+  copy:
+    content: |
+      #!/bin/sh
+      # Open VLC directly on WSLg (:0) instead of inside the Xwayland desktop.
+      unset WAYLAND_DISPLAY
+      export DISPLAY=:0
+      exec /usr/bin/vlc --vout=xcb_x11 --avcodec-hw=none "$@"
+    dest: "{{ user_home }}/.local/bin/vlc-wslg"
+    mode: '0755'
+  tags:
+    - gui
+    - xwayland
+    - vlc
+
+- name: Read the VLC desktop entry
+  slurp:
+    src: /usr/share/applications/vlc.desktop
+  register: vlc_desktop_entry
+  tags:
+    - gui
+    - xwayland
+    - vlc
+
+- name: Add "VLC (WSLg window)" menu entry
+  become: true
+  become_user: "{{ target_user }}"
+  copy:
+    content: >-
+      {{ vlc_desktop_entry.content | b64decode
+         | regex_replace('(?m)^Name\[.*\n', '')
+         | regex_replace('(?m)^Name=.*$', 'Name=VLC (WSLg window)')
+         | regex_replace('(?m)^(Exec|TryExec)=/usr/bin/vlc', '\1=' ~ user_home ~ '/.local/bin/vlc-wslg') }}
+    dest: "{{ user_home }}/.local/share/applications/vlc-wslg.desktop"
+    mode: '0644'
+  tags:
+    - gui
+    - xwayland
+    - vlc
+
 # ── 8. Desktop session selection and start helper ────────────────────────────
 
 - name: Validate desktop_session
